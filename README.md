@@ -1,2 +1,2 @@
 # pants
-PArser iN TypeScript
+Pants is a parser combinator library for Typescript.

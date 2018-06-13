@@ -8,7 +8,7 @@ export class Success<T> {
     /**
      * Returns an object representing a successful parse.
      * @param istream The remaining string.
-     * @param res The result (usually an AST node)
+     * @param res The result of the parse
      */
     constructor(istream: string, res: T) {
         this.inputstream = istream;
@@ -45,7 +45,7 @@ export interface IParser<T> {
 
 /**
  * result succeeds without consuming any input, and returns v.
- * @param v A value (usually an AST node).
+ * @param v The result of the parse.
  */
 export function result<T>(v: T) : IParser<T> {
     return (istream) => new Success<T>(istream, v);
@@ -67,7 +67,7 @@ export function item() {
         if (istream.length == 0) {
             return new Failure(istream);
         } else {
-            return new Success(istream.charAt(0), istream.slice(1,istream.length));
+            return new Success(istream.slice(1,istream.length), istream.charAt(0));
         }
     }
 }

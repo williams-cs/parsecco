@@ -32,3 +32,11 @@ describe('Zero combinator', () => {
         // }
     });
 });
+
+describe('item combinator', () => {
+    it('should successfully consume input when there is input to consume', () => {
+        const inputstream = "helloworld";
+        const output = pants.item()(inputstream);
+        expect(output.inputstream).to.equal("elloworld");
+    });
+});

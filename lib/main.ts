@@ -96,10 +96,11 @@ export function bind<T,U>(p: IParser<T>) {
  * otherwise it fails.
  * @param pred 
  */
-export function sat<T>(pred: (string) => boolean) {
-    function checker<T>(pred: (string) => boolean) : IParser<T> {
+export function sat(pred: (string) => boolean) : IParser<string> {
+    function checker(pred: (string) => boolean) : IParser<string> {
         return 
             (istream: string) => {
+                console.log("DEBUG: istream = " + istream);
                 if (pred(istream)) {
                     result(istream);
                 } else {
@@ -107,5 +108,7 @@ export function sat<T>(pred: (string) => boolean) {
                 }
             }
     }
-    return bind<string,T>(item())(checker(pred))
+    console.log("DEBUG: about to bind two parsers");
+    console.log("DEBUG: pred is: " + pred);
+    return bind<string,string>(item())(checker(pred))
 }

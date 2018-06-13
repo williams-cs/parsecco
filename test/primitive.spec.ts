@@ -23,13 +23,14 @@ describe('Zero combinator', () => {
         const inputstream = "helloworld";
         const output = pants.zero<string>()(inputstream);
         expect(output.inputstream).to.equal(inputstream);
-        // TODO: this test does not work for non-obvious reasons
-        // switch(output.tag) {
-        //     case "failure": assert(true);
-        //     default:
-        //         console.log(output.tag);
-        //         assert.fail();
-        // }
+        switch(output.tag) {
+            case "failure":
+                assert(true);
+                break;
+            default:
+                assert.fail();
+                break;
+        }
     });
 });
 
@@ -44,7 +45,14 @@ describe('Item combinator', () => {
         const inputstream = "";
         const output = pants.item()(inputstream);
         expect(output.inputstream).to.equal("");
-        // TODO: check for failure object
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        }
     });
 });
 
@@ -54,8 +62,12 @@ describe('Sat combinator', () => {
         const output = pants.sat((s) => s === "h")(inputstream);
         expect(output.inputstream).to.equal("elloworld");
         switch(output.tag) {
-            case "success": expect(output.result).to.equal("h");
-            case "failure": assert.fail();
+            case "success":
+                expect(output.result).to.equal("h");
+                break;
+            case "failure":
+                assert.fail();
+                break;
         }
     })
 })

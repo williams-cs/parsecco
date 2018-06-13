@@ -2,7 +2,7 @@
  * Represents a successful parse.
  */
 export class Success<T> {
-    tag: "success";
+    tag: "success" = "success";
     result: T;
     inputstream: string;
     /**
@@ -20,7 +20,7 @@ export class Success<T> {
  * Represents a failed parse.
  */
 export class Failure {
-    tag: "failure";
+    tag: "failure" = "failure";
     inputstream: string;
     /**
      * Returns an object representing a failed parse.
@@ -79,11 +79,11 @@ export function item() {
  * @param p 
  */
 export function bind<T,U>(p: IParser<T>) {
-    return (f: IParser<U>) => {
+    return (f: (t: T) => IParser<U>) => {
         return (istream: string) => {
             let r = p(istream)
             switch (r.tag) {
-                case "success": return f(r.inputstream);
+                case "success": return f(r.result)(r.inputstream);
                 case "failure": return r;
             }
         }
@@ -96,19 +96,14 @@ export function bind<T,U>(p: IParser<T>) {
  * otherwise it fails.
  * @param pred 
  */
-export function sat(pred: (string) => boolean) : IParser<string> {
-    function checker(pred: (string) => boolean) : IParser<string> {
-        return 
-            (istream: string) => {
-                console.log("DEBUG: istream = " + istream);
-                if (pred(istream)) {
-                    result(istream);
-                } else {
-                    return zero();
-                }
-            }
-    }
-    console.log("DEBUG: about to bind two parsers");
-    console.log("DEBUG: pred is: " + pred);
-    return bind<string,string>(item())(checker(pred))
+export function sat(pred: (s: string) => boolean) : IParser<string> {
+    let a: IParser<string> = item();
+    let b = (x: string) => {
+        if (pred(x)) {
+            return result(x);
+        } else {
+            return zero<string>();
+        }
+    };
+    return bind<string,string>(a)(b);
 }

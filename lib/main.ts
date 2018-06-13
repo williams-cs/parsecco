@@ -1,7 +1,7 @@
 /**
  * Represents a successful parse.
  */
-class Success<T> {
+export class Success<T> {
     tag: "success";
     result: T;
     inputstream: string;
@@ -19,7 +19,7 @@ class Success<T> {
 /**
  * Represents a failed parse.
  */
-class Failure {
+export class Failure {
     tag: "failure";
     inputstream: string;
     /**
@@ -34,12 +34,12 @@ class Failure {
 /**
  * Union type representing a successful or failed parse.
  */
-type Outcome<T> = Success<T> | Failure;
+export type Outcome<T> = Success<T> | Failure;
 
 /**
  * Generic type of a parser.
  */
-interface IParser<T> {
+export interface IParser<T> {
     (inputstream: string) : Outcome<T>
 }
 
@@ -47,14 +47,14 @@ interface IParser<T> {
  * result succeeds without consuming any input, and returns v.
  * @param v A value (usually an AST node).
  */
-function result<T>(v: T) : IParser<T> {
+export function result<T>(v: T) : IParser<T> {
     return (istream) => new Success<T>(istream, v);
 }
 
 /**
  * zero fails without consuming any input.
  */
-function zero<T>() : IParser<T> {
+export function zero<T>() : IParser<T> {
     return (istream) => new Failure(istream);
 }
 
@@ -62,7 +62,7 @@ function zero<T>() : IParser<T> {
  * item successfully consumes the first character if the input
  * string is non-empty, otherwise it fails.
  */
-function item() {
+export function item() {
     return (istream: string) => {
         if (istream.length == 0) {
             return new Failure(istream);
@@ -78,7 +78,7 @@ function item() {
  * of p and f.
  * @param p 
  */
-function bind<T,U>(p: IParser<T>) {
+export function bind<T,U>(p: IParser<T>) {
     return (f: IParser<U>) => {
         return (istream: string) => {
             let r = p(istream)
@@ -90,17 +90,22 @@ function bind<T,U>(p: IParser<T>) {
     }
 }
 
-// TODO: this does not work
-let sat = function(pred: (string) => boolean) {
-    return bind(item())((istream: string) => {
-        if (pred(istream)) {
-            result(istream)
-        } else {
-            zero()
-        }
-    })
-}
-
-function helloworld() {
-    return "hello world!";
+/**
+ * sat takes a predicate and yields a parser that consumes a
+ * single character if the character satisfies the predicate,
+ * otherwise it fails.
+ * @param pred 
+ */
+export function sat<T>(pred: (string) => boolean) {
+    function checker<T>(pred: (string) => boolean) : IParser<T> {
+        return 
+            (istream: string) => {
+                if (pred(istream)) {
+                    result(istream);
+                } else {
+                    return zero();
+                }
+            }
+    }
+    return bind<string,T>(item())(checker(pred))
 }

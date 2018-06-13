@@ -1,7 +1,7 @@
 {
   "name": "pants",
   "version": "1.0.0",
-  "description": "pants is a parser combinator library, for Typescript",
+  "description": "pants is a PArser combinator library, iN TypeScript",
   "main": "./lib/main.js",
   "types": "./lib/main.d.ts",
   "dependencies": {},

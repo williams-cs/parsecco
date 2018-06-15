@@ -115,6 +115,34 @@ describe('Char parser', () => {
     });
 });
 
+describe('Letter parser', () => {
+    it('should successfully consume an alphabetic letter', () => {
+        const inputstream = "helloworld";
+        const output = pants.letter()(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal("h");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        };
+    });
+
+    it('should fail to consume a non-alphabetic letter', () => {
+        const inputstream = "!helloworld";
+        const output = pants.letter()(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        };
+    });
+});
+
 describe('Digit parser', () => {
     it('should successfully consume a numeric digit if the next character in the stream is a numeric character', () => {
         const inputstream = "0helloworld";
@@ -143,7 +171,7 @@ describe('Digit parser', () => {
     });
 });
 
-describe('upper parser', () => {
+describe('Upper parser', () => {
     it('should successfully consume an uppercase character if the next char in the stream is uppercase', () => {
         const inputstream = "Helloworld";
         const output = pants.upper()(inputstream);
@@ -171,7 +199,7 @@ describe('upper parser', () => {
     });
 });
 
-describe('lower parser', () => {
+describe('Lower parser', () => {
     it('should successfully consume a lower character if the next char in the stream is lowercase', () => {
         const inputstream = "helloworld";
         const output = pants.lower()(inputstream);
@@ -196,5 +224,33 @@ describe('lower parser', () => {
                 assert(true);
                 break;
         };
+    });
+});
+
+describe('Choice parser', () => {
+    it('should allow parsing alternatives', () => {
+        const inputstream = "helloworld";
+        const output = pants.choice(pants.upper())(pants.lower())(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal("h");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should fail if no alternatives can be applied', () => {
+        const inputstream = "4helloworld";
+        const output = pants.choice(pants.upper())(pants.lower())(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        }
     });
 });

@@ -143,6 +143,18 @@ export function char(c: string) : IParser<string> {
 }
 
 /**
+ * letter returns a parser that consumes a single alphabetic
+ * character, from a-z, regardless of case.
+ */
+export function letter() : IParser<string> {
+    let contains_letter = (x: string) => {
+        let a_letter = /[A-Za-z]/;
+        return x.match(a_letter) != undefined;
+    }
+    return sat(contains_letter);
+}
+
+/**
  * digit returns a parser that consumes a single numeric
  * character, from 0-9.  Note that the type of the result
  * is a string, not a number.
@@ -165,7 +177,28 @@ export function digit() : IParser<string> {
  * if that character is uppercase.
  */
 export function upper() : IParser<string> {
-    return sat(x => x == x.toUpperCase());
+    return (istream: string) => {
+        let o1 = letter()(istream);
+        switch(o1.tag) {
+            case "success":
+                let o2 = sat(x => x == x.toUpperCase())(o1.result);
+                switch(o2.tag) {
+                    case "success":
+                        return o1;
+                        break;
+                    case "failure":
+                        // TODO: this is not correct
+                        return o1;
+                }
+                break;
+            case "failure":
+                return o1;
+                break;
+        }
+        
+        
+        throw new Error();
+    }
 }
 
 /**
@@ -174,4 +207,27 @@ export function upper() : IParser<string> {
  */
 export function lower() : IParser<string> {
     return sat(x => x == x.toLowerCase());
+}
+
+/**
+ * choice specifies an ordered choice between two parsers,
+ * p1 and p2. The returned parser will first apply
+ * parser p1.  If p1 succeeds, p1's Outcome is returned.
+ * If p2 fails, p2 is applied and the Outcome of p2 is returned.
+ * Note that the input stream given to p1 and p2 is exactly
+ * the same input stream.
+ * @param p1 A parser.
+ */
+export function choice<T>(p1: IParser<T>) {
+    return (p2: IParser<T>) => {
+        return (istream: string) => {
+            let o = p1(istream)
+            switch(o.tag) {
+                case "success":
+                    return o;
+                case "failure":
+                    return p2(istream);
+            }
+        };
+    };
 }

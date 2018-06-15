@@ -144,7 +144,7 @@ describe('Digit parser', () => {
 });
 
 describe('upper parser', () => {
-    it('should successfully consume an uppercase character is the next char in the stream is uppercase', () => {
+    it('should successfully consume an uppercase character if the next char in the stream is uppercase', () => {
         const inputstream = "Helloworld";
         const output = pants.upper()(inputstream);
         switch(output.tag) {
@@ -160,6 +160,34 @@ describe('upper parser', () => {
     it('should fail if the next character in the stream is not uppercase', () => {
         const inputstream = "hElloworld";
         const output = pants.upper()(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        };
+    });
+});
+
+describe('lower parser', () => {
+    it('should successfully consume a lower character if the next char in the stream is lowercase', () => {
+        const inputstream = "helloworld";
+        const output = pants.lower()(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal("h");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should fail if the next character in the stream is not lowercase', () => {
+        const inputstream = "Helloworld";
+        const output = pants.lower()(inputstream);
         switch(output.tag) {
             case "success":
                 assert.fail();

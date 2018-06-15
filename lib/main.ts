@@ -167,3 +167,11 @@ export function digit() : IParser<string> {
 export function upper() : IParser<string> {
     return sat(x => x == x.toUpperCase());
 }
+
+/**
+ * lower returns a parser that consumes a single character
+ * if that character is lowercase.
+ */
+export function lower() : IParser<string> {
+    return sat(x => x == x.toLowerCase());
+}

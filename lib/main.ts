@@ -76,7 +76,7 @@ export function item() {
  * bind is a curried function that takes a parser p and returns
  * a function that takes a parser f which returns the composition
  * of p and f.
- * @param p 
+ * @param p A parser
  */
 export function bind<T,U>(p: IParser<T>) {
     return (f: (t: T) => IParser<U>) => {
@@ -88,6 +88,27 @@ export function bind<T,U>(p: IParser<T>) {
             }
         }
     }
+}
+
+/**
+ * seq is a curried function that takes a parser p, a parser q,
+ * and a function f. It applies p to the input, passing the
+ * remaining input stream to q; q is then applied.  The function
+ * f takes the result of p and q, as a tuple, and returns
+ * a single result.
+ * @param p A parser
+ */
+export function seq<T,U,V>(p: IParser<T>) {
+    return (q: IParser<U>) => {
+        return (f: (e: [T,U]) => V) => {
+            return bind<T,V>(p)((x) => {
+                return bind<U,V>(q)((y) => {
+                    let tup : [T,U] = [x,y];
+                    return result<V>(f(tup));
+                });
+            });
+        }
+    };
 }
 
 /**

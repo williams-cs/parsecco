@@ -69,5 +69,20 @@ describe('Sat parser', () => {
                 assert.fail();
                 break;
         }
-    })
-})
+    });
+});
+
+describe('Seq parser', () => {
+    it('should successfully apply two parsers in a row', () => {
+        const inputstream = "helloworld";
+        const output = pants.seq(pants.item())(pants.item())((tup) => tup[1] + tup[0])(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal("eh");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+});

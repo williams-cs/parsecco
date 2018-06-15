@@ -86,3 +86,31 @@ describe('Seq parser', () => {
         }
     });
 });
+
+describe('Char parser', () => {
+    it('should successfully consume the given character if it is next in the stream', () => {
+        const inputstream = "helloworld";
+        const output = pants.char("h")(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal("h");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        };
+    });
+
+    it('should fail if the given character is not the next in the stream', () => {
+        const inputstream = "helloworld";
+        const output = pants.char("e")(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        }
+    });
+});

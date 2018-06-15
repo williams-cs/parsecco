@@ -128,3 +128,16 @@ export function sat(pred: (s: string) => boolean) : IParser<string> {
     };
     return bind<string,string>(a)(b);
 }
+
+/**
+ * char takes a character and yields a parser that consume
+ * that character. The returned parser succeeds if the next
+ * character in the input stream is c, otherwise it fails.
+ * @param c 
+ */
+export function char(c: string) : IParser<string> {
+    if (c.length != 1) {
+        throw new Error("char parser takes a string of length 1 (i.e., a char)");
+    }
+    return sat(x => x == c);
+}

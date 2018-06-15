@@ -116,7 +116,7 @@ describe('Char parser', () => {
 });
 
 describe('Digit parser', () => {
-    it('should successfully consume a numeric digit if the next character in the stream is numeric', () => {
+    it('should successfully consume a numeric digit if the next character in the stream is a numeric character', () => {
         const inputstream = "0helloworld";
         const output = pants.digit()(inputstream);
         switch(output.tag) {
@@ -129,7 +129,7 @@ describe('Digit parser', () => {
         };
     });
 
-    it('should fail if the next character in the stream is not numeric', () => {
+    it('should fail if the next character in the stream is not a numeric character', () => {
         const inputstream = "helloworld";
         const output = pants.digit()(inputstream);
         switch(output.tag) {
@@ -141,4 +141,32 @@ describe('Digit parser', () => {
                 break;
         };
     });
-})
+});
+
+describe('upper parser', () => {
+    it('should successfully consume an uppercase character is the next char in the stream is uppercase', () => {
+        const inputstream = "Helloworld";
+        const output = pants.upper()(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal("H");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should fail if the next character in the stream is not uppercase', () => {
+        const inputstream = "hElloworld";
+        const output = pants.upper()(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        };
+    });
+});

@@ -144,7 +144,7 @@ export function char(c: string) : IParser<string> {
 
 /**
  * digit returns a parser that consumes a single numeric
- * digit, from 0-9.  Note that the type of the result
+ * character, from 0-9.  Note that the type of the result
  * is a string, not a number.
  */
 export function digit() : IParser<string> {
@@ -158,4 +158,12 @@ export function digit() : IParser<string> {
                  || x == "7"
                  || x == "8"
                  || x == "9");
+}
+
+/**
+ * upper returns a parser that consumes a single character
+ * if that character is uppercase.
+ */
+export function upper() : IParser<string> {
+    return sat(x => x == x.toUpperCase());
 }

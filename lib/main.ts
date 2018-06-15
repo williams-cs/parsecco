@@ -141,3 +141,21 @@ export function char(c: string) : IParser<string> {
     }
     return sat(x => x == c);
 }
+
+/**
+ * digit returns a parser that consumes a single numeric
+ * digit, from 0-9.  Note that the type of the result
+ * is a string, not a number.
+ */
+export function digit() : IParser<string> {
+    return sat(x => x == "0"
+                 || x == "1"
+                 || x == "2"
+                 || x == "3"
+                 || x == "4"
+                 || x == "5"
+                 || x == "6"
+                 || x == "7"
+                 || x == "8"
+                 || x == "9");
+}

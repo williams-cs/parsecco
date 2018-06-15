@@ -114,3 +114,31 @@ describe('Char parser', () => {
         }
     });
 });
+
+describe('Digit parser', () => {
+    it('should successfully consume a numeric digit if the next character in the stream is numeric', () => {
+        const inputstream = "0helloworld";
+        const output = pants.digit()(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal("0");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        };
+    });
+
+    it('should fail if the next character in the stream is not numeric', () => {
+        const inputstream = "helloworld";
+        const output = pants.digit()(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        };
+    });
+})

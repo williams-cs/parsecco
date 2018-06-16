@@ -308,3 +308,17 @@ describe('Appfun parser', () => {
         }
     });
 });
+
+describe('Many parser', () => {
+    it('should apply the given parser as many times as it can', () => {
+        const inputstream = "helloworld";
+        const output = pants.many(pants.item())(inputstream);
+        expect(output.result).to.eql(["h","e","l","l","o","w","o","r","l","d"]);
+    });
+
+    it('including zero times', () => {
+        const inputstream = "";
+        const output = pants.many(pants.item())(inputstream);
+        expect(output.result).to.eql([]);
+    });
+});

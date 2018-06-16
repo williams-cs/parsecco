@@ -270,3 +270,32 @@ export function appfun<T,U>(p: IParser<T>) {
         }
     }
 }
+
+/**
+ * many repeatedly applies the parser p until p fails. many tries
+ * to guard against an infinite loop by raising an exception if p
+ * succeeds without changing the parser state. 
+ * @param p 
+ */
+export function many<T>(p: IParser<T>) {
+    return (istream: string) => {
+        let istream2 = istream;
+        let outputs: T[] = [];
+        let succeeds = true;
+        while(istream2.length > 0 && succeeds) {
+            let o = p(istream2);
+            switch(o.tag) {
+                case "success":
+                    if (istream2 == o.inputstream) {
+                        throw new Error("Parser loops infinitely.");
+                    } 
+                    istream2 = o.inputstream;
+                    outputs.push(o.result);
+                    break;
+                case "failure":
+                    break;
+            }
+        }
+        return new Success(istream2, outputs);
+    }
+}

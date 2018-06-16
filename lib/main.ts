@@ -248,3 +248,25 @@ export function choice<T>(p1: IParser<T>) {
         };
     };
 }
+
+/**
+ * appfun allows the user to apply a function f to
+ * the result of a parser p, assuming that p is successful.
+ * @param p A parser.  This is the same as the |>>
+ * function from FParsec.
+ */
+export function appfun<T,U>(p: IParser<T>) {
+    return (f: (t: T) => U) => {
+        return (istream: string) => {
+            let o = p(istream);
+            switch(o.tag) {
+                case "success":
+                    return new Success<U>(o.inputstream, f(o.result));
+                    break;
+                case "failure":
+                    return o;
+                    break;
+            }
+        }
+    }
+}

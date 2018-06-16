@@ -280,3 +280,31 @@ describe('Choice parser', () => {
         }
     });
 });
+
+describe('Appfun parser', () => {
+    it('should apply a function to the result of a successful parse', () => {
+        const inputstream = "helloworld";
+        const output = pants.appfun(pants.item())(s => "whatever!")(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal("whatever!");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should fail if p fails', () => {
+        const inputstream = "";
+        const output = pants.appfun(pants.item())(s => "whatever!")(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        }
+    });
+});

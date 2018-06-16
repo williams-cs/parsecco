@@ -187,18 +187,16 @@ export function upper() : IParser<string> {
                         return o1;
                         break;
                     case "failure":
-                        // TODO: this is not correct
-                        return o1;
+                        return new Failure(istream);
+                        break;
                 }
                 break;
             case "failure":
                 return o1;
                 break;
         }
-        
-        
-        throw new Error();
-    }
+        throw new Error("never happens");
+    };
 }
 
 /**
@@ -206,7 +204,26 @@ export function upper() : IParser<string> {
  * if that character is lowercase.
  */
 export function lower() : IParser<string> {
-    return sat(x => x == x.toLowerCase());
+    return (istream: string) => {
+        let o1 = letter()(istream);
+        switch(o1.tag) {
+            case "success":
+                let o2 = sat(x => x == x.toLowerCase())(o1.result);
+                switch(o2.tag) {
+                    case "success":
+                        return o1;
+                        break;
+                    case "failure":
+                        return new Failure(istream);
+                        break;
+                }
+                break;
+            case "failure":
+                return o1;
+                break;
+        }
+        throw new Error("never happens");
+    };
 }
 
 /**

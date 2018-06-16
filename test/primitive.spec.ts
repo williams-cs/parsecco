@@ -197,6 +197,19 @@ describe('Upper parser', () => {
                 break;
         };
     });
+
+    it('should fail if the next character in the stream is not a letter', () => {
+        const inputstream = "#helloworld";
+        const output = pants.upper()(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        };
+    });
 });
 
 describe('Lower parser', () => {
@@ -215,6 +228,19 @@ describe('Lower parser', () => {
 
     it('should fail if the next character in the stream is not lowercase', () => {
         const inputstream = "Helloworld";
+        const output = pants.lower()(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        };
+    });
+
+    it('should fail if the next character in the stream is not a letter', () => {
+        const inputstream = "#helloworld";
         const output = pants.lower()(inputstream);
         switch(output.tag) {
             case "success":

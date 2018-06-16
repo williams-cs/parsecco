@@ -322,3 +322,32 @@ describe('Many parser', () => {
         expect(output.result).to.eql([]);
     });
 });
+
+describe('Word parser', () => {
+    it('should match a string and leave remainder in inputstream', () => {
+        const inputstream = "helloworld";
+        const output = pants.word("hello")(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal("hello");
+                expect(output.inputstream).to.equal("world");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should fail if string is not in input stream', () => {
+        const inputstream = "worldhello";
+        const output = pants.word("hello")(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        }
+    })
+});

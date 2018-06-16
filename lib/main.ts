@@ -299,3 +299,14 @@ export function many<T>(p: IParser<T>) {
         return new Success(istream2, outputs);
     }
 }
+
+export function word(s: string) {
+    return (istream: string) => {
+        let re = new RegExp("^" + s);
+        if(istream.match(re)) {
+            return new Success<string>(istream.substring(s.length,istream.length), s);
+        } else {
+            return new Failure(istream);
+        }
+    }
+}

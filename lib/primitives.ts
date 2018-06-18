@@ -1,5 +1,3 @@
-import CharStream from '../lib/charstream';
-
 export namespace Primitives {
     /**
      * Represents a successful parse.
@@ -7,13 +5,13 @@ export namespace Primitives {
     export class Success<T> {
         tag: "success" = "success";
         result: T;
-        inputstream: CharStream;
+        inputstream: string;
         /**
          * Returns an object representing a successful parse.
          * @param istream The remaining string.
          * @param res The result of the parse
          */
-        constructor(istream: CharStream, res: T) {
+        constructor(istream: string, res: T) {
             this.inputstream = istream;
             this.result = res;
         }
@@ -24,12 +22,12 @@ export namespace Primitives {
      */
     export class Failure {
         tag: "failure" = "failure";
-        inputstream: CharStream;
+        inputstream: string;
         /**
          * Returns an object representing a failed parse.
          * @param istream The string, unmodified, that was given to the parser.
          */
-        constructor(istream: CharStream) {
+        constructor(istream: string) {
             this.inputstream = istream;
         }
     }
@@ -43,7 +41,7 @@ export namespace Primitives {
      * Generic type of a parser.
      */
     export interface IParser<T> {
-        (inputstream: CharStream) : Outcome<T>
+        (inputstream: string) : Outcome<T>
     }
 
     /**
@@ -66,7 +64,7 @@ export namespace Primitives {
      * string is non-empty, otherwise it fails.
      */
     export function item() {
-        return (istream: CharStream) => {
+        return (istream: string) => {
             if (istream.length == 0) {
                 return new Failure(istream);
             } else {

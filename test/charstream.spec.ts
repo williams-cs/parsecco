@@ -34,15 +34,54 @@ describe('CharStream', () => {
   it('should return EOF when the end of the input is reached', () => {
     const s = "helloworld";
     const cs = new CharStream(s);
-    const cs2 = cs.seek(10)
+    const cs2 = cs.seek(10);
     expect(cs2.isEOF()).to.equal(true);
   });
 
   it('should not be possible to seek too far', () => {
     const s = "helloworld";
     const cs = new CharStream(s);
-    const cs2 = cs.seek(100)
+    const cs2 = cs.seek(100);
     expect(cs2.isEOF()).to.equal(true);
-    expect(cs2.pos).to.equal(s.length);
+    expect(cs2.startpos).to.equal(s.length);
+  });
+
+  it('should be possible to obtain the head of a non-empty string', () => {
+    const s = "helloworld";
+    const cs = new CharStream(s);
+    const cs2 = cs.head();
+    expect(cs2.toString()).to.equal("h");
+  });
+
+  it('should not be possible to obtain the head of an empty string', () => {
+    const s = "";
+    const cs = new CharStream(s);
+    expect(function () { cs.head() }).to.throw();
+  });
+
+  it('should be possible to obtain the tail of a non-empty string', () => {
+    const s = "helloworld";
+    const cs = new CharStream(s);
+    const cs2 = cs.tail();
+    expect(cs2.toString()).to.equal("elloworld");
+  });
+
+  it('should not be possible to obtain the tail of an empty string', () => {
+    const s = "";
+    const cs = new CharStream(s);
+    expect(function () { cs.tail() }).to.throw();
+  });
+
+  it('at the EOF should also be empty', () => {
+    const s = "helloworld";
+    const cs = new CharStream(s);
+    const cs2 = cs.seek(10);
+    expect(cs2.isEmpty()).to.equal(true);
+  });
+
+  it('should be empty when an empty slice is taken', () => {
+    const s = "helloworld";
+    const cs = new CharStream(s, 5, 5);
+    expect(cs.isEmpty()).to.equal(true);
   });
 });

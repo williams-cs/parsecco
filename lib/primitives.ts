@@ -231,7 +231,7 @@ export namespace Primitives {
      * choice specifies an ordered choice between two parsers,
      * p1 and p2. The returned parser will first apply
      * parser p1.  If p1 succeeds, p1's Outcome is returned.
-     * If p2 fails, p2 is applied and the Outcome of p2 is returned.
+     * If p1 fails, p2 is applied and the Outcome of p2 is returned.
      * Note that the input stream given to p1 and p2 is exactly
      * the same input stream.
      * @param p1 A parser.

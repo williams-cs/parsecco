@@ -84,4 +84,16 @@ describe('CharStream', () => {
     const cs = new CharStream(s, 5, 5);
     expect(cs.isEmpty()).to.equal(true);
   });
+
+  it('should have a length method that works the same as string length', () => {
+    const s = "helloworld";
+    const cs = new CharStream(s);
+    expect(cs.length()).to.equal(s.length);
+  });
+
+  it('should have length zero for the empty slice', () => {
+    const s = "helloworld";
+    const cs = new CharStream(s, 5, 5);
+    expect(cs.length()).to.equal(0);
+  });
 });

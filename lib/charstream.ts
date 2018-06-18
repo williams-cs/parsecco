@@ -90,4 +90,12 @@ export default class CharStream {
     public isEmpty() : boolean {
         return this.startpos == this.endpos;
     }
+
+    /**
+     * Returns the number of characters in the string at
+     * this position.
+     */
+    public length() : number {
+        return this.endpos - this.startpos;
+    }
 }

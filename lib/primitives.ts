@@ -1,3 +1,5 @@
+import {CharUtil} from "./charstream";
+
 export namespace Primitives {
     /**
      * Represents a successful parse.
@@ -5,13 +7,13 @@ export namespace Primitives {
     export class Success<T> {
         tag: "success" = "success";
         result: T;
-        inputstream: string;
+        inputstream: CharUtil.CharStream;
         /**
          * Returns an object representing a successful parse.
          * @param istream The remaining string.
          * @param res The result of the parse
          */
-        constructor(istream: string, res: T) {
+        constructor(istream: CharUtil.CharStream, res: T) {
             this.inputstream = istream;
             this.result = res;
         }
@@ -22,12 +24,12 @@ export namespace Primitives {
      */
     export class Failure {
         tag: "failure" = "failure";
-        inputstream: string;
+        inputstream: CharUtil.CharStream;
         /**
          * Returns an object representing a failed parse.
          * @param istream The string, unmodified, that was given to the parser.
          */
-        constructor(istream: string) {
+        constructor(istream: CharUtil.CharStream) {
             this.inputstream = istream;
         }
     }
@@ -41,7 +43,7 @@ export namespace Primitives {
      * Generic type of a parser.
      */
     export interface IParser<T> {
-        (inputstream: string) : Outcome<T>
+        (inputstream: CharUtil.CharStream) : Outcome<T>
     }
 
     /**
@@ -64,11 +66,11 @@ export namespace Primitives {
      * string is non-empty, otherwise it fails.
      */
     export function item() {
-        return (istream: string) => {
-            if (istream.length == 0) {
+        return (istream: CharUtil.CharStream) => {
+            if (istream.isEmpty()) {
                 return new Failure(istream);
             } else {
-                return new Success(istream.slice(1,istream.length), istream.charAt(0));
+                return new Success(istream.tail(), istream.head());
             }
         }
     }
@@ -81,7 +83,7 @@ export namespace Primitives {
      */
     export function bind<T,U>(p: IParser<T>) {
         return (f: (t: T) => IParser<U>) => {
-            return (istream: string) => {
+            return (istream: CharUtil.CharStream) => {
                 let r = p(istream)
                 switch (r.tag) {
                     case "success": return f(r.result)(r.inputstream);
@@ -116,18 +118,19 @@ export namespace Primitives {
      * sat takes a predicate and yields a parser that consumes a
      * single character if the character satisfies the predicate,
      * otherwise it fails.
-     * @param pred 
+     * @param pred a character predicate
      */
-    export function sat(pred: (s: string) => boolean) : IParser<string> {
-        let a: IParser<string> = item();
-        let b = (x: string) => {
-            if (pred(x)) {
+    export function sat(pred: (s: string) => boolean) : IParser<CharUtil.CharStream> {
+        let pred2 = (cs: CharUtil.CharStream) => pred(cs.toString());
+        let a: IParser <CharUtil.CharStream> = item();
+        let b = (x: CharUtil.CharStream) => {
+            if (pred2(x)) {
                 return result(x);
             } else {
-                return zero<string>();
+                return zero <CharUtil.CharStream>();
             }
         };
-        return bind<string,string>(a)(b);
+        return bind<CharUtil.CharStream,CharUtil.CharStream>(a)(b);
     }
 
     /**
@@ -136,7 +139,7 @@ export namespace Primitives {
      * character in the input stream is c, otherwise it fails.
      * @param c 
      */
-    export function char(c: string) : IParser<string> {
+    export function char(c: string) : IParser <CharUtil.CharStream> {
         if (c.length != 1) {
             throw new Error("char parser takes a string of length 1 (i.e., a char)");
         }
@@ -147,7 +150,7 @@ export namespace Primitives {
      * letter returns a parser that consumes a single alphabetic
      * character, from a-z, regardless of case.
      */
-    export function letter() : IParser<string> {
+    export function letter() : IParser <CharUtil.CharStream> {
         let contains_letter = (x: string) => {
             let a_letter = /[A-Za-z]/;
             return x.match(a_letter) != undefined;
@@ -160,7 +163,7 @@ export namespace Primitives {
      * character, from 0-9.  Note that the type of the result
      * is a string, not a number.
      */
-    export function digit() : IParser<string> {
+    export function digit() : IParser <CharUtil.CharStream> {
         return sat(x => x == "0"
                     || x == "1"
                     || x == "2"
@@ -177,8 +180,8 @@ export namespace Primitives {
      * upper returns a parser that consumes a single character
      * if that character is uppercase.
      */
-    export function upper() : IParser<string> {
-        return (istream: string) => {
+    export function upper() : IParser <CharUtil.CharStream> {
+        return (istream: CharUtil.CharStream) => {
             let o1 = letter()(istream);
             switch(o1.tag) {
                 case "success":
@@ -204,8 +207,8 @@ export namespace Primitives {
      * lower returns a parser that consumes a single character
      * if that character is lowercase.
      */
-    export function lower() : IParser<string> {
-        return (istream: string) => {
+    export function lower() : IParser<CharUtil.CharStream> {
+        return (istream: CharUtil.CharStream) => {
             let o1 = letter()(istream);
             switch(o1.tag) {
                 case "success":
@@ -238,7 +241,7 @@ export namespace Primitives {
      */
     export function choice<T>(p1: IParser<T>) {
         return (p2: IParser<T>) => {
-            return (istream: string) => {
+            return (istream: CharUtil.CharStream) => {
                 let o = p1(istream)
                 switch(o.tag) {
                     case "success":
@@ -258,7 +261,7 @@ export namespace Primitives {
      */
     export function appfun<T,U>(p: IParser<T>) {
         return (f: (t: T) => U) => {
-            return (istream: string) => {
+            return (istream: CharUtil.CharStream) => {
                 let o = p(istream);
                 switch(o.tag) {
                     case "success":
@@ -279,11 +282,11 @@ export namespace Primitives {
      * @param p 
      */
     export function many<T>(p: IParser<T>) {
-        return (istream: string) => {
+        return (istream: CharUtil.CharStream) => {
             let istream2 = istream;
             let outputs: T[] = [];
             let succeeds = true;
-            while(istream2.length > 0 && succeeds) {
+            while(!istream2.isEmpty() && succeeds) {
                 let o = p(istream2);
                 switch(o.tag) {
                     case "success":
@@ -306,10 +309,12 @@ export namespace Primitives {
      * @param s A string
      */
     export function word(s: string) {
-        return (istream: string) => {
+        return (istream: CharUtil.CharStream) => {
             let re = new RegExp("^" + s);
-            if(istream.match(re)) {
-                return new Success<string>(istream.substring(s.length,istream.length), s);
+            if(istream.toString().match(re)) {
+                const rem = istream.substring(s.length,istream.length())
+                const res = istream.substring(0, s.length);
+                return new Success(rem, res);
             } else {
                 return new Failure(istream);
             }

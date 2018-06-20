@@ -381,3 +381,169 @@ describe('EOF parser', () => {
         }
     });
 });
+
+describe('FResult parser', () => {
+    it('should return the given value if the given parser succeeds', () => {
+        const p = Primitives.fresult(Primitives.word("hello"))(1);
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.equal(1);
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        };
+    });
+
+    it('should fail if the parser fails', () => {
+        const p = Primitives.fresult(Primitives.word("ello"))(1);
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(inputstream);
+                break;
+        };
+    });
+});
+
+describe('Left parser', () => {
+    it('should apply p and q in sequence and return the result of q on success', () => {
+        const p = Primitives.left(Primitives.word("hello"))(Primitives.word("world"));
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("hello");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        };
+    });
+
+    it('should fail if p fails', () => {
+        const p = Primitives.left(Primitives.word("z"))(Primitives.word("world"));
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(inputstream);
+                break;
+        };
+    });
+
+    it('should fail if q fails', () => {
+        const p = Primitives.left(Primitives.word("hello"))(Primitives.word("z"));
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(inputstream);
+                break;
+        };
+    });
+});
+
+describe('Right parser', () => {
+    it('should apply p and q in sequence and return the result of q on success', () => {
+        const p = Primitives.right(Primitives.word("hello"))(Primitives.word("world"));
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("world");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        };
+    });
+
+    it('should fail if p fails', () => {
+        const p = Primitives.right(Primitives.word("z"))(Primitives.word("world"));
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(inputstream);
+                break;
+        };
+    });
+
+    it('should fail if q fails', () => {
+        const p = Primitives.right(Primitives.word("hello"))(Primitives.word("z"));
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(inputstream);
+                break;
+        };
+    });
+});
+
+describe('Between parser', () => {
+    const input = new CharUtil.CharStream("foo(bar)");
+
+    it('should apply popen, p, and pclose in sequence and return the result of p on success', () => {
+        const p = Primitives.between(Primitives.word("foo("))(Primitives.word("bar"))(Primitives.char(")"));
+        const output = p(input);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("bar");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        };
+    });
+
+    it('should fail if popen fails', () => {
+        const p = Primitives.between(Primitives.word("zoo("))(Primitives.word("bar"))(Primitives.char(")"));
+        const output = p(input);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(input);
+                break;
+        };
+    });
+
+    it('should fail if pclose fails', () => {
+        const p = Primitives.between(Primitives.word("foo("))(Primitives.word("bar"))(Primitives.char("-"));
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(inputstream);
+                break;
+        };
+    });
+
+    it('should fail if p fails', () => {
+        const p = Primitives.between(Primitives.word("foo("))(Primitives.word("huh"))(Primitives.char(")"));
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(inputstream);
+                break;
+        };
+    });
+});

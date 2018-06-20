@@ -327,9 +327,14 @@ export namespace Primitives {
      * word yields a parser for the given string.
      * @param s A string
      */
+    // TODO: this should actually be a sequence of parsers constructed
+    // from the string s
     export function word(s: string) : IParser<CharUtil.CharStream> {
         return (istream: CharUtil.CharStream) => {
-            let re = new RegExp("^" + s);
+            // escape regex metacharacters
+            // (this likely needs work)
+            let s2 = s.replace(/(?=[() ])/g, '\\');
+            let re = new RegExp("^" + s2);
             if(istream.toString().match(re)) {
                 const rem = istream.substring(s.length,istream.length())
                 const res = istream.substring(0, s.length);
@@ -402,7 +407,6 @@ export namespace Primitives {
      * successful, returns the result of p.
      * @param popen 
      */
-    // popen >>. p .>> pclose
     export function between<T,U,V>(popen: IParser<T>) {
         return (pclose: IParser<U>) => {
             return (p: IParser<V>) => {

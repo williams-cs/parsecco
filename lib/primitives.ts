@@ -353,4 +353,63 @@ export namespace Primitives {
             }
         }
     }
+
+    /**
+     * fresult returns a parser that applies the parser p,
+     * and if p succeeds, returns the value x.
+     * @param p a parser
+     */
+    export function fresult<T,U>(p: IParser<T>) {
+        return (x: U) => {
+            return (istream: CharUtil.CharStream) => {
+                return bind<T,U>(p)((t: T) => result(x))(istream);
+            }
+        }
+        
+    }
+
+    /**
+     * left returns a parser that applies the parser p,
+     * then the parser q, and if both are successful,
+     * returns the result of p.
+     * @param p left
+     */
+    export function left<T,U>(p: IParser<T>) {
+        return (q: IParser<U>) => {
+            return (istream: CharUtil.CharStream) => {
+                return bind(p)((t: T) => fresult(q)(t))(istream);
+            }
+        }
+    }
+
+    /**
+     * right returns a parser that applies the parser p,
+     * then the parser q, and if both are successful,
+     * returns the result of q.
+     * @param p left
+     */
+    export function right<T,U>(p: IParser<T>) {
+        return (q: IParser<U>) => {
+            return (istream: CharUtil.CharStream) => {
+                return bind(p)((t: T) => q)(istream);
+            }
+        }
+    }
+
+    /**
+     * between returns a parser that applies the parser
+     * popen, p, and pclose in sequence, and if all are
+     * successful, returns the result of p.
+     * @param popen 
+     */
+    // popen >>. p .>> pclose
+    export function between<T,U,V>(popen: IParser<T>) {
+        return (pclose: IParser<U>) => {
+            return (p: IParser<V>) => {
+                return (istream: CharUtil.CharStream) => {
+                    return right(popen)(left(p)(pclose))(istream)
+                }
+            }
+        }
+    }
 }

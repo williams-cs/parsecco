@@ -142,4 +142,31 @@ export declare namespace Primitives {
      * input has been reached.
      */
     function eof(): IParser<EOFMark>;
+    /**
+     * fresult returns a parser that applies the parser p,
+     * and if p succeeds, returns the value x.
+     * @param p a parser
+     */
+    function fresult<T, U>(p: IParser<T>): (x: U) => (istream: CharUtil.CharStream) => Outcome<U>;
+    /**
+     * left returns a parser that applies the parser p,
+     * then the parser q, and if both are successful,
+     * returns the result of p.
+     * @param p left
+     */
+    function left<T, U>(p: IParser<T>): (q: IParser<U>) => (istream: CharUtil.CharStream) => Outcome<{}>;
+    /**
+     * right returns a parser that applies the parser p,
+     * then the parser q, and if both are successful,
+     * returns the result of q.
+     * @param p left
+     */
+    function right<T, U>(p: IParser<T>): (q: IParser<U>) => (istream: CharUtil.CharStream) => Outcome<{}>;
+    /**
+     * between returns a parser that applies the parser
+     * popen, p, and pclose in sequence, and if all are
+     * successful, returns the result of p.
+     * @param popen
+     */
+    function between<T, U, V>(popen: IParser<T>): (pclose: IParser<U>) => (p: IParser<V>) => (istream: CharUtil.CharStream) => Outcome<{}>;
 }

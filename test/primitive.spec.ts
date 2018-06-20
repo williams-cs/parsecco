@@ -355,5 +355,30 @@ describe('Word parser', () => {
 });
 
 describe('EOF parser', () => {
-    // TODO
+    it('should succeed at the end of the input', () => {
+        const p = Primitives.seq<CharUtil.CharStream,Primitives.EOFMark,CharUtil.CharStream>(Primitives.word("helloworld"))(Primitives.eof())(tup => tup[0]);
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("helloworld");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should fail when not at the end of the input', () => {
+        const p = Primitives.seq<CharUtil.CharStream,Primitives.EOFMark,CharUtil.CharStream>(Primitives.word("hello"))(Primitives.eof())(tup => tup[0]);
+        const output = p(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(inputstream);
+                // assert(true);
+                break;
+        }
+    });
 });

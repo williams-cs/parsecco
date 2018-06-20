@@ -1,5 +1,11 @@
 import { CharUtil } from "./charstream";
 export declare namespace Primitives {
+    class EOFMark {
+        private static _instance;
+        private constructor();
+        static readonly Instance: EOFMark;
+    }
+    const EOF: EOFMark;
     /**
      * Represents a successful parse.
      */
@@ -53,7 +59,8 @@ export declare namespace Primitives {
     /**
      * bind is a curried function that takes a parser p and returns
      * a function that takes a parser f which returns the composition
-     * of p and f.
+     * of p and f.  If _any_ of the parsers fail, the original inputstream
+     * is returned in the Failure object (i.e., bind backtracks).
      * @param p A parser
      */
     function bind<T, U>(p: IParser<T>): (f: (t: T) => IParser<U>) => (istream: CharUtil.CharStream) => Outcome<U>;
@@ -129,10 +136,10 @@ export declare namespace Primitives {
      * word yields a parser for the given string.
      * @param s A string
      */
-    function word(s: string): (istream: CharUtil.CharStream) => Outcome<CharUtil.CharStream>;
+    function word(s: string): IParser<CharUtil.CharStream>;
     /**
-     * Returns a parser that succeeds if the end of the
+     * Returns a parser that succeeds only if the end of the
      * input has been reached.
      */
-    function eof(): (istream: CharUtil.CharStream) => boolean;
+    function eof(): IParser<EOFMark>;
 }

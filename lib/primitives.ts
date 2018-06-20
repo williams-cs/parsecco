@@ -1,6 +1,16 @@
 import {CharUtil} from "./charstream";
 
 export namespace Primitives {
+    export class EOFMark {
+        private static _instance: EOFMark;
+        private constructor() {}
+        public static get Instance()
+        {
+            return this._instance || (this._instance = new this());
+        }
+    }
+    export const EOF = EOFMark.Instance;
+
     /**
      * Represents a successful parse.
      */
@@ -78,7 +88,8 @@ export namespace Primitives {
     /**
      * bind is a curried function that takes a parser p and returns
      * a function that takes a parser f which returns the composition
-     * of p and f.
+     * of p and f.  If _any_ of the parsers fail, the original inputstream
+     * is returned in the Failure object (i.e., bind backtracks).
      * @param p A parser
      */
     export function bind<T,U>(p: IParser<T>) {
@@ -86,8 +97,15 @@ export namespace Primitives {
             return (istream: CharUtil.CharStream) => {
                 let r = p(istream)
                 switch (r.tag) {
-                    case "success": return f(r.result)(r.inputstream);
-                    case "failure": return r;
+                    case "success":
+                        let o = f(r.result)(r.inputstream);
+                        switch (o.tag) {
+                            case "success": return o;
+                            case "failure":
+                                // note: backtracks, returning original istream
+                                return new Failure(istream);
+                        }
+                    case "failure": return new Failure(istream);
                 }
             }
         }
@@ -309,7 +327,7 @@ export namespace Primitives {
      * word yields a parser for the given string.
      * @param s A string
      */
-    export function word(s: string) {
+    export function word(s: string) : IParser<CharUtil.CharStream> {
         return (istream: CharUtil.CharStream) => {
             let re = new RegExp("^" + s);
             if(istream.toString().match(re)) {
@@ -323,12 +341,16 @@ export namespace Primitives {
     }
 
     /**
-     * Returns a parser that succeeds if the end of the
+     * Returns a parser that succeeds only if the end of the
      * input has been reached.
      */
-    export function eof() {
+    export function eof() : IParser<EOFMark> {
         return (istream: CharUtil.CharStream) => {
-            return istream.isEOF();
+            if (istream.isEOF()) {
+                return new Success(istream, EOF);
+            } else {
+                return new Failure(istream);
+            }
         }
     }
 }

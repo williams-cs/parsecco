@@ -130,4 +130,9 @@ export declare namespace Primitives {
      * @param s A string
      */
     function word(s: string): (istream: CharUtil.CharStream) => Outcome<CharUtil.CharStream>;
+    /**
+     * Returns a parser that succeeds if the end of the
+     * input has been reached.
+     */
+    function eof(): (istream: CharUtil.CharStream) => boolean;
 }

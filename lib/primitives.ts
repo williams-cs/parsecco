@@ -297,6 +297,7 @@ export namespace Primitives {
                         outputs.push(o.result);
                         break;
                     case "failure":
+                        succeeds = false;
                         break;
                 }
             }
@@ -318,6 +319,16 @@ export namespace Primitives {
             } else {
                 return new Failure(istream);
             }
+        }
+    }
+
+    /**
+     * Returns a parser that succeeds if the end of the
+     * input has been reached.
+     */
+    export function eof() {
+        return (istream: CharUtil.CharStream) => {
+            return istream.isEOF();
         }
     }
 }

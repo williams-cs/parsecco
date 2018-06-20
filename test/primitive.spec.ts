@@ -299,7 +299,7 @@ describe('Appfun parser', () => {
 });
 
 describe('Many parser', () => {
-    it('should apply the given parser as many times as it can', () => {
+    it('should apply the given parser until the end of the input', () => {
         const output = Primitives.many(Primitives.item())(inputstream);
         expect(output.result.toString()).to.equal("h,e,l,l,o,w,o,r,l,d");
     });
@@ -308,6 +308,21 @@ describe('Many parser', () => {
         const empty = new CharUtil.CharStream("");
         const output = Primitives.many(Primitives.item())(empty);
         expect(output.result).to.eql([]);
+    });
+
+    it('should apply the given parser until it fails', () => {
+        const tstring = "54hello"
+        const inputstream2 = new CharUtil.CharStream(tstring);
+        const output = Primitives.many(Primitives.digit())(inputstream2);
+        switch(output.tag) {
+            case "success":
+                let s = "";
+                for(let digit of output.result) {
+                    s += digit.toString();
+                }
+                expect(s).to.equal("54");
+                break;
+        }
     });
 });
 
@@ -337,4 +352,8 @@ describe('Word parser', () => {
                 break;
         }
     })
+});
+
+describe('EOF parser', () => {
+    // TODO
 });

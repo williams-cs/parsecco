@@ -3,7 +3,8 @@ export declare namespace CharUtil {
         readonly input: String;
         readonly startpos: number;
         readonly endpos: number;
-        constructor(s: String, startpos?: number, endpos?: number);
+        readonly hasEOF: boolean;
+        constructor(s: String, startpos?: number, endpos?: number, hasEOF?: boolean);
         /**
          * Returns true of the end of the input has been reached.
          */
@@ -54,7 +55,8 @@ export declare namespace CharUtil {
          * Returns the concatenation of the current CharStream with
          * the given CharStream. Note: returned object does not
          * reuse original input string, and startpos and endpos
-         * are reset.
+         * are reset. If the given CharStream contains EOF, the
+         * concatenated CharStream will also contain EOF.
          * @param cs the CharStream to concat to this CharStream
          */
         concat(cs: CharStream): CharStream;

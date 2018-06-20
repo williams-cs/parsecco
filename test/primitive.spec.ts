@@ -377,7 +377,6 @@ describe('EOF parser', () => {
                 break;
             case "failure":
                 expect(output.inputstream).to.equal(inputstream);
-                // assert(true);
                 break;
         }
     });

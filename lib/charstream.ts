@@ -1,11 +1,16 @@
 export namespace CharUtil {
     export class CharStream {
-        public readonly input : String
-        public readonly startpos : number
-        public readonly endpos : number
+        public readonly input : String;
+        public readonly startpos : number;
+        public readonly endpos : number;
+        public readonly hasEOF : boolean = true;
     
-        constructor(s: String, startpos?: number, endpos?: number) {
+        constructor(s: String, startpos?: number, endpos?: number, hasEOF?: boolean) {
             this.input = s;
+            
+            if (hasEOF != undefined) {
+                this.hasEOF = hasEOF;
+            }
             
             if (startpos == undefined) {
                 this.startpos = 0;           // not specified; set default
@@ -32,7 +37,7 @@ export namespace CharUtil {
          * Returns true of the end of the input has been reached.
          */
         public isEOF() : boolean {
-            return this.startpos == this.input.length;
+            return this.hasEOF && this.startpos == this.input.length;
         }
     
         /**
@@ -50,9 +55,9 @@ export namespace CharUtil {
          */
         public seek(num: number) : CharStream {
             if (this.startpos + num > this.endpos) {
-                return new CharStream(this.input, this.endpos, this.endpos);
+                return new CharStream(this.input, this.endpos, this.endpos, this.hasEOF);
             } else {
-                return new CharStream(this.input, this.startpos + num, this.endpos);
+                return new CharStream(this.input, this.startpos + num, this.endpos, this.hasEOF);
             }
         }
     
@@ -63,7 +68,8 @@ export namespace CharUtil {
          */
         public head() : CharStream {
             if (!this.isEmpty()) {
-                return new CharStream(this.input, this.startpos, this.startpos + 1);
+                const newHasEOF = this.startpos + 1 == this.endpos && this.hasEOF;
+                return new CharStream(this.input, this.startpos, this.startpos + 1, newHasEOF);
             } else {
                 throw new Error("Cannot get the head of an empty string.");
             }
@@ -76,7 +82,7 @@ export namespace CharUtil {
          */
         public tail() : CharStream {
             if (!this.isEmpty()) {
-                return new CharStream(this.input, this.startpos + 1, this.endpos);
+                return new CharStream(this.input, this.startpos + 1, this.endpos, this.hasEOF);
             } else {
                 throw new Error("Cannot get the tail of an empty string.");
             }
@@ -109,19 +115,21 @@ export namespace CharUtil {
         public substring(start: number, end: number) : CharStream {
             const start2 = this.startpos + start;
             const end2 = this.startpos + end;
-            return new CharStream(this.input, start2, end2);
+            const newHasEOF = this.endpos == end2 && this.hasEOF;
+            return new CharStream(this.input, start2, end2, newHasEOF);
         }
 
         /**
          * Returns the concatenation of the current CharStream with
          * the given CharStream. Note: returned object does not
          * reuse original input string, and startpos and endpos
-         * are reset.
+         * are reset. If the given CharStream contains EOF, the
+         * concatenated CharStream will also contain EOF.
          * @param cs the CharStream to concat to this CharStream
          */
         public concat(cs: CharStream) : CharStream {
             const s = this.toString() + cs.toString()
-            return new CharStream(s, 0, s.length);
+            return new CharStream(s, 0, s.length, cs.hasEOF);
         }
     }
 }

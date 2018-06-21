@@ -333,7 +333,7 @@ export namespace Primitives {
         return (istream: CharUtil.CharStream) => {
             // escape regex metacharacters
             // (this likely needs work)
-            let s2 = s.replace(/(?=[() ])/g, '\\');
+            let s2 = s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
             let re = new RegExp("^" + s2);
             if(istream.toString().match(re)) {
                 const rem = istream.substring(s.length,istream.length())
@@ -369,15 +369,14 @@ export namespace Primitives {
             return (istream: CharUtil.CharStream) => {
                 return bind<T,U>(p)((t: T) => result(x))(istream);
             }
-        }
-        
+        } 
     }
 
     /**
      * left returns a parser that applies the parser p,
      * then the parser q, and if both are successful,
      * returns the result of p.
-     * @param p left
+     * @param p a parser
      */
     export function left<T,U>(p: IParser<T>) {
         return (q: IParser<U>) => {
@@ -391,7 +390,7 @@ export namespace Primitives {
      * right returns a parser that applies the parser p,
      * then the parser q, and if both are successful,
      * returns the result of q.
-     * @param p left
+     * @param p a parser
      */
     export function right<T,U>(p: IParser<T>) {
         return (q: IParser<U>) => {
@@ -405,14 +404,38 @@ export namespace Primitives {
      * between returns a parser that applies the parser
      * popen, p, and pclose in sequence, and if all are
      * successful, returns the result of p.
-     * @param popen 
+     * @param popen the first parser
      */
     export function between<T,U,V>(popen: IParser<T>) {
         return (pclose: IParser<U>) => {
             return (p: IParser<V>) => {
                 return (istream: CharUtil.CharStream) => {
-                    return right(popen)(left(p)(pclose))(istream)
+                    return right(popen)(left(pclose)(p))(istream)
                 }
+            }
+        }
+    }
+
+    /**
+     * The debug parser takes a parser p and a debug string,
+     * printing the debug string as a side-effect before
+     * applying p to the input.
+     * @param p a parser
+     */
+    export function debug<T>(p: IParser<T>) {
+        return (label: string) => {
+            return (istream: CharUtil.CharStream) => {
+                console.log("apply: " + label);
+                let o = p(istream);
+                switch(o.tag) {
+                    case "success":
+                        console.log("success: " + label);
+                        break;
+                    case "failure":
+                        console.log("failure: " + label);
+                        break;
+                }
+                return o;
             }
         }
     }

@@ -152,21 +152,28 @@ export declare namespace Primitives {
      * left returns a parser that applies the parser p,
      * then the parser q, and if both are successful,
      * returns the result of p.
-     * @param p left
+     * @param p a parser
      */
     function left<T, U>(p: IParser<T>): (q: IParser<U>) => (istream: CharUtil.CharStream) => Outcome<{}>;
     /**
      * right returns a parser that applies the parser p,
      * then the parser q, and if both are successful,
      * returns the result of q.
-     * @param p left
+     * @param p a parser
      */
     function right<T, U>(p: IParser<T>): (q: IParser<U>) => (istream: CharUtil.CharStream) => Outcome<{}>;
     /**
      * between returns a parser that applies the parser
      * popen, p, and pclose in sequence, and if all are
      * successful, returns the result of p.
-     * @param popen
+     * @param popen the first parser
      */
     function between<T, U, V>(popen: IParser<T>): (pclose: IParser<U>) => (p: IParser<V>) => (istream: CharUtil.CharStream) => Outcome<{}>;
+    /**
+     * The debug parser takes a parser p and a debug string,
+     * printing the debug string as a side-effect before
+     * applying p to the input.
+     * @param p a parser
+     */
+    function debug<T>(p: IParser<T>): (label: string) => (istream: CharUtil.CharStream) => Outcome<T>;
 }

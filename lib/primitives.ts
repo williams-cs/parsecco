@@ -294,9 +294,10 @@ export namespace Primitives {
     }
 
     /**
-     * many repeatedly applies the parser p until p fails. many tries
-     * to guard against an infinite loop by raising an exception if p
-     * succeeds without changing the parser state. 
+     * many repeatedly applies the parser p until p fails. many always
+     * succeeds, even if it matches nothing.  many tries to guard
+     * against an infinite loop by raising an exception if p succeeds
+     * without changing the parser state. 
      * @param p 
      */
     export function many<T>(p: IParser<T>) {
@@ -321,6 +322,24 @@ export namespace Primitives {
             }
             return new Success(istream2, outputs);
         }
+    }
+
+    /**
+     * many1 repeatedly applies the parser p until p fails. many1 must
+     * succeed at least once.  many1 tries to guard against an infinite
+     * loop by raising an exception if p succeeds without changing the
+     * parser state. 
+     * @param p 
+     */
+    export function many1<T>(p: IParser<T>) {
+        return (istream: CharUtil.CharStream) => {
+            return seq<T,T[],T[]>(p)(many<T>(p))(tup => {
+                let hd: T = tup["0"];
+                let tl: T[] = tup["1"];
+                tl.unshift(hd);
+                return tl;
+            })(istream);
+        };
     }
 
     /**

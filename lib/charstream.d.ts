@@ -60,5 +60,11 @@ export declare namespace CharUtil {
          * @param cs the CharStream to concat to this CharStream
          */
         concat(cs: CharStream): CharStream;
+        /**
+         * Concatenate an array of CharStream objects into a single
+         * CharStream object.
+         * @param css a CharStream[]
+         */
+        static concat(css: CharStream[]): CharStream;
     }
 }

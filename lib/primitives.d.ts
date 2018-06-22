@@ -126,12 +126,21 @@ export declare namespace Primitives {
      */
     function appfun<T, U>(p: IParser<T>): (f: (t: T) => U) => (istream: CharUtil.CharStream) => Failure | Success<U>;
     /**
-     * many repeatedly applies the parser p until p fails. many tries
-     * to guard against an infinite loop by raising an exception if p
-     * succeeds without changing the parser state.
+     * many repeatedly applies the parser p until p fails. many always
+     * succeeds, even if it matches nothing.  many tries to guard
+     * against an infinite loop by raising an exception if p succeeds
+     * without changing the parser state.
      * @param p
      */
     function many<T>(p: IParser<T>): (istream: CharUtil.CharStream) => Success<T[]>;
+    /**
+     * many1 repeatedly applies the parser p until p fails. many1 must
+     * succeed at least once.  many1 tries to guard against an infinite
+     * loop by raising an exception if p succeeds without changing the
+     * parser state.
+     * @param p
+     */
+    function many1<T>(p: IParser<T>): (istream: CharUtil.CharStream) => Outcome<T[]>;
     /**
      * word yields a parser for the given string.
      * @param s A string

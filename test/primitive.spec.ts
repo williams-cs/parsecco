@@ -547,3 +547,33 @@ describe('Between parser', () => {
         };
     });
 });
+
+describe('many1 parser', () => {
+    it('should succeed if p succeeds at least once', () => {
+        const i = new CharUtil.CharStream("hhhelloworld");
+        const p = Primitives.many1(Primitives.char('h'));
+        const output = p(i);
+        switch(output.tag) {
+            case "success":
+                expect(CharUtil.CharStream.concat(output.result).toString()).to.equal("hhh");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should fail if p does not succeed at least once', () => {
+        const i = new CharUtil.CharStream("elloworld");
+        const p = Primitives.many1(Primitives.char('h'));
+        const output = p(i);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(i);
+                break;
+        }
+    });
+});

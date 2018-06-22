@@ -131,6 +131,22 @@ export namespace CharUtil {
             const s = this.toString() + cs.toString()
             return new CharStream(s, 0, s.length, cs.hasEOF);
         }
+
+        /**
+         * Concatenate an array of CharStream objects into a single
+         * CharStream object.
+         * @param css a CharStream[]
+         */
+        static concat(css: CharStream[]) : CharStream {
+            if (css.length == 0) {
+                throw new Error("CharStream array must contain at least one element.")
+            } else {
+                let cs = css[0];
+                for (let i = 1; i < css.length; i++) {
+                    cs = cs.concat(css[i]);
+                }
+                return cs;
+            }
+        }
     }
 }
-

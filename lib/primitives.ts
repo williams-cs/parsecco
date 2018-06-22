@@ -400,7 +400,7 @@ export namespace Primitives {
     export function left<T,U>(p: IParser<T>) {
         return (q: IParser<U>) => {
             return (istream: CharUtil.CharStream) => {
-                return bind(p)((t: T) => fresult(q)(t))(istream);
+                return bind<T,T>(p)((t: T) => fresult<U,T>(q)(t))(istream);
             }
         }
     }
@@ -414,7 +414,7 @@ export namespace Primitives {
     export function right<T,U>(p: IParser<T>) {
         return (q: IParser<U>) => {
             return (istream: CharUtil.CharStream) => {
-                return bind(p)((t: T) => q)(istream);
+                return bind<T,U>(p)(_ => q)(istream);
             }
         }
     }

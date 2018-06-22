@@ -185,4 +185,16 @@ export declare namespace Primitives {
      * @param p a parser
      */
     function debug<T>(p: IParser<T>): (label: string) => (istream: CharUtil.CharStream) => Outcome<T>;
+    /**
+     * ws matches zero or more of the following whitespace characters:
+     * ' ', '\t', '\n', or '\r\n'
+     * ws returns matched whitespace in a single CharStream result.
+     */
+    function ws(): IParser<CharUtil.CharStream>;
+    /**
+     * ws1 matches one or more of the following whitespace characters:
+     * ' ', '\t', '\n', or '\r\n'
+     * ws1 returns matched whitespace in a single CharStream result.
+     */
+    function ws1(): IParser<CharUtil.CharStream>;
 }

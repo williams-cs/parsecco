@@ -139,7 +139,7 @@ export namespace CharUtil {
          */
         static concat(css: CharStream[]) : CharStream {
             if (css.length == 0) {
-                throw new Error("CharStream array must contain at least one element.")
+                return new CharStream("", 0, 0, false);
             } else {
                 let cs = css[0];
                 for (let i = 1; i < css.length; i++) {

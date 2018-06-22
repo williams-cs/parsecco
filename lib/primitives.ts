@@ -458,4 +458,39 @@ export namespace Primitives {
             }
         }
     }
+
+    let wschars = choice(sat(c => c == ' ' || c == '\t' || c == '\n'))(str('\r\n'))
+
+    /**
+     * ws matches zero or more of the following whitespace characters:
+     * ' ', '\t', '\n', or '\r\n'
+     * ws returns matched whitespace in a single CharStream result.
+     */
+    export function ws() : IParser<CharUtil.CharStream> {
+        return (istream: CharUtil.CharStream) => {
+            let o = many(wschars)(istream)
+            switch(o.tag) {
+                case "success":
+                    return new Success(o.inputstream, CharUtil.CharStream.concat(o.result));
+                // ws never fails
+            }
+        }
+    }
+
+    /**
+     * ws1 matches one or more of the following whitespace characters:
+     * ' ', '\t', '\n', or '\r\n'
+     * ws1 returns matched whitespace in a single CharStream result.
+     */
+    export function ws1() : IParser<CharUtil.CharStream> {
+        return (istream: CharUtil.CharStream) => {
+            let o = many1(wschars)(istream)
+            switch(o.tag) {
+                case "success":
+                    return new Success(o.inputstream, CharUtil.CharStream.concat(o.result));
+                case "failure":
+                    return o;
+            }
+        }
+    }
 }

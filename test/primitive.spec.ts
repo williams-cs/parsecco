@@ -577,3 +577,60 @@ describe('many1 parser', () => {
         }
     });
 });
+
+describe('ws parser', () => {
+    it('should successfully consume whitespace', () => {
+        const i = new CharUtil.CharStream(" \t  \n\t \r\nhelloworld");
+        const output = Primitives.ws()(i);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal(" \t  \n\t \r\n");
+                expect(output.inputstream.toString()).to.equal("helloworld");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should succeed even if the string has no whitespace', () => {
+        const output = Primitives.ws()(inputstream);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("");
+                expect(output.inputstream).to.equal(inputstream);
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+});
+
+describe('ws1 parser', () => {
+    it('should successfully consume whitespace', () => {
+        const i = new CharUtil.CharStream(" \t  \n\t \r\nhelloworld");
+        const output = Primitives.ws1()(i);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal(" \t  \n\t \r\n");
+                expect(output.inputstream.toString()).to.equal("helloworld");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should fail if the string has no whitespace', () => {
+        const output = Primitives.ws1()(inputstream);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.equal(inputstream);
+                break;
+        }
+    });
+});

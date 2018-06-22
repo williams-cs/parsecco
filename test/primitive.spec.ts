@@ -326,9 +326,9 @@ describe('Many parser', () => {
     });
 });
 
-describe('Word parser', () => {
+describe('Str parser', () => {
     it('should match a string and leave remainder in inputstream', () => {
-        const output = Primitives.word("hello")(inputstream);
+        const output = Primitives.str("hello")(inputstream);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("hello");
@@ -342,7 +342,7 @@ describe('Word parser', () => {
 
     it('should fail if string is not in input stream', () => {
         const inputstream2 = new CharUtil.CharStream("worldhello");
-        const output = Primitives.word("hello")(inputstream2);
+        const output = Primitives.str("hello")(inputstream2);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -356,7 +356,7 @@ describe('Word parser', () => {
 
 describe('EOF parser', () => {
     it('should succeed at the end of the input', () => {
-        const p = Primitives.seq<CharUtil.CharStream,Primitives.EOFMark,CharUtil.CharStream>(Primitives.word("helloworld"))(Primitives.eof())(tup => tup[0]);
+        const p = Primitives.seq<CharUtil.CharStream,Primitives.EOFMark,CharUtil.CharStream>(Primitives.str("helloworld"))(Primitives.eof())(tup => tup[0]);
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -369,7 +369,7 @@ describe('EOF parser', () => {
     });
 
     it('should fail when not at the end of the input', () => {
-        const p = Primitives.seq<CharUtil.CharStream,Primitives.EOFMark,CharUtil.CharStream>(Primitives.word("hello"))(Primitives.eof())(tup => tup[0]);
+        const p = Primitives.seq<CharUtil.CharStream,Primitives.EOFMark,CharUtil.CharStream>(Primitives.str("hello"))(Primitives.eof())(tup => tup[0]);
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -384,7 +384,7 @@ describe('EOF parser', () => {
 
 describe('FResult parser', () => {
     it('should return the given value if the given parser succeeds', () => {
-        const p = Primitives.fresult(Primitives.word("hello"))(1);
+        const p = Primitives.fresult(Primitives.str("hello"))(1);
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -397,7 +397,7 @@ describe('FResult parser', () => {
     });
 
     it('should fail if the parser fails', () => {
-        const p = Primitives.fresult(Primitives.word("ello"))(1);
+        const p = Primitives.fresult(Primitives.str("ello"))(1);
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -412,7 +412,7 @@ describe('FResult parser', () => {
 
 describe('Left parser', () => {
     it('should apply p and q in sequence and return the result of q on success', () => {
-        const p = Primitives.left(Primitives.word("hello"))(Primitives.word("world"));
+        const p = Primitives.left(Primitives.str("hello"))(Primitives.str("world"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -425,7 +425,7 @@ describe('Left parser', () => {
     });
 
     it('should fail if p fails', () => {
-        const p = Primitives.left(Primitives.word("z"))(Primitives.word("world"));
+        const p = Primitives.left(Primitives.str("z"))(Primitives.str("world"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -438,7 +438,7 @@ describe('Left parser', () => {
     });
 
     it('should fail if q fails', () => {
-        const p = Primitives.left(Primitives.word("hello"))(Primitives.word("z"));
+        const p = Primitives.left(Primitives.str("hello"))(Primitives.str("z"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -453,7 +453,7 @@ describe('Left parser', () => {
 
 describe('Right parser', () => {
     it('should apply p and q in sequence and return the result of q on success', () => {
-        const p = Primitives.right(Primitives.word("hello"))(Primitives.word("world"));
+        const p = Primitives.right(Primitives.str("hello"))(Primitives.str("world"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -466,7 +466,7 @@ describe('Right parser', () => {
     });
 
     it('should fail if p fails', () => {
-        const p = Primitives.right(Primitives.word("z"))(Primitives.word("world"));
+        const p = Primitives.right(Primitives.str("z"))(Primitives.str("world"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -479,7 +479,7 @@ describe('Right parser', () => {
     });
 
     it('should fail if q fails', () => {
-        const p = Primitives.right(Primitives.word("hello"))(Primitives.word("z"));
+        const p = Primitives.right(Primitives.str("hello"))(Primitives.str("z"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -496,7 +496,7 @@ describe('Between parser', () => {
     const input = new CharUtil.CharStream("foo(bar)");
 
     it('should apply popen, p, and pclose in sequence and return the result of p on success', () => {
-        const p = Primitives.between(Primitives.word("foo("))(Primitives.word("bar"))(Primitives.char(")"));
+        const p = Primitives.between(Primitives.str("foo("))(Primitives.str("bar"))(Primitives.char(")"));
         const output = p(input);
         switch(output.tag) {
             case "success":
@@ -509,7 +509,7 @@ describe('Between parser', () => {
     });
 
     it('should fail if popen fails', () => {
-        const p = Primitives.between(Primitives.word("zoo("))(Primitives.word("bar"))(Primitives.char(")"));
+        const p = Primitives.between(Primitives.str("zoo("))(Primitives.str("bar"))(Primitives.char(")"));
         const output = p(input);
         switch(output.tag) {
             case "success":
@@ -522,7 +522,7 @@ describe('Between parser', () => {
     });
 
     it('should fail if pclose fails', () => {
-        const p = Primitives.between(Primitives.word("foo("))(Primitives.word("bar"))(Primitives.char("-"));
+        const p = Primitives.between(Primitives.str("foo("))(Primitives.str("bar"))(Primitives.char("-"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -535,7 +535,7 @@ describe('Between parser', () => {
     });
 
     it('should fail if p fails', () => {
-        const p = Primitives.between(Primitives.word("foo("))(Primitives.word("huh"))(Primitives.char(")"));
+        const p = Primitives.between(Primitives.str("foo("))(Primitives.str("huh"))(Primitives.char(")"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":

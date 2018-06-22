@@ -343,12 +343,12 @@ export namespace Primitives {
     }
 
     /**
-     * word yields a parser for the given string.
+     * str yields a parser for the given string.
      * @param s A string
      */
     // TODO: this should actually be a sequence of parsers constructed
     // from the string s
-    export function word(s: string) : IParser<CharUtil.CharStream> {
+    export function str(s: string) : IParser<CharUtil.CharStream> {
         return (istream: CharUtil.CharStream) => {
             // escape regex metacharacters
             // (this likely needs work)

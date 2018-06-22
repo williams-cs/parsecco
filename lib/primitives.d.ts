@@ -142,10 +142,10 @@ export declare namespace Primitives {
      */
     function many1<T>(p: IParser<T>): (istream: CharUtil.CharStream) => Outcome<T[]>;
     /**
-     * word yields a parser for the given string.
+     * str yields a parser for the given string.
      * @param s A string
      */
-    function word(s: string): IParser<CharUtil.CharStream>;
+    function str(s: string): IParser<CharUtil.CharStream>;
     /**
      * Returns a parser that succeeds only if the end of the
      * input has been reached.

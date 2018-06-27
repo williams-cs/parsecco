@@ -425,12 +425,12 @@ export namespace Primitives {
      * successful, returns the result of p.
      * @param popen the first parser
      */
-    export function between<T,U,V>(popen: IParser<T>) {
+    export function between<T,U,V>(popen: IParser<T>): (pclose: IParser<U>) => (p: IParser<V>) => IParser<V> {
         return (pclose: IParser<U>) => {
             return (p: IParser<V>) => {
-                return (istream: CharUtil.CharStream) => {
-                    return right(popen)(left(pclose)(p))(istream)
-                }
+                let l : IParser<V> = left<V,U>(p)(pclose);
+                let r : IParser<V> = right<T,V>(popen)(l);
+                return r;
             }
         }
     }

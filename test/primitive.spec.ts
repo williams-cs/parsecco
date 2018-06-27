@@ -496,7 +496,7 @@ describe('Between parser', () => {
     const input = new CharUtil.CharStream("foo(bar)");
 
     it('should apply popen, p, and pclose in sequence and return the result of p on success', () => {
-        const p = Primitives.between(Primitives.str("foo("))(Primitives.str("bar"))(Primitives.char(")"));
+        const p = Primitives.between(Primitives.str("foo("))(Primitives.char(")"))(Primitives.str("bar"));
         const output = p(input);
         switch(output.tag) {
             case "success":

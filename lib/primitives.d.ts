@@ -177,7 +177,7 @@ export declare namespace Primitives {
      * successful, returns the result of p.
      * @param popen the first parser
      */
-    function between<T, U, V>(popen: IParser<T>): (pclose: IParser<U>) => (p: IParser<V>) => (istream: CharUtil.CharStream) => Outcome<{}>;
+    function between<T, U, V>(popen: IParser<T>): (pclose: IParser<U>) => (p: IParser<V>) => IParser<V>;
     /**
      * The debug parser takes a parser p and a debug string,
      * printing the debug string as a side-effect before

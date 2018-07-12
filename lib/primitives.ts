@@ -448,10 +448,10 @@ export namespace Primitives {
                 let o = p(istream);
                 switch(o.tag) {
                     case "success":
-                        console.log("success: " + label);
+                        console.log("success: " + label + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
                         break;
                     case "failure":
-                        console.log("failure: " + label);
+                        console.log("failure: " + label + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
                         break;
                 }
                 return o;
@@ -492,5 +492,12 @@ export namespace Primitives {
                     return o;
             }
         }
+    }
+
+    /**
+     * nl matches and returns a newline.
+     */
+    export function nl() : IParser<CharUtil.CharStream> {
+        return Primitives.choice(Primitives.str("\n"))(Primitives.str("\r\n"))
     }
 }

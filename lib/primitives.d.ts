@@ -197,4 +197,8 @@ export declare namespace Primitives {
      * ws1 returns matched whitespace in a single CharStream result.
      */
     function ws1(): IParser<CharUtil.CharStream>;
+    /**
+     * nl matches and returns a newline.
+     */
+    function nl(): IParser<CharUtil.CharStream>;
 }

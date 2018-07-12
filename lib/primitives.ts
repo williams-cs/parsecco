@@ -459,7 +459,7 @@ export namespace Primitives {
         }
     }
 
-    let wschars = choice(sat(c => c == ' ' || c == '\t' || c == '\n'))(str('\r\n'))
+    let wschars = choice(sat(c => c == ' ' || c == '\t'))(nl())
 
     /**
      * ws matches zero or more of the following whitespace characters:

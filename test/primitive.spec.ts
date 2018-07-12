@@ -634,3 +634,59 @@ describe('ws1 parser', () => {
         }
     });
 });
+
+describe('nl parser', () => {
+    it('should successfully match a UNIX newline', () => {
+        const i = new CharUtil.CharStream("\n");
+        const output = Primitives.nl()(i);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("\n");
+                expect(output.inputstream.toString()).to.equal("");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should successfully match a Windows newline', () => {
+        const i = new CharUtil.CharStream("\r\n");
+        const output = Primitives.nl()(i);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("\r\n");
+                expect(output.inputstream.toString()).to.equal("");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should not match other whitespace', () => {
+        const i = new CharUtil.CharStream(" ");
+        const output = Primitives.nl()(i);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        }
+    });
+
+    it('should not match the empty string', () => {
+        const i = new CharUtil.CharStream("");
+        const output = Primitives.nl()(i);
+        switch(output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                assert(true);
+                break;
+        }
+    });
+});

@@ -207,15 +207,12 @@ export namespace Primitives {
                     switch(o2.tag) {
                         case "success":
                             return o1;
-                            break;
                         case "failure":
                             return new Failure(istream);
-                            break;
                     }
                     break;
                 case "failure":
                     return o1;
-                    break;
             }
             throw new Error("never happens");
         };
@@ -234,15 +231,12 @@ export namespace Primitives {
                     switch(o2.tag) {
                         case "success":
                             return o1;
-                            break;
                         case "failure":
                             return new Failure(istream);
-                            break;
                     }
                     break;
                 case "failure":
                     return o1;
-                    break;
             }
             throw new Error("never happens");
         };
@@ -284,10 +278,8 @@ export namespace Primitives {
                 switch(o.tag) {
                     case "success":
                         return new Success<U>(o.inputstream, f(o.result));
-                        break;
                     case "failure":
                         return o;
-                        break;
                 }
             }
         }

@@ -690,3 +690,34 @@ describe('nl parser', () => {
         }
     });
 });
+
+describe('strSat parser', () => {
+    it('should match the shortest, lexicographically first string in the given set that occurs in the input', () => {
+        const i = new CharUtil.CharStream("the quick brown fox jumps over the lazy dog");
+        const strs = ["the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog"];
+        const output = Primitives.strSat(strs)(i);
+        switch (output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("the");
+                expect(output.inputstream.toString()).to.equal(" quick brown fox jumps over the lazy dog");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
+
+    it('should fail if there are no matches', () => {
+        const i = new CharUtil.CharStream("hello world");
+        const strs = ["the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog"];
+        const output = Primitives.strSat(strs)(i);
+        switch (output.tag) {
+            case "success":
+                assert.fail();
+                break;
+            case "failure":
+                expect(output.inputstream).to.eql(i);
+                break;
+        }
+    });
+});

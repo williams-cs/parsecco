@@ -492,4 +492,49 @@ export namespace Primitives {
     export function nl() : IParser<CharUtil.CharStream> {
         return Primitives.choice(Primitives.str("\n"))(Primitives.str("\r\n"))
     }
+
+    function groupBy<T,U>(list: T[], keyGetter: (e:T) => U) : Map<U,T[]> {
+        let m: Map<U,T[]> = new Map<U,T[]>();
+        list.forEach((item) => {
+            const key = keyGetter(item);
+            if (!m.has(key)) {
+                m.set(key, []);
+            }
+            let collection = m.get(key)!;
+            collection.push(item);
+        });
+        return m;
+    }
+
+    export function strSat(strs: string[]) : IParser<CharUtil.CharStream> {
+        // sort strings first by length, and then lexicograpically;
+        // slice() called here so as not to modify original array
+        let smap = groupBy(strs, s => s.length);
+        let sizes: number[] = [];
+        // find size classes;
+        // also sort each set of equivalent-length values
+        smap.forEach((vals: string[], key: number, m: Map<number, string[]>) => {
+            sizes.push(key);
+            vals.sort();
+        });
+        sizes.sort();
+        
+        return (istream: CharUtil.CharStream) => {    
+            // start with the smallest size class       
+            for(let peekIndex = 0; peekIndex < sizes.length; peekIndex++) {
+                // for each size class, try matching all of
+                // the strings; if one is found, return the
+                // appropriate CharStream; if not, fail.
+                let peek = istream.peek(sizes[peekIndex]);
+                let tail = istream.seek(sizes[peekIndex]);
+                let candidates = smap.get(sizes[peekIndex])!;
+                for(let cIndex = 0; cIndex < candidates.length; cIndex++) {
+                    if (candidates[cIndex] === peek.toString()) {
+                        return new Success(tail, peek);
+                    }
+                }
+            }
+            return new Failure(istream);
+        }
+    }
 }

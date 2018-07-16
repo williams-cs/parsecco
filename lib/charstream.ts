@@ -49,6 +49,22 @@ export namespace CharUtil {
         }
     
         /**
+         * Returns a new CharStream representing the input from the
+         * current start position to an end position num chars from
+         * the current start position.  If startpos + num > endpos,
+         * the current CharStream is returned.
+         * @param num 
+         */
+        public peek(num: number) : CharStream {
+            if (this.startpos + num > this.endpos) {
+                return this;
+            } else {
+                let newHasEOF = this.startpos + num == this.endpos && this.hasEOF;
+                return new CharStream(this.input, this.startpos, this.startpos + num, newHasEOF);
+            }
+        }
+
+        /**
          * Returns a new CharStream representing the string after
          * seeking num characters from the current position.
          * @param num 

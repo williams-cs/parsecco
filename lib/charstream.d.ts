@@ -15,6 +15,14 @@ export declare namespace CharUtil {
          */
         toString(): string;
         /**
+         * Returns a new CharStream representing the input from the
+         * current start position to an end position num chars from
+         * the current start position.  If startpos + num > endpos,
+         * the current CharStream is returned.
+         * @param num
+         */
+        peek(num: number): CharStream;
+        /**
          * Returns a new CharStream representing the string after
          * seeking num characters from the current position.
          * @param num

@@ -201,4 +201,5 @@ export declare namespace Primitives {
      * nl matches and returns a newline.
      */
     function nl(): IParser<CharUtil.CharStream>;
+    function strSat(strs: string[]): IParser<CharUtil.CharStream>;
 }

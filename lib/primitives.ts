@@ -122,12 +122,14 @@ export namespace Primitives {
     export function seq<T,U,V>(p: IParser<T>) {
         return (q: IParser<U>) => {
             return (f: (e: [T,U]) => V) => {
-                return bind<T,V>(p)((x) => {
-                    return bind<U,V>(q)((y) => {
-                        let tup : [T,U] = [x,y];
-                        return result<V>(f(tup));
-                    });
-                });
+                return (istream: CharUtil.CharStream) => {
+                    return bind<T,V>(p)((x) => {
+                        return bind<U,V>(q)((y) => {
+                            let tup : [T,U] = [x,y];
+                            return result<V>(f(tup));
+                        });
+                    })(istream);
+                }
             }
         };
     }

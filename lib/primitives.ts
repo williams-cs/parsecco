@@ -111,6 +111,10 @@ export namespace Primitives {
         }
     }
 
+    export function delay<T>(p: IParser<T>) {
+        return () => p;
+    }
+
     /**
      * seq is a curried function that takes a parser p, a parser q,
      * and a function f. It applies p to the input, passing the
@@ -119,17 +123,27 @@ export namespace Primitives {
      * a single result.
      * @param p A parser
      */
+    // export let seq = function<T,U,V>(p: IParser<T>) {
+    //     return (q: IParser<U>) => {
+    //         return (f: (e: [T,U]) => V) => {
+    //             return bind<T,V>(p)((x) => {
+    //                 return bind<U,V>(q)((y) => {
+    //                     let tup : [T,U] = [x,y];
+    //                     return result<V>(f(tup));
+    //                 });
+    //             });
+    //         }
+    //     };
+    // }
     export function seq<T,U,V>(p: IParser<T>) {
         return (q: IParser<U>) => {
             return (f: (e: [T,U]) => V) => {
-                return (istream: CharUtil.CharStream) => {
-                    return bind<T,V>(p)((x) => {
-                        return bind<U,V>(q)((y) => {
-                            let tup : [T,U] = [x,y];
-                            return result<V>(f(tup));
-                        });
-                    })(istream);
-                }
+                return bind<T,V>(p)((x) => {
+                    return bind<U,V>(q)((y) => {
+                        let tup : [T,U] = [x,y];
+                        return result<V>(f(tup));
+                    });
+                });
             }
         };
     }

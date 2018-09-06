@@ -64,6 +64,7 @@ export declare namespace Primitives {
      * @param p A parser
      */
     function bind<T, U>(p: IParser<T>): (f: (t: T) => IParser<U>) => (istream: CharUtil.CharStream) => Outcome<U>;
+    function delay<T>(p: IParser<T>): () => IParser<T>;
     /**
      * seq is a curried function that takes a parser p, a parser q,
      * and a function f. It applies p to the input, passing the

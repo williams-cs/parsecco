@@ -1,26 +1,28 @@
-import {Primitives, CharUtil} from '../lib/index';
+import {CharUtil as CU} from '../lib/charstream';
+// import {CharUtil} from '../lib/index';
+import {Primitives as P} from '../lib/index';
 import { assert,expect } from 'chai';
 import 'mocha';
 
-const inputstream = new CharUtil.CharStream("helloworld");
+const inputstream = new CU.CharStream("helloworld");
 
 describe('Failure object', () => {
   it('should consume none of the input stream', () => {
-    const output = new Primitives.Failure(inputstream);
+    const output = new P.Failure(inputstream);
     expect(output.inputstream).to.equal(inputstream);
   });
 });
 
 describe('Result parser', () => {
     it('should succeed without consuming any input', () => {
-        const output = Primitives.result(true)(inputstream);
+        const output = P.result(true)(inputstream);
         expect(output.inputstream).to.equal(inputstream);
     });
 });
 
 describe('Zero parser', () => {
     it('should fail and consume no input', () => {
-        const output = Primitives.zero<string>()(inputstream);
+        const output = P.zero<string>()(inputstream);
         expect(output.inputstream).to.equal(inputstream);
         switch(output.tag) {
             case "failure":
@@ -35,13 +37,13 @@ describe('Zero parser', () => {
 
 describe('Item parser', () => {
     it('should successfully consume input when there is input to consume', () => {
-        const output = Primitives.item()(inputstream);
+        const output = P.item()(inputstream);
         expect(output.inputstream.toString()).to.equal("elloworld");
     });
 
     it('should fail to consume input when there is no input to consume', () => {
-        const empty = new CharUtil.CharStream("");
-        const output = Primitives.item()(empty);
+        const empty = new CU.CharStream("");
+        const output = P.item()(empty);
         expect(output.inputstream.toString()).to.equal("");
         switch(output.tag) {
             case "success":
@@ -56,7 +58,7 @@ describe('Item parser', () => {
 
 describe('Sat parser', () => {
     it('should successfully consume input that matches a predicate', () => {
-        const output = Primitives.sat((s) => s === "h")(inputstream);
+        const output = P.sat((s) => s === "h")(inputstream);
         expect(output.inputstream.toString()).to.equal("elloworld");
         switch(output.tag) {
             case "success":
@@ -71,7 +73,7 @@ describe('Sat parser', () => {
 
 describe('Seq parser', () => {
     it('should successfully apply two parsers in a row', () => {
-        const output = Primitives.seq<CharUtil.CharStream,CharUtil.CharStream,CharUtil.CharStream>(Primitives.item())(Primitives.item())(tup => tup[1].concat(tup[0]))(inputstream);
+        const output = P.seq<CU.CharStream,CU.CharStream,CU.CharStream>(P.item())(P.item())(tup => tup[1].concat(tup[0]))(inputstream);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("eh");
@@ -81,11 +83,17 @@ describe('Seq parser', () => {
                 break;
         }
     });
+
+    it('should not eagerly compose two parsers', () => {
+        let p2: P.IParser<CU.CharStream> = i => P.seq<CU.CharStream,CU.CharStream,CU.CharStream>(P.char("."))(p2)(x=>x[0])(i);
+        let p = p2;
+        assert(true);
+    });
 });
 
 describe('Char parser', () => {
     it('should successfully consume the given character if it is next in the stream', () => {
-        const output = Primitives.char("h")(inputstream);
+        const output = P.char("h")(inputstream);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("h");
@@ -97,7 +105,7 @@ describe('Char parser', () => {
     });
 
     it('should fail if the given character is not the next in the stream', () => {
-        const output = Primitives.char("e")(inputstream);
+        const output = P.char("e")(inputstream);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -111,7 +119,7 @@ describe('Char parser', () => {
 
 describe('Letter parser', () => {
     it('should successfully consume an alphabetic letter', () => {
-        const output = Primitives.letter()(inputstream);
+        const output = P.letter()(inputstream);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("h");
@@ -123,8 +131,8 @@ describe('Letter parser', () => {
     });
 
     it('should fail to consume a non-alphabetic letter', () => {
-        const inputstream2 = new CharUtil.CharStream("!helloworld");
-        const output = Primitives.letter()(inputstream2);
+        const inputstream2 = new CU.CharStream("!helloworld");
+        const output = P.letter()(inputstream2);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -138,8 +146,8 @@ describe('Letter parser', () => {
 
 describe('Digit parser', () => {
     it('should successfully consume a numeric digit if the next character in the stream is a numeric character', () => {
-        const inputstream2 = new CharUtil.CharStream("0helloworld");
-        const output = Primitives.digit()(inputstream2);
+        const inputstream2 = new CU.CharStream("0helloworld");
+        const output = P.digit()(inputstream2);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("0");
@@ -151,7 +159,7 @@ describe('Digit parser', () => {
     });
 
     it('should fail if the next character in the stream is not a numeric character', () => {
-        const output = Primitives.digit()(inputstream);
+        const output = P.digit()(inputstream);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -165,8 +173,8 @@ describe('Digit parser', () => {
 
 describe('Upper parser', () => {
     it('should successfully consume an uppercase character if the next char in the stream is uppercase', () => {
-        const inputstream2 = new CharUtil.CharStream("Helloworld");
-        const output = Primitives.upper()(inputstream2);
+        const inputstream2 = new CU.CharStream("Helloworld");
+        const output = P.upper()(inputstream2);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("H");
@@ -178,8 +186,8 @@ describe('Upper parser', () => {
     });
 
     it('should fail if the next character in the stream is not uppercase', () => {
-        const inputstream2 = new CharUtil.CharStream("hElloworld");
-        const output = Primitives.upper()(inputstream2);
+        const inputstream2 = new CU.CharStream("hElloworld");
+        const output = P.upper()(inputstream2);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -191,8 +199,8 @@ describe('Upper parser', () => {
     });
 
     it('should fail if the next character in the stream is not a letter', () => {
-        const inputstream2 = new CharUtil.CharStream("#helloworld");
-        const output = Primitives.upper()(inputstream2);
+        const inputstream2 = new CU.CharStream("#helloworld");
+        const output = P.upper()(inputstream2);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -206,7 +214,7 @@ describe('Upper parser', () => {
 
 describe('Lower parser', () => {
     it('should successfully consume a lower character if the next char in the stream is lowercase', () => {
-        const output = Primitives.lower()(inputstream);
+        const output = P.lower()(inputstream);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("h");
@@ -218,8 +226,8 @@ describe('Lower parser', () => {
     });
 
     it('should fail if the next character in the stream is not lowercase', () => {
-        const inputstream2 = new CharUtil.CharStream("#helloworld");
-        const output = Primitives.lower()(inputstream2);
+        const inputstream2 = new CU.CharStream("#helloworld");
+        const output = P.lower()(inputstream2);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -231,8 +239,8 @@ describe('Lower parser', () => {
     });
 
     it('should fail if the next character in the stream is not a letter', () => {
-        const inputstream2 = new CharUtil.CharStream("#helloworld");
-        const output = Primitives.lower()(inputstream2);
+        const inputstream2 = new CU.CharStream("#helloworld");
+        const output = P.lower()(inputstream2);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -246,7 +254,7 @@ describe('Lower parser', () => {
 
 describe('Choice parser', () => {
     it('should allow parsing alternatives', () => {
-        const output = Primitives.choice(Primitives.upper())(Primitives.lower())(inputstream);
+        const output = P.choice(P.upper())(P.lower())(inputstream);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("h");
@@ -258,8 +266,8 @@ describe('Choice parser', () => {
     });
 
     it('should fail if no alternatives can be applied', () => {
-        const inputstream2 = new CharUtil.CharStream("4helloworld");
-        const output = Primitives.choice(Primitives.upper())(Primitives.lower())(inputstream2);
+        const inputstream2 = new CU.CharStream("4helloworld");
+        const output = P.choice(P.upper())(P.lower())(inputstream2);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -273,7 +281,7 @@ describe('Choice parser', () => {
 
 describe('Appfun parser', () => {
     it('should apply a function to the result of a successful parse', () => {
-        const output = Primitives.appfun(Primitives.item())(s => "whatever!")(inputstream);
+        const output = P.appfun(P.item())(s => "whatever!")(inputstream);
         switch(output.tag) {
             case "success":
                 expect(output.result).to.equal("whatever!");
@@ -285,8 +293,8 @@ describe('Appfun parser', () => {
     });
 
     it('should fail if p fails', () => {
-        const empty = new CharUtil.CharStream("");
-        const output = Primitives.appfun(Primitives.item())(s => "whatever!")(empty);
+        const empty = new CU.CharStream("");
+        const output = P.appfun(P.item())(s => "whatever!")(empty);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -300,20 +308,20 @@ describe('Appfun parser', () => {
 
 describe('Many parser', () => {
     it('should apply the given parser until the end of the input', () => {
-        const output = Primitives.many(Primitives.item())(inputstream);
+        const output = P.many(P.item())(inputstream);
         expect(output.result.toString()).to.equal("h,e,l,l,o,w,o,r,l,d");
     });
 
     it('including zero times', () => {
-        const empty = new CharUtil.CharStream("");
-        const output = Primitives.many(Primitives.item())(empty);
+        const empty = new CU.CharStream("");
+        const output = P.many(P.item())(empty);
         expect(output.result).to.eql([]);
     });
 
     it('should apply the given parser until it fails', () => {
         const tstring = "54hello"
-        const inputstream2 = new CharUtil.CharStream(tstring);
-        const output = Primitives.many(Primitives.digit())(inputstream2);
+        const inputstream2 = new CU.CharStream(tstring);
+        const output = P.many(P.digit())(inputstream2);
         switch(output.tag) {
             case "success":
                 let s = "";
@@ -328,7 +336,7 @@ describe('Many parser', () => {
 
 describe('Str parser', () => {
     it('should match a string and leave remainder in inputstream', () => {
-        const output = Primitives.str("hello")(inputstream);
+        const output = P.str("hello")(inputstream);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("hello");
@@ -341,8 +349,8 @@ describe('Str parser', () => {
     });
 
     it('should fail if string is not in input stream', () => {
-        const inputstream2 = new CharUtil.CharStream("worldhello");
-        const output = Primitives.str("hello")(inputstream2);
+        const inputstream2 = new CU.CharStream("worldhello");
+        const output = P.str("hello")(inputstream2);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -356,7 +364,7 @@ describe('Str parser', () => {
 
 describe('EOF parser', () => {
     it('should succeed at the end of the input', () => {
-        const p = Primitives.seq<CharUtil.CharStream,Primitives.EOFMark,CharUtil.CharStream>(Primitives.str("helloworld"))(Primitives.eof())(tup => tup[0]);
+        const p = P.seq<CU.CharStream,P.EOFMark,CU.CharStream>(P.str("helloworld"))(P.eof())(tup => tup[0]);
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -369,7 +377,7 @@ describe('EOF parser', () => {
     });
 
     it('should fail when not at the end of the input', () => {
-        const p = Primitives.seq<CharUtil.CharStream,Primitives.EOFMark,CharUtil.CharStream>(Primitives.str("hello"))(Primitives.eof())(tup => tup[0]);
+        const p = P.seq<CU.CharStream,P.EOFMark,CU.CharStream>(P.str("hello"))(P.eof())(tup => tup[0]);
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -384,7 +392,7 @@ describe('EOF parser', () => {
 
 describe('FResult parser', () => {
     it('should return the given value if the given parser succeeds', () => {
-        const p = Primitives.fresult(Primitives.str("hello"))(1);
+        const p = P.fresult(P.str("hello"))(1);
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -397,7 +405,7 @@ describe('FResult parser', () => {
     });
 
     it('should fail if the parser fails', () => {
-        const p = Primitives.fresult(Primitives.str("ello"))(1);
+        const p = P.fresult(P.str("ello"))(1);
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -412,7 +420,7 @@ describe('FResult parser', () => {
 
 describe('Left parser', () => {
     it('should apply p and q in sequence and return the result of q on success', () => {
-        const p = Primitives.left(Primitives.str("hello"))(Primitives.str("world"));
+        const p = P.left(P.str("hello"))(P.str("world"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -425,7 +433,7 @@ describe('Left parser', () => {
     });
 
     it('should fail if p fails', () => {
-        const p = Primitives.left(Primitives.str("z"))(Primitives.str("world"));
+        const p = P.left(P.str("z"))(P.str("world"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -438,7 +446,7 @@ describe('Left parser', () => {
     });
 
     it('should fail if q fails', () => {
-        const p = Primitives.left(Primitives.str("hello"))(Primitives.str("z"));
+        const p = P.left(P.str("hello"))(P.str("z"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -453,7 +461,7 @@ describe('Left parser', () => {
 
 describe('Right parser', () => {
     it('should apply p and q in sequence and return the result of q on success', () => {
-        const p = Primitives.right(Primitives.str("hello"))(Primitives.str("world"));
+        const p = P.right(P.str("hello"))(P.str("world"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -466,7 +474,7 @@ describe('Right parser', () => {
     });
 
     it('should fail if p fails', () => {
-        const p = Primitives.right(Primitives.str("z"))(Primitives.str("world"));
+        const p = P.right(P.str("z"))(P.str("world"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -479,7 +487,7 @@ describe('Right parser', () => {
     });
 
     it('should fail if q fails', () => {
-        const p = Primitives.right(Primitives.str("hello"))(Primitives.str("z"));
+        const p = P.right(P.str("hello"))(P.str("z"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -493,10 +501,10 @@ describe('Right parser', () => {
 });
 
 describe('Between parser', () => {
-    const input = new CharUtil.CharStream("foo(bar)");
+    const input = new CU.CharStream("foo(bar)");
 
     it('should apply popen, p, and pclose in sequence and return the result of p on success', () => {
-        const p = Primitives.between(Primitives.str("foo("))(Primitives.char(")"))(Primitives.str("bar"));
+        const p = P.between(P.str("foo("))(P.char(")"))(P.str("bar"));
         const output = p(input);
         switch(output.tag) {
             case "success":
@@ -509,7 +517,7 @@ describe('Between parser', () => {
     });
 
     it('should fail if popen fails', () => {
-        const p = Primitives.between(Primitives.str("zoo("))(Primitives.str("bar"))(Primitives.char(")"));
+        const p = P.between(P.str("zoo("))(P.str("bar"))(P.char(")"));
         const output = p(input);
         switch(output.tag) {
             case "success":
@@ -522,7 +530,7 @@ describe('Between parser', () => {
     });
 
     it('should fail if pclose fails', () => {
-        const p = Primitives.between(Primitives.str("foo("))(Primitives.str("bar"))(Primitives.char("-"));
+        const p = P.between(P.str("foo("))(P.str("bar"))(P.char("-"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -535,7 +543,7 @@ describe('Between parser', () => {
     });
 
     it('should fail if p fails', () => {
-        const p = Primitives.between(Primitives.str("foo("))(Primitives.str("huh"))(Primitives.char(")"));
+        const p = P.between(P.str("foo("))(P.str("huh"))(P.char(")"));
         const output = p(inputstream);
         switch(output.tag) {
             case "success":
@@ -550,12 +558,12 @@ describe('Between parser', () => {
 
 describe('many1 parser', () => {
     it('should succeed if p succeeds at least once', () => {
-        const i = new CharUtil.CharStream("hhhelloworld");
-        const p = Primitives.many1(Primitives.char('h'));
+        const i = new CU.CharStream("hhhelloworld");
+        const p = P.many1(P.char('h'));
         const output = p(i);
         switch(output.tag) {
             case "success":
-                expect(CharUtil.CharStream.concat(output.result).toString()).to.equal("hhh");
+                expect(CU.CharStream.concat(output.result).toString()).to.equal("hhh");
                 break;
             case "failure":
                 assert.fail();
@@ -564,8 +572,8 @@ describe('many1 parser', () => {
     });
 
     it('should fail if p does not succeed at least once', () => {
-        const i = new CharUtil.CharStream("elloworld");
-        const p = Primitives.many1(Primitives.char('h'));
+        const i = new CU.CharStream("elloworld");
+        const p = P.many1(P.char('h'));
         const output = p(i);
         switch(output.tag) {
             case "success":
@@ -580,8 +588,8 @@ describe('many1 parser', () => {
 
 describe('ws parser', () => {
     it('should successfully consume whitespace', () => {
-        const i = new CharUtil.CharStream(" \t  \n\t \r\nhelloworld");
-        const output = Primitives.ws()(i);
+        const i = new CU.CharStream(" \t  \n\t \r\nhelloworld");
+        const output = P.ws()(i);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal(" \t  \n\t \r\n");
@@ -594,7 +602,7 @@ describe('ws parser', () => {
     });
 
     it('should succeed even if the string has no whitespace', () => {
-        const output = Primitives.ws()(inputstream);
+        const output = P.ws()(inputstream);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("");
@@ -609,8 +617,8 @@ describe('ws parser', () => {
 
 describe('ws1 parser', () => {
     it('should successfully consume whitespace', () => {
-        const i = new CharUtil.CharStream(" \t  \n\t \r\nhelloworld");
-        const output = Primitives.ws1()(i);
+        const i = new CU.CharStream(" \t  \n\t \r\nhelloworld");
+        const output = P.ws1()(i);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal(" \t  \n\t \r\n");
@@ -623,7 +631,7 @@ describe('ws1 parser', () => {
     });
 
     it('should fail if the string has no whitespace', () => {
-        const output = Primitives.ws1()(inputstream);
+        const output = P.ws1()(inputstream);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -637,8 +645,8 @@ describe('ws1 parser', () => {
 
 describe('nl parser', () => {
     it('should successfully match a UNIX newline', () => {
-        const i = new CharUtil.CharStream("\n");
-        const output = Primitives.nl()(i);
+        const i = new CU.CharStream("\n");
+        const output = P.nl()(i);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("\n");
@@ -651,8 +659,8 @@ describe('nl parser', () => {
     });
 
     it('should successfully match a Windows newline', () => {
-        const i = new CharUtil.CharStream("\r\n");
-        const output = Primitives.nl()(i);
+        const i = new CU.CharStream("\r\n");
+        const output = P.nl()(i);
         switch(output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("\r\n");
@@ -665,8 +673,8 @@ describe('nl parser', () => {
     });
 
     it('should not match other whitespace', () => {
-        const i = new CharUtil.CharStream(" ");
-        const output = Primitives.nl()(i);
+        const i = new CU.CharStream(" ");
+        const output = P.nl()(i);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -678,8 +686,8 @@ describe('nl parser', () => {
     });
 
     it('should not match the empty string', () => {
-        const i = new CharUtil.CharStream("");
-        const output = Primitives.nl()(i);
+        const i = new CU.CharStream("");
+        const output = P.nl()(i);
         switch(output.tag) {
             case "success":
                 assert.fail();
@@ -693,9 +701,9 @@ describe('nl parser', () => {
 
 describe('strSat parser', () => {
     it('should match the shortest, lexicographically first string in the given set that occurs in the input', () => {
-        const i = new CharUtil.CharStream("the quick brown fox jumps over the lazy dog");
+        const i = new CU.CharStream("the quick brown fox jumps over the lazy dog");
         const strs = ["the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog"];
-        const output = Primitives.strSat(strs)(i);
+        const output = P.strSat(strs)(i);
         switch (output.tag) {
             case "success":
                 expect(output.result.toString()).to.equal("the");
@@ -708,9 +716,9 @@ describe('strSat parser', () => {
     });
 
     it('should fail if there are no matches', () => {
-        const i = new CharUtil.CharStream("hello world");
+        const i = new CU.CharStream("hello world");
         const strs = ["the", "quick", "brown", "fox", "jumps", "over", "lazy", "dog"];
-        const output = Primitives.strSat(strs)(i);
+        const output = P.strSat(strs)(i);
         switch (output.tag) {
             case "success":
                 assert.fail();

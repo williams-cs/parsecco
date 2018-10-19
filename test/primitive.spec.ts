@@ -142,6 +142,19 @@ describe('Letter parser', () => {
                 break;
         };
     });
+
+    it('should only consume a single alphabetic letter', () => {
+        const inputstream2 = new CU.CharStream("hey");
+        const output = P.letter()(inputstream2);
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("h");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
+    });
 });
 
 describe('Digit parser', () => {

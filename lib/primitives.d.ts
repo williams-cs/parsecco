@@ -6,6 +6,11 @@ export declare namespace Primitives {
         static readonly Instance: EOFMark;
     }
     const EOF: EOFMark;
+    class HighWaterMark {
+        location: number;
+        expecting: string;
+        constructor(location: number, expecting: string);
+    }
     /**
      * Represents a successful parse.
      */
@@ -17,6 +22,7 @@ export declare namespace Primitives {
          * Returns an object representing a successful parse.
          * @param istream The remaining string.
          * @param res The result of the parse
+         * @param index: high-watermark, where to start backtrack, index of last success+1
          */
         constructor(istream: CharUtil.CharStream, res: T);
     }
@@ -26,11 +32,12 @@ export declare namespace Primitives {
     class Failure {
         tag: "failure";
         inputstream: CharUtil.CharStream;
+        high_watermark: HighWaterMark;
         /**
          * Returns an object representing a failed parse.
          * @param istream The string, unmodified, that was given to the parser.
          */
-        constructor(istream: CharUtil.CharStream);
+        constructor(istream: CharUtil.CharStream, hwm: HighWaterMark);
     }
     /**
      * Union type representing a successful or failed parse.
@@ -49,8 +56,9 @@ export declare namespace Primitives {
     function result<T>(v: T): IParser<T>;
     /**
      * zero fails without consuming any input.
+     * @param expecting the error message.
      */
-    function zero<T>(): IParser<T>;
+    function zero<T>(expecting: string): IParser<T>;
     /**
      * item successfully consumes the first character if the input
      * string is non-empty, otherwise it fails.
@@ -80,7 +88,7 @@ export declare namespace Primitives {
      * otherwise it fails.
      * @param pred a character predicate
      */
-    function sat(pred: (s: string) => boolean): IParser<CharUtil.CharStream>;
+    function sat(char_class: string[]): IParser<CharUtil.CharStream>;
     /**
      * char takes a character and yields a parser that consume
      * that character. The returned parser succeeds if the next
@@ -118,7 +126,7 @@ export declare namespace Primitives {
      * the same input stream.
      * @param p1 A parser.
      */
-    function choice<T>(p1: IParser<T>): (p2: IParser<T>) => (istream: CharUtil.CharStream) => Outcome<T>;
+    function choice<T>(p1: IParser<T>): (p2: IParser<T>) => (istream: CharUtil.CharStream) => Failure | Success<T> | undefined;
     /**
      * appfun allows the user to apply a function f to
      * the result of a parser p, assuming that p is successful.

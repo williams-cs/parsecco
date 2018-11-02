@@ -11,6 +11,15 @@ export namespace Primitives {
     }
     export const EOF = EOFMark.Instance;
 
+    export class HighWaterMark {
+        location: number;
+        expecting: string;
+        constructor(location: number, expecting: string) {
+            this.location = location;
+            this.expecting = expecting;
+        }
+    }
+
     /**
      * Represents a successful parse.
      */
@@ -22,6 +31,7 @@ export namespace Primitives {
          * Returns an object representing a successful parse.
          * @param istream The remaining string.
          * @param res The result of the parse
+         * @param index: high-watermark, where to start backtrack, index of last success+1
          */
         constructor(istream: CharUtil.CharStream, res: T) {
             this.inputstream = istream;
@@ -35,12 +45,14 @@ export namespace Primitives {
     export class Failure {
         tag: "failure" = "failure";
         inputstream: CharUtil.CharStream;
+        high_watermark: HighWaterMark;
         /**
          * Returns an object representing a failed parse.
          * @param istream The string, unmodified, that was given to the parser.
          */
-        constructor(istream: CharUtil.CharStream) {
+        constructor(istream: CharUtil.CharStream, hwm: HighWaterMark) {
             this.inputstream = istream;
+            this.high_watermark = hwm;
         }
     }
 
@@ -66,9 +78,13 @@ export namespace Primitives {
 
     /**
      * zero fails without consuming any input.
+     * @param expecting the error message.
      */
-    export function zero<T>() : IParser<T> {
-        return (istream) => new Failure(istream);
+    export function zero<T>(expecting: string) : IParser<T> {
+        return (istream) => {
+            let hwm = new HighWaterMark(istream.startpos, expecting);
+            return new Failure(istream, hwm);
+        } 
     }
 
     /**
@@ -78,9 +94,11 @@ export namespace Primitives {
     export function item() {
         return (istream: CharUtil.CharStream) => {
             if (istream.isEmpty()) {
-                return new Failure(istream);
+                return new Failure(istream, new HighWaterMark(istream.startpos, "a character"));
             } else {
-                return new Success(istream.tail(), istream.head());
+                let remaining = istream.tail(); //remaing string;
+                let res = istream.head(); //result of parse;
+                return new Success(remaining, res);
             }
         }
     }
@@ -100,12 +118,15 @@ export namespace Primitives {
                     case "success":
                         let o = f(r.result)(r.inputstream);
                         switch (o.tag) {
-                            case "success": return o;
+                            case "success":
+                                break;
                             case "failure":
                                 // note: backtracks, returning original istream
-                                return new Failure(istream);
+                                return new Failure(istream, o.high_watermark);
                         }
-                    case "failure": return new Failure(istream);
+                        return o;
+                    case "failure":
+                      return new Failure(istream, r.high_watermark);
                 }
             }
         }
@@ -123,18 +144,6 @@ export namespace Primitives {
      * a single result.
      * @param p A parser
      */
-    // export let seq = function<T,U,V>(p: IParser<T>) {
-    //     return (q: IParser<U>) => {
-    //         return (f: (e: [T,U]) => V) => {
-    //             return bind<T,V>(p)((x) => {
-    //                 return bind<U,V>(q)((y) => {
-    //                     let tup : [T,U] = [x,y];
-    //                     return result<V>(f(tup));
-    //                 });
-    //             });
-    //         }
-    //     };
-    // }
     export function seq<T,U,V>(p: IParser<T>) {
         return (q: IParser<U>) => {
             return (f: (e: [T,U]) => V) => {
@@ -154,17 +163,29 @@ export namespace Primitives {
      * otherwise it fails.
      * @param pred a character predicate
      */
-    export function sat(pred: (s: string) => boolean) : IParser<CharUtil.CharStream> {
-        let pred2 = (cs: CharUtil.CharStream) => pred(cs.toString());
-        let a: IParser <CharUtil.CharStream> = item();
-        let b = (x: CharUtil.CharStream) => {
+    export function sat(char_class: string[]) : IParser<CharUtil.CharStream> {
+        let pred2 = (cs: CharUtil.CharStream) => {
+            // input is guaranteed to be one char
+            let input = cs.toString();
+            // checks if input is in the array
+            return char_class.indexOf(input) != -1; 
+        }
+        let p = (x: CharUtil.CharStream) => {
             if (pred2(x)) {
                 return result(x);
             } else {
-                return zero <CharUtil.CharStream>();
+                return zero<CharUtil.CharStream>("next character should be one of [" + char_class.toString() + "]" );
             }
         };
-        return bind<CharUtil.CharStream,CharUtil.CharStream>(a)(b);
+        return bind<CharUtil.CharStream,CharUtil.CharStream>(item())(p);
+    }
+
+    function lower_chars() {
+        return 'abcdefghijklmnopqrstuvwxyz'.split('');
+    }
+
+    function upper_chars() {
+        return 'abcdefghijklmnopqrstuvwxyz'.toUpperCase().split('');
     }
 
     /**
@@ -177,7 +198,7 @@ export namespace Primitives {
         if (c.length != 1) {
             throw new Error("char parser takes a string of length 1 (i.e., a char)");
         }
-        return sat(x => x == c);
+        return sat([c]);
     }
 
     /**
@@ -185,11 +206,7 @@ export namespace Primitives {
      * character, from a-z, regardless of case.
      */
     export function letter() : IParser <CharUtil.CharStream> {
-        let contains_letter = (x: string) => {
-            let a_letter = /[A-Za-z]/;
-            return x.match(a_letter) != undefined;
-        }
-        return sat(contains_letter);
+        return sat(lower_chars().concat(upper_chars()));
     }
 
     /**
@@ -198,16 +215,7 @@ export namespace Primitives {
      * is a string, not a number.
      */
     export function digit() : IParser <CharUtil.CharStream> {
-        return sat(x => x == "0"
-                    || x == "1"
-                    || x == "2"
-                    || x == "3"
-                    || x == "4"
-                    || x == "5"
-                    || x == "6"
-                    || x == "7"
-                    || x == "8"
-                    || x == "9");
+        return sat(["1","2","3","4","5","6","7","8","9"]);
     }
 
     /**
@@ -215,23 +223,7 @@ export namespace Primitives {
      * if that character is uppercase.
      */
     export function upper() : IParser <CharUtil.CharStream> {
-        return (istream: CharUtil.CharStream) => {
-            let o1 = letter()(istream);
-            switch(o1.tag) {
-                case "success":
-                    let o2 = sat(x => x == x.toUpperCase())(o1.result);
-                    switch(o2.tag) {
-                        case "success":
-                            return o1;
-                        case "failure":
-                            return new Failure(istream);
-                    }
-                    break;
-                case "failure":
-                    return o1;
-            }
-            throw new Error("never happens");
-        };
+        return sat(upper_chars());
     }
 
     /**
@@ -239,23 +231,7 @@ export namespace Primitives {
      * if that character is lowercase.
      */
     export function lower() : IParser<CharUtil.CharStream> {
-        return (istream: CharUtil.CharStream) => {
-            let o1 = letter()(istream);
-            switch(o1.tag) {
-                case "success":
-                    let o2 = sat(x => x == x.toLowerCase())(o1.result);
-                    switch(o2.tag) {
-                        case "success":
-                            return o1;
-                        case "failure":
-                            return new Failure(istream);
-                    }
-                    break;
-                case "failure":
-                    return o1;
-            }
-            throw new Error("never happens");
-        };
+        return sat(lower_chars());
     }
 
     /**
@@ -267,7 +243,7 @@ export namespace Primitives {
      * the same input stream.
      * @param p1 A parser.
      */
-    export function choice<T>(p1: IParser<T>) {
+    export function choice<T>(p1: IParser<T>): (p2: IParser<T>) => IParser<T> {
         return (p2: IParser<T>) => {
             return (istream: CharUtil.CharStream) => {
                 let o = p1(istream)
@@ -275,7 +251,20 @@ export namespace Primitives {
                     case "success":
                         return o;
                     case "failure":
-                        return p2(istream);
+                        let o2 = p2(istream);
+                        switch (o2.tag) {
+                            case "success":
+                                return o2;
+                            case "failure":
+                                if (o.high_watermark.location >= o2.high_watermark.location) {
+                                    return new Failure(o2.inputstream, o.high_watermark);
+                                } else {
+                                    return new Failure(o2.inputstream, o2.high_watermark);
+                                }
+                            default:
+                                // I have no idea why TypeScript thinks we need this.
+                                return o2;
+                        }
                 }
             };
         };
@@ -308,7 +297,7 @@ export namespace Primitives {
      * without changing the parser state. 
      * @param p 
      */
-    export function many<T>(p: IParser<T>) {
+    export function many<T>(p: IParser<T>): IParser<T[]>{
         return (istream: CharUtil.CharStream) => {
             let istream2 = istream;
             let outputs: T[] = [];
@@ -354,22 +343,17 @@ export namespace Primitives {
      * str yields a parser for the given string.
      * @param s A string
      */
-    // TODO: this should actually be a sequence of parsers constructed
-    // from the string s
     export function str(s: string) : IParser<CharUtil.CharStream> {
         return (istream: CharUtil.CharStream) => {
-            // escape regex metacharacters
-            // (this likely needs work)
-            let s2 = s.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
-            let re = new RegExp("^" + s2);
-            if(istream.toString().match(re)) {
-                const rem = istream.substring(s.length,istream.length())
-                const res = istream.substring(0, s.length);
-                return new Success(rem, res);
-            } else {
-                return new Failure(istream);
+            let chars: string[] = s.split("");
+            let p = result(new CharUtil.CharStream(""));
+            let f = (tup: [CharUtil.CharStream, CharUtil.CharStream]) => tup[0].concat(tup[1]);
+            for (var c in chars) {
+                p = seq<CharUtil.CharStream, CharUtil.CharStream, CharUtil.CharStream>(p)(char(c))(f);
             }
+            return p(istream);
         }
+        
     }
 
     /**
@@ -381,7 +365,7 @@ export namespace Primitives {
             if (istream.isEOF()) {
                 return new Success(istream, EOF);
             } else {
-                return new Failure(istream);
+                return new Failure(istream, new HighWaterMark(istream.startpos, "end of file"));
             }
         }
     }
@@ -467,7 +451,7 @@ export namespace Primitives {
         }
     }
 
-    let wschars = choice(sat(c => c == ' ' || c == '\t'))(nl())
+    let wschars: IParser<CharUtil.CharStream> = choice(sat(['', "\t"]))(nl());
 
     /**
      * ws matches zero or more of the following whitespace characters:
@@ -479,8 +463,9 @@ export namespace Primitives {
             let o = many(wschars)(istream)
             switch(o.tag) {
                 case "success":
-                    return new Success(o.inputstream, CharUtil.CharStream.concat(o.result));
-                // ws never fails
+                    return new Success(o.inputstream, CharUtil.CharStream.concat(o.result));                // ws never fails
+                case "failure":
+                    return o;
             }
         }
     }
@@ -550,7 +535,7 @@ export namespace Primitives {
                     }
                 }
             }
-            return new Failure(istream);
+            return new Failure(istream, new HighWaterMark(istream.startpos, "[" + strs.toString() + "]"));
         }
     }
 }

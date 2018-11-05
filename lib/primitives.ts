@@ -167,8 +167,8 @@ export namespace Primitives {
         let pred2 = (cs: CharUtil.CharStream) => {
             // input is guaranteed to be one char
             let input = cs.toString();
-            // checks if input is in the array
-            return char_class.indexOf(input) != -1; 
+            // checks if input is in the array, for some reasons != doesn't work...
+            return char_class.indexOf(input) > -1;
         }
         let p = (x: CharUtil.CharStream) => {
             if (pred2(x)) {
@@ -215,7 +215,7 @@ export namespace Primitives {
      * is a string, not a number.
      */
     export function digit() : IParser <CharUtil.CharStream> {
-        return sat(["1","2","3","4","5","6","7","8","9"]);
+        return sat(["0","1","2","3","4","5","6","7","8","9"]);
     }
 
     /**
@@ -348,12 +348,14 @@ export namespace Primitives {
             let chars: string[] = s.split("");
             let p = result(new CharUtil.CharStream(""));
             let f = (tup: [CharUtil.CharStream, CharUtil.CharStream]) => tup[0].concat(tup[1]);
-            for (var c in chars) {
+            // let hack = "result()";
+            for (var c of chars) {
                 p = seq<CharUtil.CharStream, CharUtil.CharStream, CharUtil.CharStream>(p)(char(c))(f);
+                // hack = "seq(" + hack + ")(char(" + c + "))";
             }
+            // console.log("DEBUG! (" + chars + ")\n" + hack);
             return p(istream);
-        }
-        
+        } 
     }
 
     /**
@@ -451,7 +453,7 @@ export namespace Primitives {
         }
     }
 
-    let wschars: IParser<CharUtil.CharStream> = choice(sat(['', "\t"]))(nl());
+    let wschars: IParser<CharUtil.CharStream> = choice(sat([' ', "\t"]))(nl());
 
     /**
      * ws matches zero or more of the following whitespace characters:

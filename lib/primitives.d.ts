@@ -126,7 +126,7 @@ export declare namespace Primitives {
      * the same input stream.
      * @param p1 A parser.
      */
-    function choice<T>(p1: IParser<T>): (p2: IParser<T>) => (istream: CharUtil.CharStream) => Failure | Success<T> | undefined;
+    function choice<T>(p1: IParser<T>): (p2: IParser<T>) => IParser<T>;
     /**
      * appfun allows the user to apply a function f to
      * the result of a parser p, assuming that p is successful.
@@ -141,7 +141,7 @@ export declare namespace Primitives {
      * without changing the parser state.
      * @param p
      */
-    function many<T>(p: IParser<T>): (istream: CharUtil.CharStream) => Success<T[]>;
+    function many<T>(p: IParser<T>): IParser<T[]>;
     /**
      * many1 repeatedly applies the parser p until p fails. many1 must
      * succeed at least once.  many1 tries to guard against an infinite

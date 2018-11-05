@@ -8,7 +8,7 @@ const inputstream = new CU.CharStream("helloworld");
 
 describe('Failure object', () => {
   it('should consume none of the input stream', () => {
-    const output = new P.Failure(inputstream);
+    const output = new P.Failure(inputstream, new P.HighWaterMark(inputstream.startpos, ""));
     expect(output.inputstream).to.equal(inputstream);
   });
 });
@@ -22,7 +22,7 @@ describe('Result parser', () => {
 
 describe('Zero parser', () => {
     it('should fail and consume no input', () => {
-        const output = P.zero<string>()(inputstream);
+        const output = P.zero<string>("")(inputstream);
         expect(output.inputstream).to.equal(inputstream);
         switch(output.tag) {
             case "failure":
@@ -58,7 +58,7 @@ describe('Item parser', () => {
 
 describe('Sat parser', () => {
     it('should successfully consume input that matches a predicate', () => {
-        const output = P.sat((s) => s === "h")(inputstream);
+        const output = P.sat(["h"])(inputstream);
         expect(output.inputstream.toString()).to.equal("elloworld");
         switch(output.tag) {
             case "success":
@@ -322,13 +322,27 @@ describe('Appfun parser', () => {
 describe('Many parser', () => {
     it('should apply the given parser until the end of the input', () => {
         const output = P.many(P.item())(inputstream);
-        expect(output.result.toString()).to.equal("h,e,l,l,o,w,o,r,l,d");
+        switch(output.tag) {
+            case "success":
+                expect(output.result.toString()).to.equal("h,e,l,l,o,w,o,r,l,d");
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
     });
 
     it('including zero times', () => {
         const empty = new CU.CharStream("");
         const output = P.many(P.item())(empty);
-        expect(output.result).to.eql([]);
+        switch(output.tag) {
+            case "success":
+                expect(output.result).to.eql([]);
+                break;
+            case "failure":
+                assert.fail();
+                break;
+        }
     });
 
     it('should apply the given parser until it fails', () => {
@@ -349,13 +363,16 @@ describe('Many parser', () => {
 
 describe('Str parser', () => {
     it('should match a string and leave remainder in inputstream', () => {
-        const output = P.str("hello")(inputstream);
+        const p = P.str("hello");
+        const output = p(inputstream);
         switch(output.tag) {
             case "success":
+                // console.log("DEBUGGING!" + inputstream);
                 expect(output.result.toString()).to.equal("hello");
                 expect(output.inputstream.toString()).to.equal("world");
                 break;
             case "failure":
+                // console.log("DEBUGGIN! fail")
                 assert.fail();
                 break;
         }
@@ -384,7 +401,8 @@ describe('EOF parser', () => {
                 expect(output.result.toString()).to.equal("helloworld");
                 break;
             case "failure":
-                assert.fail();
+                // assert.fail();
+                expect(output.high_watermark).to.eq(new P.HighWaterMark(inputstream.startpos, "end of file"))
                 break;
         }
     });

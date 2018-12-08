@@ -31,7 +31,6 @@ export namespace Primitives {
          * Returns an object representing a successful parse.
          * @param istream The remaining string.
          * @param res The result of the parse
-         * @param index: high-watermark, where to start backtrack, index of last success+1
          */
         constructor(istream: CharUtil.CharStream, res: T) {
             this.inputstream = istream;
@@ -83,6 +82,7 @@ export namespace Primitives {
     export function zero<T>(expecting: string) : IParser<T> {
         return (istream) => {
             let hwm = new HighWaterMark(istream.startpos, expecting);
+            console.log("zero(), hwm loc: " + hwm.location + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
             return new Failure(istream, hwm);
         } 
     }
@@ -94,7 +94,9 @@ export namespace Primitives {
     export function item() {
         return (istream: CharUtil.CharStream) => {
             if (istream.isEmpty()) {
-                return new Failure(istream, new HighWaterMark(istream.startpos, "a character"));
+                let hwm = new HighWaterMark(istream.startpos, "a character");
+                console.log("item(), hwm loc: " + hwm.location);
+                return new Failure(istream, hwm);
             } else {
                 let remaining = istream.tail(); //remaing string;
                 let res = istream.head(); //result of parse;
@@ -113,7 +115,7 @@ export namespace Primitives {
     export function bind<T,U>(p: IParser<T>) {
         return (f: (t: T) => IParser<U>) => {
             return (istream: CharUtil.CharStream) => {
-                let r = p(istream)
+                let r = p(istream);
                 switch (r.tag) {
                     case "success":
                         let o = f(r.result)(r.inputstream);
@@ -122,11 +124,15 @@ export namespace Primitives {
                                 break;
                             case "failure":
                                 // note: backtracks, returning original istream
-                                return new Failure(istream, o.high_watermark);
+                                let hwm = o.high_watermark;
+                                console.log("bind(), hwm loc: " + hwm.location);
+                                return new Failure(istream, hwm);
                         }
                         return o;
                     case "failure":
-                      return new Failure(istream, r.high_watermark);
+                        let hwm_r = r.high_watermark
+                        console.log("bind(), hwm loc: " + hwm_r.location);
+                        return new Failure(istream, hwm_r);
                 }
             }
         }
@@ -170,17 +176,23 @@ export namespace Primitives {
             // checks if input is in the array, for some reasons != doesn't work...
             return char_class.indexOf(input) > -1;
         }
-        let p = (x: CharUtil.CharStream) => {
+        let f = (x: CharUtil.CharStream) => {
+            console.log("sat(), startpos: " + x.startpos + ", endpos: " + x.endpos);
             if (pred2(x)) {
                 return result(x);
             } else {
-                return zero<CharUtil.CharStream>("next character should be one of [" + char_class.toString() + "]" );
+                return (istream: CharUtil.CharStream) => {
+                    let hwm = new HighWaterMark(istream.startpos-1, "")
+                    console.log("sat() failure case, hwm loc: " + hwm.location);
+                    return new Failure(istream, hwm);
+                }
+                // return zero<CharUtil.CharStream>("next character should be one of [" + char_class.toString() + "]" );
             }
         };
-        return bind<CharUtil.CharStream,CharUtil.CharStream>(item())(p);
+        return bind<CharUtil.CharStream,CharUtil.CharStream>(item())(f);
     }
 
-    function lower_chars() {
+    export function lower_chars() {
         return 'abcdefghijklmnopqrstuvwxyz'.split('');
     }
 
@@ -206,8 +218,11 @@ export namespace Primitives {
      * character, from a-z, regardless of case.
      */
     export function letter() : IParser <CharUtil.CharStream> {
-        return sat(lower_chars().concat(upper_chars()));
+        return sat(lower_chars());
     }
+    // export function letter() : IParser <CharUtil.CharStream> {
+    //     return sat(lower_chars().concat(upper_chars()));
+    // }
 
     /**
      * digit returns a parser that consumes a single numeric
@@ -256,10 +271,16 @@ export namespace Primitives {
                             case "success":
                                 return o2;
                             case "failure":
+                                // console.log("o1 inputstream: " + o.inputstream);
+                                // console.log("o2 inputstream: " + o2.inputstream);
                                 if (o.high_watermark.location >= o2.high_watermark.location) {
-                                    return new Failure(o2.inputstream, o.high_watermark);
+                                    let hwm_a = o.high_watermark;
+                                    console.log("choice(), hwm location: " + hwm_a.location);
+                                    return new Failure(o2.inputstream, hwm_a);
                                 } else {
-                                    return new Failure(o2.inputstream, o2.high_watermark);
+                                    let hwm_b = o2.high_watermark;
+                                    console.log("choice(), hwm location: " + hwm_b.location)
+                                    return new Failure(o2.inputstream, hwm_b);
                                 }
                             default:
                                 // I have no idea why TypeScript thinks we need this.
@@ -367,7 +388,10 @@ export namespace Primitives {
             if (istream.isEOF()) {
                 return new Success(istream, EOF);
             } else {
-                return new Failure(istream, new HighWaterMark(istream.startpos, "end of file"));
+                let hwm = new HighWaterMark(istream.startpos, "end of file");
+                // let hwm = new HighWaterMark(0, "end of file");
+                console.log("eof(), hwm loc: " + hwm.location);
+                return new Failure(istream, hwm);
             }
         }
     }
@@ -438,7 +462,7 @@ export namespace Primitives {
     export function debug<T>(p: IParser<T>) {
         return (label: string) => {
             return (istream: CharUtil.CharStream) => {
-                console.log("apply: " + label);
+                console.log("apply: " + label + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
                 let o = p(istream);
                 switch(o.tag) {
                     case "success":

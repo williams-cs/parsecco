@@ -4,7 +4,8 @@ export declare namespace CharUtil {
         readonly startpos: number;
         readonly endpos: number;
         readonly hasEOF: boolean;
-        constructor(s: String, startpos?: number, endpos?: number, hasEOF?: boolean);
+        furthestFailure: number;
+        constructor(s: String, furthestFailure?: number, startpos?: number, endpos?: number, hasEOF?: boolean);
         /**
          * Returns true of the end of the input has been reached.
          */

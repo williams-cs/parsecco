@@ -11,15 +11,6 @@ export namespace Primitives {
     }
     export const EOF = EOFMark.Instance;
 
-    export class HighWaterMark {
-        location: number;
-        expecting: string;
-        constructor(location: number, expecting: string) {
-            this.location = location;
-            this.expecting = expecting;
-        }
-    }
-
     /**
      * Represents a successful parse.
      */
@@ -44,14 +35,12 @@ export namespace Primitives {
     export class Failure {
         tag: "failure" = "failure";
         inputstream: CharUtil.CharStream;
-        high_watermark: HighWaterMark;
         /**
          * Returns an object representing a failed parse.
          * @param istream The string, unmodified, that was given to the parser.
          */
-        constructor(istream: CharUtil.CharStream, hwm: HighWaterMark) {
+        constructor(istream: CharUtil.CharStream) {
             this.inputstream = istream;
-            this.high_watermark = hwm;
         }
     }
 
@@ -72,7 +61,11 @@ export namespace Primitives {
      * @param v The result of the parse.
      */
     export function result<T>(v: T) : IParser<T> {
-        return (istream) => new Success<T>(istream, v);
+        // return (istream) => new Success<T>(istream, v);
+        return (istream) => {
+            // console.log("zero(), loc: " + istream.furthestFailure + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
+            return new Success<T>(istream, v);
+        }
     }
 
     /**
@@ -81,9 +74,10 @@ export namespace Primitives {
      */
     export function zero<T>(expecting: string) : IParser<T> {
         return (istream) => {
-            let hwm = new HighWaterMark(istream.startpos, expecting);
-            console.log("zero(), hwm loc: " + hwm.location + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
-            return new Failure(istream, hwm);
+            // let hwm = new HighWaterMark(istream.startpos, expecting);
+            istream.furthestFailure = istream.startpos;
+            // console.log("zero(), loc: " + istream.furthestFailure + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
+            return new Failure(istream);
         } 
     }
 
@@ -94,12 +88,13 @@ export namespace Primitives {
     export function item() {
         return (istream: CharUtil.CharStream) => {
             if (istream.isEmpty()) {
-                let hwm = new HighWaterMark(istream.startpos, "a character");
-                console.log("item(), hwm loc: " + hwm.location);
-                return new Failure(istream, hwm);
+                istream.furthestFailure = istream.startpos;
+                // console.log("item() empty, loc: " + istream.furthestFailure);
+                return new Failure(istream);
             } else {
                 let remaining = istream.tail(); //remaing string;
                 let res = istream.head(); //result of parse;
+                // console.log("item() success, loc: " + istream.furthestFailure);
                 return new Success(remaining, res);
             }
         }
@@ -122,17 +117,35 @@ export namespace Primitives {
                         switch (o.tag) {
                             case "success":
                                 break;
-                            case "failure":
-                                // note: backtracks, returning original istream
-                                let hwm = o.high_watermark;
-                                console.log("bind(), hwm loc: " + hwm.location);
-                                return new Failure(istream, hwm);
+                            case "failure": // note: backtracks, returning original istream
+                                let failure_loc = o.inputstream.furthestFailure;
+
+                                // if (istream.furthestFailure != failure_loc) {
+                                //     console.log("bind(), istream furthest: " + istream.furthestFailure);
+                                //     console.log("bind(), output failure loc: " + failure_loc);
+                                // }
+
+                                if (istream.furthestFailure < failure_loc) {
+                                    istream.furthestFailure = failure_loc;
+                                }
+                                // let hwm = o.high_watermark;
+                                // console.log("bind(), loc: " + istream.furthestFailure);
+                                return new Failure(istream);
                         }
                         return o;
                     case "failure":
-                        let hwm_r = r.high_watermark
-                        console.log("bind(), hwm loc: " + hwm_r.location);
-                        return new Failure(istream, hwm_r);
+                        let failure_loc = r.inputstream.furthestFailure;
+                        // if (istream.furthestFailure != failure_loc) {
+                        //     console.log("bind(), istream furthest: " + istream.furthestFailure);
+                        //     console.log("bind(), output failure loc: " + failure_loc);
+                        // }
+                        
+                        if (istream.furthestFailure < failure_loc) {
+                            istream.furthestFailure = failure_loc;
+                        }
+
+                        // console.log("bind(), loc: " + istream.furthestFailure);
+                        return new Failure(istream);
                 }
             }
         }
@@ -177,14 +190,15 @@ export namespace Primitives {
             return char_class.indexOf(input) > -1;
         }
         let f = (x: CharUtil.CharStream) => {
-            console.log("sat(), startpos: " + x.startpos + ", endpos: " + x.endpos);
+            // console.log("sat() success, startpos: " + x.startpos + ", endpos: " + x.endpos);
             if (pred2(x)) {
                 return result(x);
             } else {
                 return (istream: CharUtil.CharStream) => {
-                    let hwm = new HighWaterMark(istream.startpos-1, "")
-                    console.log("sat() failure case, hwm loc: " + hwm.location);
-                    return new Failure(istream, hwm);
+                    // let hwm = new HighWaterMark(istream.startpos-1, "")
+                    istream.furthestFailure = istream.startpos - 1;
+                    // console.log("sat() failure, loc: " + istream.furthestFailure);
+                    return new Failure(istream);
                 }
                 // return zero<CharUtil.CharStream>("next character should be one of [" + char_class.toString() + "]" );
             }
@@ -218,11 +232,8 @@ export namespace Primitives {
      * character, from a-z, regardless of case.
      */
     export function letter() : IParser <CharUtil.CharStream> {
-        return sat(lower_chars());
+        return sat(lower_chars().concat(upper_chars()));
     }
-    // export function letter() : IParser <CharUtil.CharStream> {
-    //     return sat(lower_chars().concat(upper_chars()));
-    // }
 
     /**
      * digit returns a parser that consumes a single numeric
@@ -271,16 +282,18 @@ export namespace Primitives {
                             case "success":
                                 return o2;
                             case "failure":
+                                let loc_a = o.inputstream.furthestFailure;
+                                let loc_b = o2.inputstream.furthestFailure;
                                 // console.log("o1 inputstream: " + o.inputstream);
                                 // console.log("o2 inputstream: " + o2.inputstream);
-                                if (o.high_watermark.location >= o2.high_watermark.location) {
-                                    let hwm_a = o.high_watermark;
-                                    console.log("choice(), hwm location: " + hwm_a.location);
-                                    return new Failure(o2.inputstream, hwm_a);
+                                if (loc_a >= loc_b) {
+                                    // let hwm_a = o.high_watermark;
+                                    // console.log("choice(), loc: " + loc_a);
+                                    return new Failure(o.inputstream);
                                 } else {
-                                    let hwm_b = o2.high_watermark;
-                                    console.log("choice(), hwm location: " + hwm_b.location)
-                                    return new Failure(o2.inputstream, hwm_b);
+                                    // let hwm_b = o2.high_watermark;
+                                    // console.log("choice(), loc: " + loc_b)
+                                    return new Failure(o2.inputstream);
                                 }
                             default:
                                 // I have no idea why TypeScript thinks we need this.
@@ -305,6 +318,10 @@ export namespace Primitives {
                     case "success":
                         return new Success<U>(o.inputstream, f(o.result));
                     case "failure":
+                        // let failure_loc = o.inputstream.furthestFailure;
+                        // if (istream.furthestFailure < failure_loc) {
+                        //     istream.furthestFailure = failure_loc;
+                        // }
                         return o;
                 }
             }
@@ -388,10 +405,10 @@ export namespace Primitives {
             if (istream.isEOF()) {
                 return new Success(istream, EOF);
             } else {
-                let hwm = new HighWaterMark(istream.startpos, "end of file");
-                // let hwm = new HighWaterMark(0, "end of file");
-                console.log("eof(), hwm loc: " + hwm.location);
-                return new Failure(istream, hwm);
+                // let hwm = new HighWaterMark(istream.startpos, "end of file");
+                istream.furthestFailure = istream.startpos;
+                // console.log("eof(), loc: " + istream.furthestFailure);
+                return new Failure(istream);
             }
         }
     }
@@ -561,7 +578,8 @@ export namespace Primitives {
                     }
                 }
             }
-            return new Failure(istream, new HighWaterMark(istream.startpos, "[" + strs.toString() + "]"));
+            // return new Failure(istream, new HighWaterMark(istream.startpos, "[" + strs.toString() + "]"));
+            return new Failure(istream);
         }
     }
 }

@@ -4,9 +4,16 @@ export namespace CharUtil {
         public readonly startpos : number;
         public readonly endpos : number;
         public readonly hasEOF : boolean = true;
+        public furthestFailure: number; 
     
-        constructor(s: String, startpos?: number, endpos?: number, hasEOF?: boolean) {
+        constructor(s: String, furthestFailure?: number, startpos?: number, endpos?: number, hasEOF?: boolean) {
             this.input = s;
+
+            if (furthestFailure == undefined) {
+                this.furthestFailure = 0;
+            } else {
+                this.furthestFailure = furthestFailure;
+            }
             
             if (hasEOF != undefined) {
                 this.hasEOF = hasEOF;
@@ -60,7 +67,7 @@ export namespace CharUtil {
                 return this;
             } else {
                 let newHasEOF = this.startpos + num == this.endpos && this.hasEOF;
-                return new CharStream(this.input, this.startpos, this.startpos + num, newHasEOF);
+                return new CharStream(this.input, this.furthestFailure, this.startpos, this.startpos + num, newHasEOF);
             }
         }
 
@@ -71,9 +78,9 @@ export namespace CharUtil {
          */
         public seek(num: number) : CharStream {
             if (this.startpos + num > this.endpos) {
-                return new CharStream(this.input, this.endpos, this.endpos, this.hasEOF);
+                return new CharStream(this.input, this.furthestFailure, this.endpos, this.endpos, this.hasEOF);
             } else {
-                return new CharStream(this.input, this.startpos + num, this.endpos, this.hasEOF);
+                return new CharStream(this.input, this.furthestFailure, this.startpos + num, this.endpos, this.hasEOF);
             }
         }
     
@@ -85,7 +92,7 @@ export namespace CharUtil {
         public head() : CharStream {
             if (!this.isEmpty()) {
                 const newHasEOF = this.startpos + 1 == this.endpos && this.hasEOF;
-                return new CharStream(this.input, this.startpos, this.startpos + 1, newHasEOF);
+                return new CharStream(this.input, this.furthestFailure, this.startpos, this.startpos + 1, newHasEOF);
             } else {
                 throw new Error("Cannot get the head of an empty string.");
             }
@@ -98,7 +105,7 @@ export namespace CharUtil {
          */
         public tail() : CharStream {
             if (!this.isEmpty()) {
-                return new CharStream(this.input, this.startpos + 1, this.endpos, this.hasEOF);
+                return new CharStream(this.input, this.furthestFailure, this.startpos + 1, this.endpos, this.hasEOF);
             } else {
                 throw new Error("Cannot get the tail of an empty string.");
             }
@@ -132,7 +139,7 @@ export namespace CharUtil {
             const start2 = this.startpos + start;
             const end2 = this.startpos + end;
             const newHasEOF = this.endpos == end2 && this.hasEOF;
-            return new CharStream(this.input, start2, end2, newHasEOF);
+            return new CharStream(this.input, this.furthestFailure,  start2, end2, newHasEOF);
         }
 
         /**
@@ -145,7 +152,7 @@ export namespace CharUtil {
          */
         public concat(cs: CharStream) : CharStream {
             const s = this.toString() + cs.toString()
-            return new CharStream(s, 0, s.length, cs.hasEOF);
+            return new CharStream(s, this.furthestFailure, 0, s.length, cs.hasEOF);
         }
 
         /**
@@ -155,7 +162,7 @@ export namespace CharUtil {
          */
         static concat(css: CharStream[]) : CharStream {
             if (css.length == 0) {
-                return new CharStream("", 0, 0, false);
+                return new CharStream("", 0, 0, 0, false);
             } else {
                 let cs = css[0];
                 for (let i = 1; i < css.length; i++) {

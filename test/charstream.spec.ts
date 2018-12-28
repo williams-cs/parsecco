@@ -81,7 +81,7 @@ describe('CharStream', () => {
 
   it('should be empty when an empty slice is taken', () => {
     const s = "helloworld";
-    const cs = new CharUtil.CharStream(s, 5, 5);
+    const cs = new CharUtil.CharStream(s, 0, 5, 5);
     expect(cs.isEmpty()).to.equal(true);
   });
 
@@ -93,7 +93,7 @@ describe('CharStream', () => {
 
   it('should have length zero for the empty slice', () => {
     const s = "helloworld";
-    const cs = new CharUtil.CharStream(s, 5, 5);
+    const cs = new CharUtil.CharStream(s, 0, 5, 5);
     expect(cs.length()).to.equal(0);
   });
 

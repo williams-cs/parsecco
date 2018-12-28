@@ -8,7 +8,7 @@ const inputstream = new CU.CharStream("helloworld");
 
 describe('Failure object', () => {
   it('should consume none of the input stream', () => {
-    const output = new P.Failure(inputstream, new P.HighWaterMark(inputstream.startpos, ""));
+    const output = new P.Failure(inputstream);
     expect(output.inputstream).to.equal(inputstream);
   });
 });
@@ -401,8 +401,8 @@ describe('EOF parser', () => {
                 expect(output.result.toString()).to.equal("helloworld");
                 break;
             case "failure":
-                // assert.fail();
-                expect(output.high_watermark).to.eq(new P.HighWaterMark(inputstream.startpos, "end of file"))
+                assert.fail();
+                // expect(output.high_watermark).to.eq(new P.HighWaterMark(inputstream.startpos, "end of file"))
                 break;
         }
     });

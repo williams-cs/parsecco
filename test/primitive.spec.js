@@ -8,7 +8,7 @@ require("mocha");
 const inputstream = new charstream_1.CharUtil.CharStream("helloworld");
 describe('Failure object', () => {
     it('should consume none of the input stream', () => {
-        const output = new index_1.Primitives.Failure(inputstream, new index_1.Primitives.HighWaterMark(inputstream.startpos, ""));
+        const output = new index_1.Primitives.Failure(inputstream);
         chai_1.expect(output.inputstream).to.equal(inputstream);
     });
 });

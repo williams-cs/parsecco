@@ -111,4 +111,98 @@ export declare namespace Primitives {
      * if that character is lowercase.
      */
     function lower(): IParser<CharUtil.CharStream>;
+    /**
+     * choice specifies an ordered choice between two parsers,
+     * p1 and p2. The returned parser will first apply
+     * parser p1.  If p1 succeeds, p1's Outcome is returned.
+     * If p1 fails, p2 is applied and the Outcome of p2 is returned.
+     * Note that the input stream given to p1 and p2 is exactly
+     * the same input stream.
+     * @param p1 A parser.
+     */
+    function choice<T>(p1: IParser<T>): (p2: IParser<T>) => IParser<T>;
+    /**
+     * appfun allows the user to apply a function f to
+     * the result of a parser p, assuming that p is successful.
+     * @param p A parser.  This is the same as the |>>
+     * function from FParsec.
+     */
+    function appfun<T, U>(p: IParser<T>): (f: (t: T) => U) => (istream: CharUtil.CharStream) => Failure | Success<U>;
+    /**
+     * many repeatedly applies the parser p until p fails. many always
+     * succeeds, even if it matches nothing.  many tries to guard
+     * against an infinite loop by raising an exception if p succeeds
+     * without changing the parser state.
+     * @param p
+     */
+    function many<T>(p: IParser<T>): IParser<T[]>;
+    /**
+     * many1 repeatedly applies the parser p until p fails. many1 must
+     * succeed at least once.  many1 tries to guard against an infinite
+     * loop by raising an exception if p succeeds without changing the
+     * parser state.
+     * @param p
+     */
+    function many1<T>(p: IParser<T>): (istream: CharUtil.CharStream) => Outcome<T[]>;
+    /**
+     * str yields a parser for the given string.
+     * @param s A string
+     */
+    function str(s: string): IParser<CharUtil.CharStream>;
+    /**
+     * Returns a parser that succeeds only if the end of the
+     * input has been reached.
+     */
+    function eof(): IParser<EOFMark>;
+    /**
+     * fresult returns a parser that applies the parser p,
+     * and if p succeeds, returns the value x.
+     * @param p a parser
+     */
+    function fresult<T, U>(p: IParser<T>): (x: U) => (istream: CharUtil.CharStream) => Outcome<U>;
+    /**
+     * left returns a parser that applies the parser p,
+     * then the parser q, and if both are successful,
+     * returns the result of p.
+     * @param p a parser
+     */
+    function left<T, U>(p: IParser<T>): (q: IParser<U>) => (istream: CharUtil.CharStream) => Outcome<T>;
+    /**
+     * right returns a parser that applies the parser p,
+     * then the parser q, and if both are successful,
+     * returns the result of q.
+     * @param p a parser
+     */
+    function right<T, U>(p: IParser<T>): (q: IParser<U>) => (istream: CharUtil.CharStream) => Outcome<U>;
+    /**
+     * between returns a parser that applies the parser
+     * popen, p, and pclose in sequence, and if all are
+     * successful, returns the result of p.
+     * @param popen the first parser
+     */
+    function between<T, U, V>(popen: IParser<T>): (pclose: IParser<U>) => (p: IParser<V>) => IParser<V>;
+    /**
+     * The debug parser takes a parser p and a debug string,
+     * printing the debug string as a side-effect before
+     * applying p to the input.
+     * @param p a parser
+     */
+    function debug<T>(p: IParser<T>): (label: string) => (istream: CharUtil.CharStream) => Outcome<T>;
+    /**
+     * ws matches zero or more of the following whitespace characters:
+     * ' ', '\t', '\n', or '\r\n'
+     * ws returns matched whitespace in a single CharStream result.
+     */
+    function ws(): IParser<CharUtil.CharStream>;
+    /**
+     * ws1 matches one or more of the following whitespace characters:
+     * ' ', '\t', '\n', or '\r\n'
+     * ws1 returns matched whitespace in a single CharStream result.
+     */
+    function ws1(): IParser<CharUtil.CharStream>;
+    /**
+     * nl matches and returns a newline.
+     */
+    function nl(): IParser<CharUtil.CharStream>;
+    function strSat(strs: string[]): IParser<CharUtil.CharStream>;
 }

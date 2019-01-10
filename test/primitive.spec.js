@@ -380,8 +380,8 @@ describe('EOF parser', () => {
                 chai_1.expect(output.result.toString()).to.equal("helloworld");
                 break;
             case "failure":
-                // assert.fail();
-                chai_1.expect(output.high_watermark).to.eq(new index_1.Primitives.HighWaterMark(inputstream.startpos, "end of file"));
+                chai_1.assert.fail();
+                // expect(output.high_watermark).to.eq(new P.HighWaterMark(inputstream.startpos, "end of file"))
                 break;
         }
     });

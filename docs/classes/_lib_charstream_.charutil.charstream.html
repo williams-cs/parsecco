@@ -92,6 +92,7 @@
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_charstream_.charutil.charstream.html#endpos" class="tsd-kind-icon">endpos</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_charstream_.charutil.charstream.html#furthestfailure" class="tsd-kind-icon">furthest<wbr>Failure</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_charstream_.charutil.charstream.html#haseof" class="tsd-kind-icon">hasEOF</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_charstream_.charutil.charstream.html#input" class="tsd-kind-icon">input</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_charstream_.charutil.charstream.html#startpos" class="tsd-kind-icon">startpos</a></li>
@@ -122,13 +123,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Char<wbr>Stream<span class="tsd-signature-symbol">(</span>s<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">String</span>, startpos<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, endpos<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, hasEOF<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_lib_charstream_.charutil.charstream.html" class="tsd-signature-type">CharStream</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Char<wbr>Stream<span class="tsd-signature-symbol">(</span>s<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">String</span>, furthestFailure<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, startpos<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, endpos<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span>, hasEOF<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_lib_charstream_.charutil.charstream.html" class="tsd-signature-type">CharStream</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L6">lib/charstream.ts:6</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L7">lib/charstream.ts:7</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -137,13 +138,16 @@
 									<h5>s: <span class="tsd-signature-type">String</span></h5>
 								</li>
 								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> furthestFailure: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> startpos: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> endpos: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> hasEOF: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> hasEOF: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_lib_charstream_.charutil.charstream.html" class="tsd-signature-type">CharStream</a></h4>
@@ -159,7 +163,17 @@
 					<div class="tsd-signature tsd-kind-icon">endpos<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L5">lib/charstream.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L5">lib/charstream.ts:5</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="furthestfailure" class="tsd-anchor"></a>
+					<h3>furthest<wbr>Failure</h3>
+					<div class="tsd-signature tsd-kind-icon">furthest<wbr>Failure<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L7">lib/charstream.ts:7</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -169,7 +183,7 @@
 					<div class="tsd-signature tsd-kind-icon">hasEOF<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;true</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L6">lib/charstream.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L6">lib/charstream.ts:6</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -179,7 +193,7 @@
 					<div class="tsd-signature tsd-kind-icon">input<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">String</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L3">lib/charstream.ts:3</a></li>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L3">lib/charstream.ts:3</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -189,7 +203,7 @@
 					<div class="tsd-signature tsd-kind-icon">startpos<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L4">lib/charstream.ts:4</a></li>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L4">lib/charstream.ts:4</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -206,7 +220,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L146">lib/charstream.ts:146</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L153">lib/charstream.ts:153</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -241,7 +255,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L85">lib/charstream.ts:85</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L92">lib/charstream.ts:92</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -265,7 +279,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L39">lib/charstream.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L46">lib/charstream.ts:46</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -287,7 +301,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L113">lib/charstream.ts:113</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L120">lib/charstream.ts:120</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -312,7 +326,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L121">lib/charstream.ts:121</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L128">lib/charstream.ts:128</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -335,7 +349,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L58">lib/charstream.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L65">lib/charstream.ts:65</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -368,7 +382,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L72">lib/charstream.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L79">lib/charstream.ts:79</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -399,7 +413,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L131">lib/charstream.ts:131</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L138">lib/charstream.ts:138</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -437,7 +451,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L99">lib/charstream.ts:99</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L106">lib/charstream.ts:106</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -461,7 +475,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L47">lib/charstream.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L54">lib/charstream.ts:54</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -484,7 +498,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/4a6228c/lib/charstream.ts#L156">lib/charstream.ts:156</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a768e53/lib/charstream.ts#L163">lib/charstream.ts:163</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -528,6 +542,9 @@
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_lib_charstream_.charutil.charstream.html#endpos" class="tsd-kind-icon">endpos</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_lib_charstream_.charutil.charstream.html#furthestfailure" class="tsd-kind-icon">furthest<wbr>Failure</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_lib_charstream_.charutil.charstream.html#haseof" class="tsd-kind-icon">hasEOF</a>

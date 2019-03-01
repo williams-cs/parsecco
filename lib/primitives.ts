@@ -78,7 +78,7 @@ export namespace Primitives {
             istream.furthestFailure = istream.startpos;
             // console.log("zero(), loc: " + istream.furthestFailure + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
             return new Failure(istream);
-        } 
+        }
     }
 
     /**
@@ -139,7 +139,7 @@ export namespace Primitives {
                         //     console.log("bind(), istream furthest: " + istream.furthestFailure);
                         //     console.log("bind(), output failure loc: " + failure_loc);
                         // }
-                        
+
                         if (istream.furthestFailure < failure_loc) {
                             istream.furthestFailure = failure_loc;
                         }
@@ -218,7 +218,7 @@ export namespace Primitives {
      * char takes a character and yields a parser that consume
      * that character. The returned parser succeeds if the next
      * character in the input stream is c, otherwise it fails.
-     * @param c 
+     * @param c
      */
     export function char(c: string) : IParser <CharUtil.CharStream> {
         if (c.length != 1) {
@@ -332,8 +332,8 @@ export namespace Primitives {
      * many repeatedly applies the parser p until p fails. many always
      * succeeds, even if it matches nothing.  many tries to guard
      * against an infinite loop by raising an exception if p succeeds
-     * without changing the parser state. 
-     * @param p 
+     * without changing the parser state.
+     * @param p
      */
     export function many<T>(p: IParser<T>): IParser<T[]>{
         return (istream: CharUtil.CharStream) => {
@@ -346,7 +346,7 @@ export namespace Primitives {
                     case "success":
                         if (istream2 == o.inputstream) {
                             throw new Error("Parser loops infinitely.");
-                        } 
+                        }
                         istream2 = o.inputstream;
                         outputs.push(o.result);
                         break;
@@ -363,8 +363,8 @@ export namespace Primitives {
      * many1 repeatedly applies the parser p until p fails. many1 must
      * succeed at least once.  many1 tries to guard against an infinite
      * loop by raising an exception if p succeeds without changing the
-     * parser state. 
-     * @param p 
+     * parser state.
+     * @param p
      */
     export function many1<T>(p: IParser<T>) {
         return (istream: CharUtil.CharStream) => {
@@ -393,7 +393,7 @@ export namespace Primitives {
             }
             // console.log("DEBUG! (" + chars + ")\n" + hack);
             return p(istream);
-        } 
+        }
     }
 
     /**
@@ -423,7 +423,7 @@ export namespace Primitives {
             return (istream: CharUtil.CharStream) => {
                 return bind<T,U>(p)((t: T) => result(x))(istream);
             }
-        } 
+        }
     }
 
     /**
@@ -561,10 +561,10 @@ export namespace Primitives {
             sizes.push(key);
             vals.sort();
         });
-        sizes.sort();
-        
-        return (istream: CharUtil.CharStream) => {    
-            // start with the smallest size class       
+        sizes.sort().reverse();
+
+        return (istream: CharUtil.CharStream) => {
+            // start with the smallest size class
             for(let peekIndex = 0; peekIndex < sizes.length; peekIndex++) {
                 // for each size class, try matching all of
                 // the strings; if one is found, return the

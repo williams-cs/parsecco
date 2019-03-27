@@ -71,7 +71,7 @@ describe('CharStream', () => {
     });
     it('should be empty when an empty slice is taken', () => {
         const s = "helloworld";
-        const cs = new charstream_1.CharUtil.CharStream(s, 0, 5, 5);
+        const cs = new charstream_1.CharUtil.CharStream(s, 5, 5);
         chai_1.expect(cs.isEmpty()).to.equal(true);
     });
     it('should have a length method that works the same as string length', () => {
@@ -81,7 +81,7 @@ describe('CharStream', () => {
     });
     it('should have length zero for the empty slice', () => {
         const s = "helloworld";
-        const cs = new charstream_1.CharUtil.CharStream(s, 0, 5, 5);
+        const cs = new charstream_1.CharUtil.CharStream(s, 5, 5);
         chai_1.expect(cs.length()).to.equal(0);
     });
     it('should return the same substring as string.substring', () => {

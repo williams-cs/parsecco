@@ -98,7 +98,10 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_primitives_.primitives.failure.html#error_msg" class="tsd-kind-icon">error_<wbr>msg</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_primitives_.primitives.failure.html#error_pos" class="tsd-kind-icon">error_<wbr>pos</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_primitives_.primitives.failure.html#inputstream" class="tsd-kind-icon">inputstream</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_primitives_.primitives.failure.html#is_critical" class="tsd-kind-icon">is_<wbr>critical</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class"><a href="_lib_primitives_.primitives.failure.html#tag" class="tsd-kind-icon">tag</a></li>
 							</ul>
 						</section>
@@ -111,18 +114,19 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3>constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>Failure<span class="tsd-signature-symbol">(</span>istream<span class="tsd-signature-symbol">: </span><a href="_lib_charstream_.charutil.charstream.html" class="tsd-signature-type">CharStream</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_lib_primitives_.primitives.failure.html" class="tsd-signature-type">Failure</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Failure<span class="tsd-signature-symbol">(</span>istream<span class="tsd-signature-symbol">: </span><a href="_lib_charstream_.charutil.charstream.html" class="tsd-signature-type">CharStream</a>, error_pos<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, error_msg<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">string</span>, is_critical<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="_lib_primitives_.primitives.failure.html" class="tsd-signature-type">Failure</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L37">lib/primitives.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L41">lib/primitives.ts:41</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns an object representing a failed parse.</p>
+									<p>Returns an object representing a failed parse.
+									If the failure is critical, then parsing will stop immediately.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -135,6 +139,30 @@
 										</div>
 									</div>
 								</li>
+								<li>
+									<h5>error_pos: <span class="tsd-signature-type">number</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The position of the parsing failure in istream</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> error_msg: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;&quot;&quot;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>The error message for the failure</p>
+										</div>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> is_critical: <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> =&nbsp;false</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<div class="lead">
+											<p>Whether or not the failure is critical</p>
+										</div>
+									</div>
+								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="_lib_primitives_.primitives.failure.html" class="tsd-signature-type">Failure</a></h4>
 						</li>
@@ -144,12 +172,42 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="error_msg" class="tsd-anchor"></a>
+					<h3>error_<wbr>msg</h3>
+					<div class="tsd-signature tsd-kind-icon">error_<wbr>msg<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L40">lib/primitives.ts:40</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="error_pos" class="tsd-anchor"></a>
+					<h3>error_<wbr>pos</h3>
+					<div class="tsd-signature tsd-kind-icon">error_<wbr>pos<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L39">lib/primitives.ts:39</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="inputstream" class="tsd-anchor"></a>
 					<h3>inputstream</h3>
 					<div class="tsd-signature tsd-kind-icon">inputstream<span class="tsd-signature-symbol">:</span> <a href="_lib_charstream_.charutil.charstream.html" class="tsd-signature-type">CharStream</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L37">lib/primitives.ts:37</a></li>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L38">lib/primitives.ts:38</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
+					<a name="is_critical" class="tsd-anchor"></a>
+					<h3>is_<wbr>critical</h3>
+					<div class="tsd-signature tsd-kind-icon">is_<wbr>critical<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L41">lib/primitives.ts:41</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -159,7 +217,7 @@
 					<div class="tsd-signature tsd-kind-icon">tag<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"failure"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;failure&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L36">lib/primitives.ts:36</a></li>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L37">lib/primitives.ts:37</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -187,7 +245,16 @@
 								<a href="_lib_primitives_.primitives.failure.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_lib_primitives_.primitives.failure.html#error_msg" class="tsd-kind-icon">error_<wbr>msg</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_lib_primitives_.primitives.failure.html#error_pos" class="tsd-kind-icon">error_<wbr>pos</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_lib_primitives_.primitives.failure.html#inputstream" class="tsd-kind-icon">inputstream</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class">
+								<a href="_lib_primitives_.primitives.failure.html#is_critical" class="tsd-kind-icon">is_<wbr>critical</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class">
 								<a href="_lib_primitives_.primitives.failure.html#tag" class="tsd-kind-icon">tag</a>
@@ -227,6 +294,9 @@
 						<a href="../modules/_lib_primitives_.primitives.html#choice" class="tsd-kind-icon">choice</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="../modules/_lib_primitives_.primitives.html#choices" class="tsd-kind-icon">choices</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="../modules/_lib_primitives_.primitives.html#debug" class="tsd-kind-icon">debug</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
@@ -237,6 +307,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/_lib_primitives_.primitives.html#eof-1" class="tsd-kind-icon">eof</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="../modules/_lib_primitives_.primitives.html#expect" class="tsd-kind-icon">expect</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="../modules/_lib_primitives_.primitives.html#fresult" class="tsd-kind-icon">fresult</a>
@@ -289,7 +362,7 @@
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/_lib_primitives_.primitives.html#upper" class="tsd-kind-icon">upper</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="../modules/_lib_primitives_.primitives.html#upper_chars" class="tsd-kind-icon">upper_<wbr>chars</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">

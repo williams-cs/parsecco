@@ -4,21 +4,10 @@ export namespace CharUtil {
         public readonly startpos : number;
         public readonly endpos : number;
         public readonly hasEOF : boolean = true;
-        public furthestFailure: number; 
-    
-        constructor(s: String, furthestFailure?: number, startpos?: number, endpos?: number, hasEOF?: boolean) {
+
+        constructor(s: String, startpos?: number, endpos?: number, hasEOF?: boolean) {
             this.input = s;
 
-            if (furthestFailure == undefined) {
-                this.furthestFailure = 0;
-            } else {
-                this.furthestFailure = furthestFailure;
-            }
-            
-            if (hasEOF != undefined) {
-                this.hasEOF = hasEOF;
-            }
-            
             if (startpos == undefined) {
                 this.startpos = 0;           // not specified; set default
             } else if (startpos > s.length) {
@@ -26,7 +15,7 @@ export namespace CharUtil {
             } else {
                 this.startpos = startpos;    // specified and in bounds
             }
-    
+
             if (endpos == undefined) {
                 this.endpos = s.length;      // not specified; set default
             } else if (endpos > s.length) {
@@ -34,19 +23,23 @@ export namespace CharUtil {
             } else {
                 this.endpos = endpos;        // specified and in bounds
             }
-    
+
             if (this.startpos > this.endpos) {
                 this.startpos = this.endpos; // if the user flipped positions
             }
+
+            if (hasEOF != undefined) {
+                this.hasEOF = hasEOF;
+            }
         }
-    
+
         /**
          * Returns true of the end of the input has been reached.
          */
         public isEOF() : boolean {
             return this.hasEOF && this.startpos == this.input.length;
         }
-    
+
         /**
          * Returns a Javscript primitive string of the slice of input
          * represented by this CharStream.
@@ -54,36 +47,36 @@ export namespace CharUtil {
         public toString() : string {
             return this.input.substring(this.startpos, this.endpos);
         }
-    
+
         /**
          * Returns a new CharStream representing the input from the
          * current start position to an end position num chars from
          * the current start position.  If startpos + num > endpos,
          * the current CharStream is returned.
-         * @param num 
+         * @param num
          */
         public peek(num: number) : CharStream {
             if (this.startpos + num > this.endpos) {
                 return this;
             } else {
                 let newHasEOF = this.startpos + num == this.endpos && this.hasEOF;
-                return new CharStream(this.input, this.furthestFailure, this.startpos, this.startpos + num, newHasEOF);
+                return new CharStream(this.input, this.startpos, this.startpos + num, newHasEOF);
             }
         }
 
         /**
          * Returns a new CharStream representing the string after
          * seeking num characters from the current position.
-         * @param num 
+         * @param num
          */
         public seek(num: number) : CharStream {
             if (this.startpos + num > this.endpos) {
-                return new CharStream(this.input, this.furthestFailure, this.endpos, this.endpos, this.hasEOF);
+                return new CharStream(this.input, this.endpos, this.endpos, this.hasEOF);
             } else {
-                return new CharStream(this.input, this.furthestFailure, this.startpos + num, this.endpos, this.hasEOF);
+                return new CharStream(this.input, this.startpos + num, this.endpos, this.hasEOF);
             }
         }
-    
+
         /**
          * Returns a new CharStream representing the head of the input at
          * the current position.  Throws an exception if the CharStream is
@@ -92,12 +85,12 @@ export namespace CharUtil {
         public head() : CharStream {
             if (!this.isEmpty()) {
                 const newHasEOF = this.startpos + 1 == this.endpos && this.hasEOF;
-                return new CharStream(this.input, this.furthestFailure, this.startpos, this.startpos + 1, newHasEOF);
+                return new CharStream(this.input, this.startpos, this.startpos + 1, newHasEOF);
             } else {
                 throw new Error("Cannot get the head of an empty string.");
             }
         }
-    
+
         /**
          * Returns a new CharStream representing the tail of the input at
          * the current position.  Throws an exception if the CharStream is
@@ -105,12 +98,12 @@ export namespace CharUtil {
          */
         public tail() : CharStream {
             if (!this.isEmpty()) {
-                return new CharStream(this.input, this.furthestFailure, this.startpos + 1, this.endpos, this.hasEOF);
+                return new CharStream(this.input, this.startpos + 1, this.endpos, this.hasEOF);
             } else {
                 throw new Error("Cannot get the tail of an empty string.");
             }
         }
-    
+
         /**
          * Returns true if the input at the current position is empty. Note
          * that a CharStream at the end of the input contains an empty
@@ -120,7 +113,7 @@ export namespace CharUtil {
         public isEmpty() : boolean {
             return this.startpos == this.endpos;
         }
-    
+
         /**
          * Returns the number of characters remaining at
          * the current position.
@@ -128,7 +121,7 @@ export namespace CharUtil {
         public length() : number {
             return this.endpos - this.startpos;
         }
-    
+
         /**
          * Returns the substring between start and end at the
          * current position.
@@ -139,7 +132,7 @@ export namespace CharUtil {
             const start2 = this.startpos + start;
             const end2 = this.startpos + end;
             const newHasEOF = this.endpos == end2 && this.hasEOF;
-            return new CharStream(this.input, this.furthestFailure,  start2, end2, newHasEOF);
+            return new CharStream(this.input,  start2, end2, newHasEOF);
         }
 
         /**
@@ -152,7 +145,7 @@ export namespace CharUtil {
          */
         public concat(cs: CharStream) : CharStream {
             const s = this.toString() + cs.toString()
-            return new CharStream(s, this.furthestFailure, 0, s.length, cs.hasEOF);
+            return new CharStream(s, 0, s.length, cs.hasEOF);
         }
 
         /**
@@ -162,7 +155,7 @@ export namespace CharUtil {
          */
         static concat(css: CharStream[]) : CharStream {
             if (css.length == 0) {
-                return new CharStream("", 0, 0, 0, false);
+                return new CharStream("", 0, 0, false);
             } else {
                 let cs = css[0];
                 for (let i = 1; i < css.length; i++) {

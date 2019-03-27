@@ -106,10 +106,12 @@
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_lib_primitives_.primitives.html#bind" class="tsd-kind-icon">bind</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#char" class="tsd-kind-icon">char</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_lib_primitives_.primitives.html#choice" class="tsd-kind-icon">choice</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_lib_primitives_.primitives.html#choices" class="tsd-kind-icon">choices</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_lib_primitives_.primitives.html#debug" class="tsd-kind-icon">debug</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_lib_primitives_.primitives.html#delay" class="tsd-kind-icon">delay</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#digit" class="tsd-kind-icon">digit</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#eof-1" class="tsd-kind-icon">eof</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_lib_primitives_.primitives.html#expect" class="tsd-kind-icon">expect</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_lib_primitives_.primitives.html#fresult" class="tsd-kind-icon">fresult</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter tsd-is-not-exported"><a href="_lib_primitives_.primitives.html#groupby" class="tsd-kind-icon">group<wbr>By</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#item" class="tsd-kind-icon">item</a></li>
@@ -127,7 +129,7 @@
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#str" class="tsd-kind-icon">str</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#strsat" class="tsd-kind-icon">str<wbr>Sat</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#upper" class="tsd-kind-icon">upper</a></li>
-								<li class="tsd-kind-function tsd-parent-kind-module tsd-is-not-exported"><a href="_lib_primitives_.primitives.html#upper_chars" class="tsd-kind-icon">upper_<wbr>chars</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#upper_chars" class="tsd-kind-icon">upper_<wbr>chars</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#ws" class="tsd-kind-icon">ws</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_lib_primitives_.primitives.html#ws1" class="tsd-kind-icon">ws1</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter"><a href="_lib_primitives_.primitives.html#zero" class="tsd-kind-icon">zero</a></li>
@@ -144,7 +146,7 @@
 					<div class="tsd-signature tsd-kind-icon">Outcome<span class="tsd-signature-symbol">:</span> <a href="../classes/_lib_primitives_.primitives.success.html" class="tsd-signature-type">Success</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> | </span><a href="../classes/_lib_primitives_.primitives.failure.html" class="tsd-signature-type">Failure</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L50">lib/primitives.ts:50</a></li>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L66">lib/primitives.ts:66</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -162,7 +164,7 @@
 					<div class="tsd-signature tsd-kind-icon">EOF<span class="tsd-signature-symbol">:</span> <a href="../classes/_lib_primitives_.primitives.eofmark.html" class="tsd-signature-type">EOFMark</a><span class="tsd-signature-symbol"> =&nbsp;EOFMark.Instance</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L12">lib/primitives.ts:12</a></li>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L12">lib/primitives.ts:12</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -172,7 +174,7 @@
 					<div class="tsd-signature tsd-kind-icon">wschars<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><a href="../classes/_lib_charstream_.charutil.charstream.html" class="tsd-signature-type">CharStream</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> =&nbsp;choice(sat([&#x27; &#x27;, &quot;\t&quot;]))(nl())</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L497">lib/primitives.ts:497</a></li>
+							<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L487">lib/primitives.ts:487</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -189,7 +191,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L313">lib/primitives.ts:313</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L317">lib/primitives.ts:317</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -231,7 +233,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L463">lib/primitives.ts:463</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L453">lib/primitives.ts:453</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -312,7 +314,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L110">lib/primitives.ts:110</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L144">lib/primitives.ts:144</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -355,7 +357,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L223">lib/primitives.ts:223</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L210">lib/primitives.ts:210</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -387,7 +389,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L272">lib/primitives.ts:272</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L269">lib/primitives.ts:269</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -395,10 +397,10 @@
 									<p>choice specifies an ordered choice between two parsers,
 										p1 and p2. The returned parser will first apply
 										parser p1.  If p1 succeeds, p1&#39;s Outcome is returned.
-										If p1 fails, p2 is applied and the Outcome of p2 is returned.
-										Note that the input stream given to p1 and p2 is exactly
-									the same input stream.</p>
+									If p1 fails, p2 is applied and the Outcome of p2 is returned.</p>
 								</div>
+								<p>An exception is when an outcome is a critical failure,
+								that outcome is immediately returned.</p>
 							</div>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
 							<ul class="tsd-type-parameters">
@@ -438,6 +440,46 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="choices" class="tsd-anchor"></a>
+					<h3>choices</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">choices&lt;T&gt;<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>parsers<span class="tsd-signature-symbol">: </span><a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L302">lib/primitives.ts:302</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Like choice, but chooses from multiple possible parsers
+										The parser will be tried in the order of the input, and the result of
+										the first parser to succeed is returned
+									Example usage: choices(p1, p2, p3)</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>parsers: <a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[]</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>An array of parsers to try</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 					<a name="debug" class="tsd-anchor"></a>
 					<h3>debug</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
@@ -447,7 +489,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L479">lib/primitives.ts:479</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L469">lib/primitives.ts:469</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -486,7 +528,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L154">lib/primitives.ts:154</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L165">lib/primitives.ts:165</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -515,7 +557,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L243">lib/primitives.ts:243</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L238">lib/primitives.ts:238</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -539,7 +581,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L403">lib/primitives.ts:403</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L400">lib/primitives.ts:400</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -553,6 +595,47 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+					<a name="expect" class="tsd-anchor"></a>
+					<h3>expect</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<li class="tsd-signature tsd-kind-icon">expect&lt;T&gt;<span class="tsd-signature-symbol">(</span>parser<span class="tsd-signature-symbol">: </span><a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">(Anonymous function)</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L105">lib/primitives.ts:105</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>expect tries to apply the given parser and returns the result of that parser
+										if it succeeds, otherwise it returns a critical Failure
+										If the parser results in a critical Failure, expect simply returns it,
+										otherwise expect creates a critical Failure with the given error message
+									and the start pos of the istream as the error pos.</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>parser: <a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The parser to try</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">(Anonymous function)</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 					<a name="fresult" class="tsd-anchor"></a>
 					<h3>fresult</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
@@ -562,7 +645,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L421">lib/primitives.ts:421</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L411">lib/primitives.ts:411</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -603,7 +686,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L540">lib/primitives.ts:540</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L531">lib/primitives.ts:531</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -656,7 +739,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L88">lib/primitives.ts:88</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L125">lib/primitives.ts:125</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -679,7 +762,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L435">lib/primitives.ts:435</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L425">lib/primitives.ts:425</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -721,7 +804,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L234">lib/primitives.ts:234</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L229">lib/primitives.ts:229</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -744,7 +827,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L259">lib/primitives.ts:259</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L254">lib/primitives.ts:254</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -767,7 +850,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L209">lib/primitives.ts:209</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L217">lib/primitives.ts:217</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4>
@@ -784,15 +867,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L338">lib/primitives.ts:338</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L338">lib/primitives.ts:338</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>many repeatedly applies the parser p until p fails. many always
-										succeeds, even if it matches nothing.  many tries to guard
-										against an infinite loop by raising an exception if p succeeds
-									without changing the parser state.</p>
+										succeeds, even if it matches nothing or if an outcome is critical.
+										many tries to guard against an infinite loop by raising an exception
+									if p succeeds without changing the parser state.</p>
 								</div>
 							</div>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -806,6 +889,7 @@
 								<li>
 									<h5>p: <a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
+										<p>The parser to try</p>
 									</div>
 								</li>
 							</ul>
@@ -823,7 +907,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L369">lib/primitives.ts:369</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L369">lib/primitives.ts:369</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -845,6 +929,7 @@
 								<li>
 									<h5>p: <a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h5>
 									<div class="tsd-comment tsd-typography">
+										<p>The parser to try</p>
 									</div>
 								</li>
 							</ul>
@@ -862,7 +947,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L536">lib/primitives.ts:536</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L527">lib/primitives.ts:527</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -884,7 +969,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L63">lib/primitives.ts:63</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L79">lib/primitives.ts:79</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -921,7 +1006,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L449">lib/primitives.ts:449</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L439">lib/primitives.ts:439</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -963,7 +1048,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L185">lib/primitives.ts:185</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L195">lib/primitives.ts:195</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -993,7 +1078,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L166">lib/primitives.ts:166</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L177">lib/primitives.ts:177</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1040,7 +1125,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L384">lib/primitives.ts:384</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L384">lib/primitives.ts:384</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1071,7 +1156,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L553">lib/primitives.ts:553</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L544">lib/primitives.ts:544</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -1094,7 +1179,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L251">lib/primitives.ts:251</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L246">lib/primitives.ts:246</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1107,17 +1192,17 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="upper_chars" class="tsd-anchor"></a>
 					<h3>upper_<wbr>chars</h3>
-					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
 						<li class="tsd-signature tsd-kind-icon">upper_<wbr>chars<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L213">lib/primitives.ts:213</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L221">lib/primitives.ts:221</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h4>
@@ -1134,14 +1219,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L504">lib/primitives.ts:504</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L495">lib/primitives.ts:495</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>ws matches zero or more of the following whitespace characters:
 										&#39; &#39;, &#39;\t&#39;, &#39;\n&#39;, or &#39;\r\n&#39;
-									ws returns matched whitespace in a single CharStream result.</p>
+										ws returns matched whitespace in a single CharStream result.
+									Note: ws NEVER fails</p>
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_lib_primitives_.primitives.iparser.html" class="tsd-signature-type">IParser</a><span class="tsd-signature-symbol">&lt;</span><a href="../classes/_lib_charstream_.charutil.charstream.html" class="tsd-signature-type">CharStream</a><span class="tsd-signature-symbol">&gt;</span></h4>
@@ -1158,7 +1244,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L521">lib/primitives.ts:521</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L512">lib/primitives.ts:512</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1182,7 +1268,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/a3245c7/lib/primitives.ts#L75">lib/primitives.ts:75</a></li>
+									<li>Defined in <a href="https://github.com/williams-cs/pants/blob/cda7611/lib/primitives.ts#L89">lib/primitives.ts:89</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1258,6 +1344,9 @@
 						<a href="_lib_primitives_.primitives.html#choice" class="tsd-kind-icon">choice</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="_lib_primitives_.primitives.html#choices" class="tsd-kind-icon">choices</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="_lib_primitives_.primitives.html#debug" class="tsd-kind-icon">debug</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
@@ -1268,6 +1357,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_lib_primitives_.primitives.html#eof-1" class="tsd-kind-icon">eof</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
+						<a href="_lib_primitives_.primitives.html#expect" class="tsd-kind-icon">expect</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module tsd-has-type-parameter">
 						<a href="_lib_primitives_.primitives.html#fresult" class="tsd-kind-icon">fresult</a>
@@ -1320,7 +1412,7 @@
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_lib_primitives_.primitives.html#upper" class="tsd-kind-icon">upper</a>
 					</li>
-					<li class=" tsd-kind-function tsd-parent-kind-module tsd-is-not-exported">
+					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_lib_primitives_.primitives.html#upper_chars" class="tsd-kind-icon">upper_<wbr>chars</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">

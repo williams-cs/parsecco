@@ -1,4 +1,5 @@
 import { CharUtil } from "./charstream";
+import CharStream = CharUtil.CharStream;
 export declare namespace Primitives {
     class EOFMark {
         private static _instance;
@@ -11,26 +12,34 @@ export declare namespace Primitives {
      */
     class Success<T> {
         tag: "success";
+        inputstream: CharStream;
         result: T;
-        inputstream: CharUtil.CharStream;
         /**
          * Returns an object representing a successful parse.
          * @param istream The remaining string.
          * @param res The result of the parse
          */
-        constructor(istream: CharUtil.CharStream, res: T);
+        constructor(istream: CharStream, res: T);
     }
     /**
      * Represents a failed parse.
      */
     class Failure {
         tag: "failure";
-        inputstream: CharUtil.CharStream;
+        inputstream: CharStream;
+        error_pos: number;
+        error_msg: string;
+        is_critical: boolean;
         /**
          * Returns an object representing a failed parse.
+         * If the failure is critical, then parsing will stop immediately.
+         *
          * @param istream The string, unmodified, that was given to the parser.
+         * @param error_pos The position of the parsing failure in istream
+         * @param error_msg The error message for the failure
+         * @param is_critical Whether or not the failure is critical
          */
-        constructor(istream: CharUtil.CharStream);
+        constructor(istream: CharStream, error_pos: number, error_msg?: string, is_critical?: boolean);
     }
     /**
      * Union type representing a successful or failed parse.
@@ -40,7 +49,7 @@ export declare namespace Primitives {
      * Generic type of a parser.
      */
     interface IParser<T> {
-        (inputstream: CharUtil.CharStream): Outcome<T>;
+        (inputstream: CharStream): Outcome<T>;
     }
     /**
      * result succeeds without consuming any input, and returns v.
@@ -52,6 +61,17 @@ export declare namespace Primitives {
      * @param expecting the error message.
      */
     function zero<T>(expecting: string): IParser<T>;
+    /**
+     * expect tries to apply the given parser and returns the result of that parser
+     * if it succeeds, otherwise it returns a critical Failure
+     * If the parser results in a critical Failure, expect simply returns it,
+     * otherwise expect creates a critical Failure with the given error message
+     * and the start pos of the istream as the error pos.
+     *
+     * @param parser The parser to try
+     * @param error_msg The error message if the parser fails
+     */
+    function expect<T>(parser: IParser<T>): (error_msg: string) => (istream: CharUtil.CharStream) => Outcome<T>;
     /**
      * item successfully consumes the first character if the input
      * string is non-empty, otherwise it fails.
@@ -79,48 +99,59 @@ export declare namespace Primitives {
      * sat takes a predicate and yields a parser that consumes a
      * single character if the character satisfies the predicate,
      * otherwise it fails.
-     * @param pred a character predicate
      */
-    function sat(char_class: string[]): IParser<CharUtil.CharStream>;
-    function lower_chars(): string[];
+    function sat(char_class: string[]): IParser<CharStream>;
     /**
      * char takes a character and yields a parser that consume
      * that character. The returned parser succeeds if the next
      * character in the input stream is c, otherwise it fails.
      * @param c
      */
-    function char(c: string): IParser<CharUtil.CharStream>;
+    function char(c: string): IParser<CharStream>;
+    function lower_chars(): string[];
+    function upper_chars(): string[];
     /**
      * letter returns a parser that consumes a single alphabetic
      * character, from a-z, regardless of case.
      */
-    function letter(): IParser<CharUtil.CharStream>;
+    function letter(): IParser<CharStream>;
     /**
      * digit returns a parser that consumes a single numeric
      * character, from 0-9.  Note that the type of the result
      * is a string, not a number.
      */
-    function digit(): IParser<CharUtil.CharStream>;
+    function digit(): IParser<CharStream>;
     /**
      * upper returns a parser that consumes a single character
      * if that character is uppercase.
      */
-    function upper(): IParser<CharUtil.CharStream>;
+    function upper(): IParser<CharStream>;
     /**
      * lower returns a parser that consumes a single character
      * if that character is lowercase.
      */
-    function lower(): IParser<CharUtil.CharStream>;
+    function lower(): IParser<CharStream>;
     /**
      * choice specifies an ordered choice between two parsers,
      * p1 and p2. The returned parser will first apply
      * parser p1.  If p1 succeeds, p1's Outcome is returned.
      * If p1 fails, p2 is applied and the Outcome of p2 is returned.
-     * Note that the input stream given to p1 and p2 is exactly
-     * the same input stream.
+     *
+     * An exception is when an outcome is a critical failure,
+     * that outcome is immediately returned.
+     *
      * @param p1 A parser.
      */
     function choice<T>(p1: IParser<T>): (p2: IParser<T>) => IParser<T>;
+    /**
+     * Like choice, but chooses from multiple possible parsers
+     * The parser will be tried in the order of the input, and the result of
+     * the first parser to succeed is returned
+     * Example usage: choices(p1, p2, p3)
+     *
+     * @param parsers An array of parsers to try
+     */
+    function choices<T>(...parsers: IParser<T>[]): IParser<T>;
     /**
      * appfun allows the user to apply a function f to
      * the result of a parser p, assuming that p is successful.
@@ -130,10 +161,10 @@ export declare namespace Primitives {
     function appfun<T, U>(p: IParser<T>): (f: (t: T) => U) => (istream: CharUtil.CharStream) => Failure | Success<U>;
     /**
      * many repeatedly applies the parser p until p fails. many always
-     * succeeds, even if it matches nothing.  many tries to guard
-     * against an infinite loop by raising an exception if p succeeds
-     * without changing the parser state.
-     * @param p
+     * succeeds, even if it matches nothing or if an outcome is critical.
+     * many tries to guard against an infinite loop by raising an exception
+     * if p succeeds without changing the parser state.
+     * @param p The parser to try
      */
     function many<T>(p: IParser<T>): IParser<T[]>;
     /**
@@ -141,14 +172,14 @@ export declare namespace Primitives {
      * succeed at least once.  many1 tries to guard against an infinite
      * loop by raising an exception if p succeeds without changing the
      * parser state.
-     * @param p
+     * @param p The parser to try
      */
     function many1<T>(p: IParser<T>): (istream: CharUtil.CharStream) => Outcome<T[]>;
     /**
      * str yields a parser for the given string.
      * @param s A string
      */
-    function str(s: string): IParser<CharUtil.CharStream>;
+    function str(s: string): IParser<CharStream>;
     /**
      * Returns a parser that succeeds only if the end of the
      * input has been reached.
@@ -192,17 +223,18 @@ export declare namespace Primitives {
      * ws matches zero or more of the following whitespace characters:
      * ' ', '\t', '\n', or '\r\n'
      * ws returns matched whitespace in a single CharStream result.
+     * Note: ws NEVER fails
      */
-    function ws(): IParser<CharUtil.CharStream>;
+    function ws(): IParser<CharStream>;
     /**
      * ws1 matches one or more of the following whitespace characters:
      * ' ', '\t', '\n', or '\r\n'
      * ws1 returns matched whitespace in a single CharStream result.
      */
-    function ws1(): IParser<CharUtil.CharStream>;
+    function ws1(): IParser<CharStream>;
     /**
      * nl matches and returns a newline.
      */
-    function nl(): IParser<CharUtil.CharStream>;
-    function strSat(strs: string[]): IParser<CharUtil.CharStream>;
+    function nl(): IParser<CharStream>;
+    function strSat(strs: string[]): IParser<CharStream>;
 }

@@ -8,7 +8,7 @@ require("mocha");
 const inputstream = new charstream_1.CharUtil.CharStream("helloworld");
 describe('Failure object', () => {
     it('should consume none of the input stream', () => {
-        const output = new index_1.Primitives.Failure(inputstream);
+        const output = new index_1.Primitives.Failure(inputstream, inputstream.startpos);
         chai_1.expect(output.inputstream).to.equal(inputstream);
     });
 });
@@ -28,7 +28,44 @@ describe('Zero parser', () => {
                 break;
             default:
                 chai_1.assert.fail();
+        }
+    });
+});
+describe('Expect parser', () => {
+    it('should create a critical failure with the correct error message and at the correct position', () => {
+        let error_msg = "Expected )";
+        let inputstream = new charstream_1.CharUtil.CharStream("   (   ");
+        let openParen = index_1.Primitives.right(index_1.Primitives.ws())(index_1.Primitives.char("("));
+        let closeParen = index_1.Primitives.right(index_1.Primitives.ws())(index_1.Primitives.char(")"));
+        let expectCloseParen = index_1.Primitives.expect(closeParen)(error_msg);
+        let parenParser = index_1.Primitives.right(openParen)(expectCloseParen);
+        let outcome = parenParser(inputstream);
+        switch (outcome.tag) {
+            case "failure":
+                if (!outcome.is_critical || outcome.error_msg != error_msg || outcome.error_pos != 4) {
+                    chai_1.assert.fail();
+                }
+                else {
+                    chai_1.assert(true);
+                }
                 break;
+            default:
+                chai_1.assert.fail();
+        }
+    });
+    it('should not create a failure if the parser succeeds', () => {
+        let inputstream = new charstream_1.CharUtil.CharStream("   (  ) ");
+        let openParen = index_1.Primitives.right(index_1.Primitives.ws())(index_1.Primitives.char("("));
+        let closeParen = index_1.Primitives.right(index_1.Primitives.ws())(index_1.Primitives.char(")"));
+        let expectCloseParen = index_1.Primitives.expect(closeParen)("Expected )");
+        let parenParser = index_1.Primitives.right(openParen)(expectCloseParen);
+        let outcome = parenParser(inputstream);
+        switch (outcome.tag) {
+            case "success":
+                chai_1.assert(true);
+                break;
+            default:
+                chai_1.assert.fail();
         }
     });
 });
@@ -255,10 +292,10 @@ describe('Lower parser', () => {
 });
 describe('Choice parser', () => {
     it('should allow parsing alternatives', () => {
-        const output = index_1.Primitives.choice(index_1.Primitives.upper())(index_1.Primitives.lower())(inputstream);
-        switch (output.tag) {
+        const outcome = index_1.Primitives.choice(index_1.Primitives.upper())(index_1.Primitives.lower())(inputstream);
+        switch (outcome.tag) {
             case "success":
-                chai_1.expect(output.result.toString()).to.equal("h");
+                chai_1.expect(outcome.result.toString()).to.equal("h");
                 break;
             case "failure":
                 chai_1.assert.fail();
@@ -267,13 +304,73 @@ describe('Choice parser', () => {
     });
     it('should fail if no alternatives can be applied', () => {
         const inputstream2 = new charstream_1.CharUtil.CharStream("4helloworld");
-        const output = index_1.Primitives.choice(index_1.Primitives.upper())(index_1.Primitives.lower())(inputstream2);
-        switch (output.tag) {
+        const outcome = index_1.Primitives.choice(index_1.Primitives.upper())(index_1.Primitives.lower())(inputstream2);
+        switch (outcome.tag) {
             case "success":
                 chai_1.assert.fail();
                 break;
             case "failure":
                 chai_1.assert(true);
+                break;
+        }
+    });
+    it('should fail on the first choice if there is a critical failure', () => {
+        const p1 = index_1.Primitives.expect(index_1.Primitives.strSat(["Hello"]))("Expected Hello");
+        const p2 = index_1.Primitives.strSat(["hello"]);
+        const outcome = index_1.Primitives.choice(p1)(p2)(inputstream);
+        switch (outcome.tag) {
+            case "success":
+                chai_1.assert.fail();
+                break;
+            case "failure":
+                chai_1.expect(outcome.is_critical).to.equal(true);
+                break;
+        }
+    });
+});
+describe('Choices parser', () => {
+    it('should allow parsing multiple options', () => {
+        const p1 = index_1.Primitives.char("a");
+        const p2 = index_1.Primitives.char("b");
+        const p3 = index_1.Primitives.char("h");
+        const p4 = index_1.Primitives.char("w");
+        const outcome = index_1.Primitives.choices(p1, p2, p3, p4)(inputstream);
+        switch (outcome.tag) {
+            case "success":
+                chai_1.expect(outcome.result.toString()).to.equal("h");
+                break;
+            case "failure":
+                chai_1.assert.fail();
+                break;
+        }
+    });
+    it('should fail if no alternatives can be applied', () => {
+        const p1 = index_1.Primitives.char("a");
+        const p2 = index_1.Primitives.char("b");
+        const p3 = index_1.Primitives.char("c");
+        const p4 = index_1.Primitives.char("d");
+        const outcome = index_1.Primitives.choices(p1, p2, p3, p4)(inputstream);
+        switch (outcome.tag) {
+            case "success":
+                chai_1.assert.fail();
+                break;
+            case "failure":
+                chai_1.assert(true);
+                break;
+        }
+    });
+    it('should fail on the first critical failure', () => {
+        const p1 = index_1.Primitives.char("a");
+        const p2 = index_1.Primitives.char("b");
+        const p3 = index_1.Primitives.expect(index_1.Primitives.char("c"))("Expected c");
+        const p4 = index_1.Primitives.char("d");
+        const outcome = index_1.Primitives.choices(p1, p2, p3, p4)(inputstream);
+        switch (outcome.tag) {
+            case "success":
+                chai_1.assert.fail();
+                break;
+            case "failure":
+                chai_1.expect(outcome.is_critical).to.equal(true);
                 break;
         }
     });

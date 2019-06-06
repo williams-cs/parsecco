@@ -597,7 +597,7 @@ describe('Left parser', () => {
 
 describe('Right parser', () => {
     it('should apply p and q in sequence and return the result of q on success', () => {
-        const p = P.right(P.str("hello"))(P.str("world"));
+        const p = P.right<CU.CharStream, CU.CharStream>(P.str("hello"))(P.str("world"));
         const output = p(inputstream);
         switch (output.tag) {
             case "success":
@@ -610,7 +610,7 @@ describe('Right parser', () => {
     });
 
     it('should fail if p fails', () => {
-        const p = P.right(P.str("z"))(P.str("world"));
+        const p = P.right<CU.CharStream, CU.CharStream>(P.str("z"))(P.str("world"));
         const output = p(inputstream);
         switch (output.tag) {
             case "success":
@@ -640,7 +640,7 @@ describe('Between parser', () => {
     const input = new CU.CharStream("foo(bar)");
 
     it('should apply popen, p, and pclose in sequence and return the result of p on success', () => {
-        const p = P.between(P.str("foo("))(P.char(")"))(P.str("bar"));
+        const p = P.between<CU.CharStream, CU.CharStream, CU.CharStream>(P.str("foo("))(P.char(")"))(P.str("bar"));
         const output = p(input);
         switch (output.tag) {
             case "success":

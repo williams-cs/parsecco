@@ -5,21 +5,21 @@ Pants is a parser combinator library for Typescript.
 
 [Typedoc documentation can be found here](https://williams-cs.github.io/pants/)
 
-## installing development dependencies
+## installing dependencies and building
 
-To install package dependencies for `pants` you will need to run:
+We supply a `Makefile` with Pants to make working with this library easy.  To build, run:
 
 ```
-$ npm install
+$ make
 ```
 
-in the pants repository directory.
+in the Pants repository directory.
 
 ## running tests
 
 Run:
 
 ```
-$ npm run test
+$ make test
 ```
 

@@ -125,7 +125,8 @@ export namespace Primitives {
     export function item() {
         return (istream: CharStream) => {
             if (istream.isEmpty()) {
-                return new Failure(istream, istream.startpos);
+                let error_mes : string = "No more character";
+                return new Failure(istream, istream.startpos, error_mes, true);
             } else {
                 let remaining = istream.tail(); // remaining string;
                 let res = istream.head(); // result of parse;

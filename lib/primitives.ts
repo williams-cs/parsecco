@@ -1,5 +1,11 @@
 import { CharUtil } from "./charstream";
 import CharStream = CharUtil.CharStream;
+import { ErrorType } from "./ErrorType";
+import { Errors } from "./Errors";
+import { CharError } from "./CharError";
+import { StringError } from "./StringError";
+import { BetweenLeftError } from "./BetweenLeftError";
+import { BetweenRightError } from "./BetweenRightError";
 
 export namespace Primitives {
     export class EOFMark {
@@ -37,7 +43,7 @@ export namespace Primitives {
         tag: "failure" = "failure";
         inputstream: CharStream;
         error_pos: number;
-        error_msg: string;
+        error_msg: Errors;
         is_critical: boolean;
 
         /**
@@ -51,7 +57,7 @@ export namespace Primitives {
          */
         constructor(
             istream: CharStream, error_pos: number,
-            error_msg: string = "", is_critical = false
+            error_msg: Errors, is_critical = false
         ) {
             this.inputstream = istream;
             this.error_pos = error_pos;
@@ -88,7 +94,7 @@ export namespace Primitives {
      */
     export function zero<T>(expecting: string): IParser<T> {
         return (istream) => {
-            return new Failure(istream, istream.startpos, expecting);
+            return new Failure(istream, istream.startpos, new StringError(expecting));
         }
     }
 
@@ -103,7 +109,7 @@ export namespace Primitives {
      * @param error_msg The error message if the parser fails
      */
     export function expect<T>(parser: IParser<T>) {
-        return (error_msg: string) => {
+        return (error: Errors) => {
             return (istream: CharStream) => {
                 let outcome: Outcome<T> = parser(istream);
                 switch (outcome.tag) {
@@ -112,7 +118,7 @@ export namespace Primitives {
                     case "failure":
                         return outcome.is_critical
                             ? outcome
-                            : new Failure(istream, istream.startpos, error_msg, true);
+                            : new Failure(istream, istream.startpos, error, true);
                 }
             }
         };
@@ -125,8 +131,7 @@ export namespace Primitives {
     export function item() {
         return (istream: CharStream) => {
             if (istream.isEmpty()) {
-                let error_mes : string = "No more character";
-                return new Failure(istream, istream.startpos, error_mes, true);
+                return new Failure(istream, istream.startpos, new CharError(""), true);
             } else {
                 let remaining = istream.tail(); // remaining string;
                 let res = istream.head(); // result of parse;
@@ -153,6 +158,7 @@ export namespace Primitives {
                             case "success":
                                 break;
                             case "failure": // note: backtracks, returning original istream
+                                console.log(o.error_msg);
                                 return new Failure(istream, o.error_pos, o.error_msg, o.is_critical);
                         }
                         return o;
@@ -197,7 +203,7 @@ export namespace Primitives {
         let f = (x: CharStream) => {
             return (char_class.indexOf(x.toString()) > -1)
                 ? result(x)
-                : (istream: CharStream) => new Failure(istream, istream.startpos - 1);
+                : (istream: CharStream) => new Failure(istream, istream.startpos - 1, new CharError(x.toString()));
         };
         return bind<CharStream, CharStream>(item())(f);
     }
@@ -387,7 +393,14 @@ export namespace Primitives {
             let chars: string[] = s.split("");
             let p = result(new CharStream(""));
             let f = (tup: [CharStream, CharStream]) => tup[0].concat(tup[1]);
-            for (var c of chars) {
+
+            // for (let c = 0; c < chars.length; c++) {
+            //     if (char(s[c])(istream.substring(c, c)) instanceof Failure) {
+            //         let error_mes : string = "Missing string: " + s;
+            //         return new Failure(new CharStream(s[c]), 2 , error_mes, true);
+            //     }
+            // }  
+            for (let c of chars) {
                 p = seq<CharStream, CharStream, CharStream>(p)(char(c))(f);
             }
             return p(istream);
@@ -400,7 +413,7 @@ export namespace Primitives {
      */
     export function eof(): IParser<EOFMark> {
         return (istream: CharStream) => {
-            return istream.isEOF() ? new Success(istream, EOF) : new Failure(istream, istream.startpos);
+            return istream.isEOF() ? new Success(istream, EOF) : new Failure(istream, istream.startpos, new StringError("EOF Error"));
         }
     }
 
@@ -454,8 +467,8 @@ export namespace Primitives {
     export function between<T, U, V>(popen: IParser<T>): (pclose: IParser<U>) => (p: IParser<V>) => IParser<V> {
         return (pclose: IParser<U>) => {
             return (p: IParser<V>) => {
-                let l: IParser<V> = left<V, U>(p)(pclose);
-                let r: IParser<V> = right<T, V>(popen)(l);
+                let l: IParser<V> = expect(left<V, U>(p)(pclose))(new BetweenRightError("("));
+                let r: IParser<V> = expect(right<T, V>(popen)(l))(new BetweenLeftError(")"));
                 return r;
             }
         }
@@ -570,7 +583,7 @@ export namespace Primitives {
                     }
                 }
             }
-            return new Failure(istream, istream.startpos);
+            return new Failure(istream, istream.startpos, new StringError(<string>istream.substring(istream.startpos, istream.length() - 1).input));
         }
     }
 }

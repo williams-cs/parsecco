@@ -8,7 +8,7 @@ export class ItemError implements ErrorType {
     }
 
     explanation() {
-        return "something...";
+        return "";
     }
 
     toString() : string {

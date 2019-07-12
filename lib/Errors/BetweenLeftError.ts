@@ -13,7 +13,7 @@ export class BetweenLeftError implements ErrorType {
     }
 
     explanation() : string {
-        return "left part";
+        return "left";
     }
 
     toString() {

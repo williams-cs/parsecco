@@ -510,7 +510,7 @@ export namespace Primitives {
      */
     export function ws(): IParser<CharStream> {
         return (istream: CharStream) => {
-            let o = expect(many(wschars))((error : ErrorType) => new WSError())(istream);
+            let o = many(wschars)(istream);
             switch (o.tag) {
                 case "success":
                     return new Success(o.inputstream, CharStream.concat(o.result));
@@ -527,7 +527,7 @@ export namespace Primitives {
      */
     export function ws1(): IParser<CharStream> {
         return (istream: CharStream) => {
-            let o = expect(many1(wschars))((error : ErrorType) => new WSError())(istream);
+            let o = expect(many1(wschars))((error: ErrorType) => new WSError())(istream);
             switch (o.tag) {
                 case "success":
                     return new Success(o.inputstream, CharStream.concat(o.result));
@@ -541,7 +541,7 @@ export namespace Primitives {
      * nl matches and returns a newline.
      */
     export function nl(): IParser<CharStream> {
-        return Primitives.choice(Primitives.str("\n"))(Primitives.str("\r\n"))
+        return choice(str("\n"))(str("\r\n"));
     }
 
     function groupBy<T, U>(list: T[], keyGetter: (e: T) => U): Map<U, T[]> {

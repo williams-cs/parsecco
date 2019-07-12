@@ -1,5 +1,6 @@
 import { CharUtil } from "./charstream";
 import CharStream = CharUtil.CharStream;
+import { ErrorType } from "./Errors/ErrorType";
 export declare namespace Primitives {
     class EOFMark {
         private static _instance;
@@ -7,6 +8,12 @@ export declare namespace Primitives {
         static readonly Instance: EOFMark;
     }
     const EOF: EOFMark;
+    /**
+     * Represents an Errors composition function.
+     */
+    interface EComposer {
+        (e: ErrorType): ErrorType;
+    }
     /**
      * Represents a successful parse.
      */
@@ -28,18 +35,16 @@ export declare namespace Primitives {
         tag: "failure";
         inputstream: CharStream;
         error_pos: number;
-        error_msg: string;
-        is_critical: boolean;
+        error: ErrorType;
         /**
          * Returns an object representing a failed parse.
          * If the failure is critical, then parsing will stop immediately.
          *
          * @param istream The string, unmodified, that was given to the parser.
          * @param error_pos The position of the parsing failure in istream
-         * @param error_msg The error message for the failure
-         * @param is_critical Whether or not the failure is critical
+         * @param error The error message for the failure
          */
-        constructor(istream: CharStream, error_pos: number, error_msg?: string, is_critical?: boolean);
+        constructor(istream: CharStream, error_pos: number, error: ErrorType);
     }
     /**
      * Union type representing a successful or failed parse.
@@ -69,9 +74,9 @@ export declare namespace Primitives {
      * and the start pos of the istream as the error pos.
      *
      * @param parser The parser to try
-     * @param error_msg The error message if the parser fails
+     * @param f A function that produces a new Errors given an existing Errors
      */
-    function expect<T>(parser: IParser<T>): (error_msg: string) => (istream: CharUtil.CharStream) => Outcome<T>;
+    function expect<T>(parser: IParser<T>): (f: EComposer) => IParser<T>;
     /**
      * item successfully consumes the first character if the input
      * string is non-empty, otherwise it fails.

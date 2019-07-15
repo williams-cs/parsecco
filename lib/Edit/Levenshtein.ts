@@ -1,5 +1,5 @@
 //Naive implementation based on wikipedia article on Wagner-Fischer Algorithm
-import jslevenshtein from 'js-levenshtein';
+const jslevenshtein = require('js-levenshtein');
 /*
 Performs one instance of a levenshtein calculation 
 given two strings, and returns the distance. The 
@@ -66,5 +66,10 @@ export function levenshteinString(table: string[][]): string{
     return "a";
 }
 
-levenshteinDist("This is a long phrase", "this is a short sentence");
-jslevenshtein("This is a long phrase", "this is a short sentence");
+let a = "this is a short sentence"
+console.time("non opt")
+console.log("non opt: " + levenshteinDist("", a));
+console.timeEnd("non opt")
+console.time("opt")
+console.log("opt: " + jslevenshtein("", a));
+console.timeEnd("opt")

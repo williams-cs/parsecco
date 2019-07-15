@@ -1,3 +1,5 @@
+//Naive implementation based on wikipedia article on Wagner-Fischer Algorithm
+import jslevenshtein from 'js-levenshtein';
 /*
 Performs one instance of a levenshtein calculation 
 given two strings, and returns the distance. The 
@@ -64,5 +66,5 @@ export function levenshteinString(table: string[][]): string{
     return "a";
 }
 
-console.log(levenshteinDist("var x = 2", "let y = 3"));
-console.log(levenshteinTable("var x = 2", "let y = 3"));
+levenshteinDist("This is a long phrase", "this is a short sentence");
+jslevenshtein("This is a long phrase", "this is a short sentence");

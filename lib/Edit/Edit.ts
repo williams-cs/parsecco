@@ -1,5 +1,6 @@
 import { ErrorType } from "../Errors/ErrorType";
 import { levenshteinDist } from "./Levenshtein";
+import jslevenshtein from 'js-levenshtein';
 
 export class Edit {
     private _input: string;

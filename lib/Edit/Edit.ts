@@ -1,4 +1,5 @@
 import { ErrorType } from "../Errors/ErrorType";
+import { levenshteinDist } from "./Levenshtein";
 
 export class Edit {
     private _input: string;
@@ -12,20 +13,10 @@ export class Edit {
     }
 
     /*
-    Performs one instance of a levenshtein calculation 
-    given two strings, and returns the distance. The 
-    complexity of this method is O(mn), where m and n 
-    are the lengths of the current and optimal string
-    */
-    private levenshtein(curr: string, opt:string): number {
-
-        return 2;
-    }
-
-    /*
-    Given a particular error, it creates a non-infinite 
-    space to search for the minimum edit distance via 
-    heuristics. 
+    Given a particular error, it creates a finite 
+    space of most possible error correcting replacements.
+    All of items in the search space are possible fixes
+    to the rror
     */
     private searchSpace(error: ErrorType): string[]{
 
@@ -36,10 +27,24 @@ export class Edit {
     Returns the minimum edit distance of a string that 
     fixes the error, and returns that string. The complexity 
     is O(kmn), where k is the size of the search space.
+    Returns a tuple of the minimum edit distance and 
+    alternate string associated
     */
     minEdit(): [number, string]{
-        let s: this.searchSpace
-        this._output = [2,"k"]
+        let space: string[] = this.searchSpace(this._error);
+        let min: number = levenshteinDist(this._input, space[0]);
+        let closestStr: string = "";
+        for(let str in space){
+            let curr: number = levenshteinDist(this._input,str);
+            if (curr < min){
+                min = curr
+                closestStr = str
+            }
+            if (min == 1){
+                break;
+            }
+        }
+        this._output = [min,closestStr]
         return this._output;
     }
 

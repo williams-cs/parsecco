@@ -1,0 +1,1 @@
+{"version":3,"file":"DigitError.js","sourceRoot":"","sources":["../../../lib/Errors/DigitError.ts"],"names":[],"mappings":";;AACA,2CAAgD;AAEhD,MAAa,UAAU;IAEnB,SAAS;QACL,OAAO,iBAAI,CAAC;IAChB,CAAC;IAED,WAAW;QACP,OAAO,QAAQ,CAAC;IACpB,CAAC;IAED,QAAQ;QACJ,OAAO,YAAY,CAAC;IACxB,CAAC;CACJ;AAbD,gCAaC"}

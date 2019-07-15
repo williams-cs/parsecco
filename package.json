@@ -4,7 +4,9 @@
   "description": "pants is a PArser combinator library, iN TypeScript",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
-  "dependencies": {},
+  "dependencies": {
+    "space-lift": "^0.8.7"
+  },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",

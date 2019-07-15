@@ -66,10 +66,11 @@ export function levenshteinString(table: string[][]): string{
     return "a";
 }
 
-let a = "this is a short sentence"
+let a = "this is a short sentence and this is a long sentence and this is a medium sentence"
+let b = "recursively finds the optimum string associated with a dynamic programming table"
 console.time("non opt")
-console.log("non opt: " + levenshteinDist("", a));
+console.log("non opt: " + levenshteinDist(b, a));
 console.timeEnd("non opt")
 console.time("opt")
-console.log("opt: " + jslevenshtein("", a));
+console.log("opt: " + jslevenshtein(b, a));
 console.timeEnd("opt")

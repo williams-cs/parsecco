@@ -5,11 +5,13 @@ import { levenshteinDist } from "./Levenshtein";
 export class Edit {
     private _input: string;
     private _error: ErrorType;
+    private _prevEdit: number;
     private _output: [number,string];
 
-    constructor(input: string, error: ErrorType){
+    constructor(input: string, error: ErrorType, prevEdit: number = 0){
         this._input = input;
         this._error = error;
+        this._prevEdit = prevEdit;
         this._output = [0,""];
     }
 
@@ -45,7 +47,7 @@ export class Edit {
                 break;
             }
         }
-        this._output = [min,closestStr]
+        this._output = [min + this._prevEdit,closestStr]
         return this._output;
     }
 

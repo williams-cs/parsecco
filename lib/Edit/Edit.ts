@@ -1,5 +1,5 @@
 import { Option } from "space-lift";
-export interface ErrorType {
+export interface Edit {
     rootCause(): Option<ErrorType>;
     explanation(): string;
 }

@@ -1,6 +1,8 @@
 import { ErrorType } from "../Errors/ErrorType";
 import { levenshteinDist } from "./Levenshtein";
-//import jslevenshtein from 'js-levenshtein';
+import { StringError,CharError, DigitError, ItemError, LetterError, SatError,
+         WSError, BetweenLeftError, BetweenRightError } from "../Errors/ErrorIndex";
+const jslevenshtein = require('js-levenshtein');
 
 export class Edit {
     private _input: string;
@@ -19,12 +21,11 @@ export class Edit {
     Given a particular error, it creates a finite 
     space of most possible error correcting replacements.
     All of items in the search space are possible fixes
-    to the rror
+    to the error
     */
-    private searchSpace(error: ErrorType): string[]{
-
-        return ["a","2"]
-    }
+    // private searchSpace(error: ErrorType): string[]{
+    //     return error.fix();
+    // }
 
     /*
     Returns the minimum edit distance of a string that 
@@ -33,10 +34,9 @@ export class Edit {
     Returns a tuple of the minimum edit distance and 
     alternate string associated
     */
-    minEdit(): [number, string]{
-        let space: string[] = this.searchSpace(this._error);
+    minFix(space: string[]): [number, string]{
         let min: number = levenshteinDist(this._input, space[0]);
-        let closestStr: string = "";
+        let closestStr: string = space[0];
         for(let str in space){
             let curr: number = levenshteinDist(this._input,str);
             if (curr < min){

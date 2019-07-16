@@ -16,6 +16,10 @@ export class StringError implements ErrorType {
         return "string " + " ' " + this._expectedStr + " ' "; 
     }
 
+    fix() : string[] {
+        return [this._expectedStr];
+    }
+
     toString() {
         return "StringError -> " + " ' " + this._expectedStr + " ' "; 
     }

@@ -11,6 +11,10 @@ export class WSError implements ErrorType {
         return "white space";
     }
 
+    fix(): string[] {
+        return [" "];
+    }
+
     toString() : string {
         return "WSError"; 
     }

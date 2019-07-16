@@ -1,7 +1,9 @@
 //Naive implementation based on wikipedia article on Wagner-Fischer Algorithm
+//and text in Skiena
 const jslevenshtein = require('js-levenshtein');
+
 /*
-Performs one instance of a levenshtein calculation 
+Performs one instance of a levenshtein distance 
 given two strings, and returns the distance. The 
 complexity of this method is O(mn), where m and n 
 are the lengths of the current and optimal string

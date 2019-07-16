@@ -299,10 +299,12 @@ export namespace Primitives {
                                 (o2.error instanceof CharError && o.error instanceof CharError)) {
                                     let str = istream.toString()
                                     if (str.length > 5) {
-                                        let o2Edit = o2.error.minEdit(str.substring(0,6), o2.error.expectedStr);
-                                        let o1Edit = o.error.minEdit(str.substring(0,6), o.error.expectedStr);
-                                        return (o2Edit > o1Edit) ? o : o2;
-                                    } 
+                                        str = str.substring(0,6);
+                                    }
+                                    let o2Edit = o2.error.minEdit(str, o2.error.expectedStr);
+                                    let o1Edit = o.error.minEdit(str, o.error.expectedStr);
+                                    return (o2Edit > o1Edit) ? o : o2;
+
                                 }
                                 return (o2.error_pos >= o.error_pos)
                                     ? o2 : o;

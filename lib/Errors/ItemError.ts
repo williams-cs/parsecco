@@ -12,9 +12,8 @@ export class ItemError implements ErrorType {
         return "";
     }
 
-    minEdit(input: string, expectedStr: string = "") : number {
-        let val: number = jslevenshtein (input, expectedStr);
-        return val;
+    minEdit(input: string, expectedStr: string) : number {
+        return jslevenshtein (input, expectedStr);
     }
 
     expectedStr() : string {

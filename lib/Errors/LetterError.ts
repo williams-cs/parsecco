@@ -12,13 +12,12 @@ export class LetterError implements ErrorType {
         return "letter";
     }
 
-    minEdit(input: string, expectedStr: string = "x") : number {
-        let val: number = jslevenshtein (input, expectedStr);
-        return val;
+    minEdit(input: string, expectedStr: string) : number {
+        return jslevenshtein(input, expectedStr);
     }
 
     expectedStr() : string {
-        return "x" ;
+        return " " ;
     }
 
     toString() : string {

@@ -16,8 +16,8 @@ export class BetweenLeftError implements ErrorType {
         return "left";
     }
 
-    minEdit(input: string, expectedStr: string = "") : number {
-        return 0;
+    minEdit(input: string, expectedStr: string) : number {
+        return this._rootCause.minEdit(input, expectedStr);
     }
 
     expectedStr() : string {

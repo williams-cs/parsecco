@@ -12,13 +12,12 @@ export class DigitError implements ErrorType {
         return "number";
     }
 
-    minEdit(input: string, expectedStr: string = "0") : number {
-        let val: number = jslevenshtein (input, expectedStr);
-        return val;
+    minEdit(input: string, expectedStr: string) : number {
+        return jslevenshtein(input, expectedStr);
     }
 
     expectedStr() : string {
-        return "0" ;
+        return " " ;
     }
 
     toString() : string {

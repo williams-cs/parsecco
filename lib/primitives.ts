@@ -294,24 +294,14 @@ export namespace Primitives {
                             case "success":
                                 break;
                             case "failure":
-
                                 let str = istream.toString()
                                 if (str.length > 5) {
                                     str = str.substring(0,6);
                                 }
-                                let finger1 = o.error;
-                                while (finger1.rootCause().isDefined()){
-                                    finger1 = finger1.rootCause().getOrElse(new ItemError());
-                                }
-                                let finger2 = o2.error;
-                                while(finger2.rootCause().isDefined()){
-                                    finger2 = finger2.rootCause().getOrElse(new ItemError());
-                                }
-
-                                let o2Edit = finger2.minEdit(str, o2.error.expectedStr());
-                                let o1Edit = finger1.minEdit(str, o.error.expectedStr());
+                                
+                                let o2Edit = o2.error.minEdit(str, o2.error.expectedStr());
+                                let o1Edit = o.error.minEdit(str, o.error.expectedStr());
                                 return (o2Edit > o1Edit) ? o : o2;
-
                         }
                         return o2;
                 }

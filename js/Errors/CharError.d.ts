@@ -6,6 +6,6 @@ export declare class CharError implements ErrorType {
     rootCause(): Option<ErrorType>;
     explanation(): string;
     minEdit(input: string, expectedStr: string): number;
-    readonly expectedStr: string;
+    expectedStr(): string;
     toString(): string;
 }

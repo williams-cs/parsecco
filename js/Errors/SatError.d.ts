@@ -6,5 +6,7 @@ export declare class SatError implements ErrorType {
     rootCause(): Option<ErrorType>;
     readonly errors: string[];
     explanation(): string;
+    minEdit(input: string, expectedStr: string): number;
+    expectedStr(): string;
     toString(): string;
 }

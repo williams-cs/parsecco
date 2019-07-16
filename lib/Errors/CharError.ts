@@ -18,8 +18,7 @@ export class CharError implements ErrorType {
     }
 
     minEdit(input: string, expectedStr: string) : number {
-        let val: number = jslevenshtein (input, expectedStr);
-        return val;
+        return jslevenshtein (input, expectedStr);
     }
 
     expectedStr() : string {

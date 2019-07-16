@@ -16,11 +16,6 @@ export class SatError implements ErrorType {
         return this._expectedStr;
     }
 
-    //duplicate method 
-    fix(): string[]{
-        return this._expectedStr;
-    }
-
     explanation() {
         return "";
     }

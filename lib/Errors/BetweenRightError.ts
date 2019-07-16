@@ -16,10 +16,6 @@ export class BetweenRightError implements ErrorType {
         return "right part";
     }
 
-    fix() : string[] {
-        return ['"', ')', "]", '}', "'", '>']
-    }
-
     toString() {
         return "BetweenRightError -> " + this._rootCause; 
     }

@@ -11,10 +11,6 @@ export class ItemError implements ErrorType {
         return "";
     }
 
-    fix() : string[] {
-        return [""]
-    }
-
     toString() : string {
         return "ItemError"; 
     }

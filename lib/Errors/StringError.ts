@@ -22,7 +22,7 @@ export class StringError implements ErrorType {
         return val;
     }
 
-    get expectedStr() : string {
+    expectedStr() : string {
         return this._expectedStr;
     }
 

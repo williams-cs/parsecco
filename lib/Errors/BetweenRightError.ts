@@ -16,6 +16,14 @@ export class BetweenRightError implements ErrorType {
         return "right part";
     }
 
+    minEdit(input: string, expectedStr: string = "") : number {
+        return 0;
+    }
+
+    expectedStr() : string {
+        return "" ;
+    }
+
     toString() {
         return "BetweenRightError -> " + this._rootCause; 
     }

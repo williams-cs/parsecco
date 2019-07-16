@@ -1,5 +1,6 @@
 import { ErrorType } from "./ErrorType";
 import { Option, Some, None } from "space-lift";
+const jslevenshtein = require('js-levenshtein');
 
 export class LetterError implements ErrorType {
 
@@ -9,6 +10,15 @@ export class LetterError implements ErrorType {
 
     explanation() {
         return "letter";
+    }
+
+    minEdit(input: string, expectedStr: string = "x") : number {
+        let val: number = jslevenshtein (input, expectedStr);
+        return val;
+    }
+
+    expectedStr() : string {
+        return "x" ;
     }
 
     toString() : string {

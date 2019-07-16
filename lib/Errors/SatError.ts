@@ -20,6 +20,14 @@ export class SatError implements ErrorType {
         return "";
     }
 
+    minEdit(input: string, expectedStr: string) : number {
+        return 0;
+    }
+
+    expectedStr(): string{
+        return "";
+    }
+
     toString() {
         return "SatError -> " + this._expectedStr; 
     }

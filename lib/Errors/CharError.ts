@@ -16,6 +16,9 @@ export class CharError implements ErrorType {
         return "character " + " ' " + this._expectedChar + " ' "; 
     }
 
+    fix(): string[] {
+        return [this._expectedChar];
+    }
     toString() : string {
         return "CharError -> " + " ' " + this._expectedChar + " ' "; 
     }

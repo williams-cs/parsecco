@@ -16,6 +16,10 @@ export class BetweenLeftError implements ErrorType {
         return "left";
     }
 
+    fix() : string[] {
+        return ['"', '(', "[", '{', "'", '<']
+    }
+
     toString() {
         return "BetweenLeftError -> " + this._rootCause;
     }

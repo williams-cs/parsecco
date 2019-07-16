@@ -5,5 +5,7 @@ export declare class StringError implements ErrorType {
     constructor(expectedStr: string);
     rootCause(): Option<ErrorType>;
     explanation(): string;
+    minEdit(input: string, expectedStr: string): number;
+    readonly expectedStr: string;
     toString(): string;
 }

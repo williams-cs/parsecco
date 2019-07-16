@@ -1,9 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 //Naive implementation based on wikipedia article on Wagner-Fischer Algorithm
+//and text in Skiena
 const jslevenshtein = require('js-levenshtein');
 /*
-Performs one instance of a levenshtein calculation
+Performs one instance of a levenshtein distance
 given two strings, and returns the distance. The
 complexity of this method is O(mn), where m and n
 are the lengths of the current and optimal string
@@ -56,6 +57,12 @@ function levenshteinString(table) {
     return "a";
 }
 exports.levenshteinString = levenshteinString;
-levenshteinDist("This is a long phrase", "this is a short sentence");
-jslevenshtein("This is a long phrase", "this is a short sentence");
+let a = "this is a short sentence and this is a long sentence and this is a medium sentence";
+let b = "recursively finds the optimum string associated with a dynamic programming table";
+console.time("non opt");
+console.log("non opt: " + levenshteinDist(b, a));
+console.timeEnd("non opt");
+console.time("opt");
+console.log("opt: " + jslevenshtein(b, a));
+console.timeEnd("opt");
 //# sourceMappingURL=Levenshtein.js.map

@@ -22,6 +22,10 @@ export class CharError implements ErrorType {
         return val;
     }
 
+    get expectedStr() : string {
+        return this._expectedChar;
+    }
+
     toString() : string {
         return "CharError -> " + " ' " + this._expectedChar + " ' "; 
     }

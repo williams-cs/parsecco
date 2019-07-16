@@ -23,9 +23,9 @@ export class Edit {
     All of items in the search space are possible fixes
     to the error
     */
-    private searchSpace(error: ErrorType): string[]{
-        return error.fix();
-    }
+    // private searchSpace(error: ErrorType): string[]{
+    //     return error.fix();
+    // }
 
     /*
     Returns the minimum edit distance of a string that 
@@ -34,10 +34,9 @@ export class Edit {
     Returns a tuple of the minimum edit distance and 
     alternate string associated
     */
-    minFix(): [number, string]{
-        let space: string[] = this.searchSpace(this._error);
+    minFix(space: string[]): [number, string]{
         let min: number = levenshteinDist(this._input, space[0]);
-        let closestStr: string = "";
+        let closestStr: string = space[0];
         for(let str in space){
             let curr: number = levenshteinDist(this._input,str);
             if (curr < min){

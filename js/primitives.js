@@ -265,19 +265,21 @@ var Primitives;
                             case "success":
                                 break;
                             case "failure":
-                                if ((o2.error instanceof StringError_1.StringError && o.error instanceof StringError_1.StringError) ||
-                                    (o2.error instanceof StringError_1.StringError && o.error instanceof CharError_1.CharError) ||
-                                    (o2.error instanceof CharError_1.CharError && o.error instanceof StringError_1.StringError) ||
-                                    (o2.error instanceof CharError_1.CharError && o.error instanceof CharError_1.CharError)) {
-                                    let str = istream.toString();
-                                    if (str.length > 5) {
-                                        let o2Edit = o2.error.minEdit(str.substring(0, 6), o2.error.expectedStr);
-                                        let o1Edit = o.error.minEdit(str.substring(0, 6), o.error.expectedStr);
-                                        return (o2Edit > o1Edit) ? o : o2;
-                                    }
+                                let str = istream.toString();
+                                if (str.length > 5) {
+                                    str = str.substring(0, 6);
                                 }
-                                return (o2.error_pos >= o.error_pos)
-                                    ? o2 : o;
+                                let finger1 = o.error;
+                                while (finger1.rootCause().isDefined()) {
+                                    finger1 = finger1.rootCause().getOrElse(new ItemError_1.ItemError());
+                                }
+                                let finger2 = o2.error;
+                                while (finger2.rootCause().isDefined()) {
+                                    finger2 = finger2.rootCause().getOrElse(new ItemError_1.ItemError());
+                                }
+                                let o2Edit = finger2.minEdit(str, o2.error.expectedStr());
+                                let o1Edit = finger1.minEdit(str, o.error.expectedStr());
+                                return (o2Edit > o1Edit) ? o : o2;
                         }
                         return o2;
                 }

@@ -14,6 +14,12 @@ class SatError {
     explanation() {
         return "";
     }
+    minEdit(input, expectedStr) {
+        return 0;
+    }
+    expectedStr() {
+        return "";
+    }
     toString() {
         return "SatError -> " + this._expectedStr;
     }

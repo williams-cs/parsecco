@@ -5,5 +5,7 @@ export declare class BetweenRightError implements ErrorType {
     constructor(rootCause: ErrorType);
     rootCause(): Option<ErrorType>;
     explanation(): string;
+    minEdit(input: string, expectedStr?: string): number;
+    expectedStr(): string;
     toString(): string;
 }

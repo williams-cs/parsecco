@@ -16,7 +16,7 @@ class StringError {
         let val = jslevenshtein(input, expectedStr);
         return val;
     }
-    get expectedStr() {
+    expectedStr() {
         return this._expectedStr;
     }
     toString() {

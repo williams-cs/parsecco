@@ -11,6 +11,12 @@ class BetweenLeftError {
     explanation() {
         return "left";
     }
+    minEdit(input, expectedStr = "") {
+        return 0;
+    }
+    expectedStr() {
+        return "";
+    }
     toString() {
         return "BetweenLeftError -> " + this._rootCause;
     }

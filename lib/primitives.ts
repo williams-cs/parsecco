@@ -59,7 +59,6 @@ export namespace Primitives {
 
         /**
          * Returns an object representing a failed parse.
-         * If the failure is critical, then parsing will stop immediately.
          *
          * @param istream The string, unmodified, that was given to the parser.
          * @param error_pos The position of the parsing failure in istream
@@ -109,10 +108,8 @@ export namespace Primitives {
 
     /**
      * expect tries to apply the given parser and returns the result of that parser
-     * if it succeeds, otherwise it returns a critical Failure
-     * If the parser results in a critical Failure, expect simply returns it,
-     * otherwise expect creates a critical Failure with the given error message
-     * and the start pos of the istream as the error pos.
+     * if it succeeds, otherwise it replaces the current stream with a stream with
+     * modified code given a correct edit, and tries again.
      *
      * @param parser The parser to try
      * @param f A function that produces a new Errors given an existing Errors
@@ -125,6 +122,9 @@ export namespace Primitives {
                     case "success":
                         return outcome;
                     case "failure":
+                        //let fail: Failure = new Failure(istream, istream.startpos, f(outcome.error));
+                        //let fix = fail.error.minEdit(istream.toString(),fail.error.expectedStr());
+                
                         return new Failure(istream, istream.startpos, f(outcome.error));
                 }
             }

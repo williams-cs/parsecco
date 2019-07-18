@@ -1,6 +1,7 @@
 import { Option, Some, None, tuple} from 'space-lift';
 import { ErrorType } from "./ErrorType";
 const jslevenshtein = require('js-levenshtein');
+const metriclcs = require('metric-lcs');
 
 export class StringError implements ErrorType {
     public _expectedStr : string;
@@ -18,7 +19,7 @@ export class StringError implements ErrorType {
     }
 
     minEdit(input: string, expectedStr: string) : number {
-        return jslevenshtein(input, expectedStr);
+        return metriclcs(input, expectedStr);
     }
 
     expectedStr() : string {

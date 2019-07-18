@@ -21,7 +21,7 @@ export class BetweenLeftError implements ErrorType {
     }
 
     expectedStr() : string {
-        return "" ;
+        return "(" ;
     }
 
     toString() {

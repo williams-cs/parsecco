@@ -298,13 +298,6 @@ export namespace Primitives {
                                 if (o.error_pos == o2.error_pos) {
                                     let o2Edit : number = o2.error.minEdit(str, o2.error.expectedStr());
                                     let o1Edit : number = o.error.minEdit(str, o.error.expectedStr());
-                                    console.log("o1 error");
-                                    
-                                    console.log(o.error)
-                                    console.log("o2 error");
-                                    console.log(o2.error)
-                                    console.log(o1Edit + " o1 edit");
-                                    console.log(o2Edit + " o2 edit");
                                     return (o2Edit > o1Edit) ? o : o2;
                                 }
 

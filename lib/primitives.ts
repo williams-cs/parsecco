@@ -296,25 +296,16 @@ export namespace Primitives {
                             case "failure":
                                 let str = istream.toString()
                                 if (o.error_pos == o2.error_pos) {
-                                    let o2Edit : number = o2.error.minEdit(str, o2.error.expectedStr());
-                                    let o1Edit : number = o.error.minEdit(str, o.error.expectedStr());
-                                    return (o2Edit > o1Edit) ? o : o2;
+                                    let str1 = str.substring(o.error_pos, o.error_pos + o.error.expectedStr().length);
+                                    let str2 = str.substring(o.error_pos, o.error_pos + o2.error.expectedStr().length);
+                            
+                                    let o1Edit : number = o.error.minEdit(str1, o.error.expectedStr());
+                                    let o2Edit : number = o2.error.minEdit(str2, o2.error.expectedStr());
+
+                                    return (o2Edit < o1Edit) ? o : o2;
                                 }
 
-                                // if (str.length > 5) {
-                                //     str = str.substring(0,6);
-                                // }
-                                //console.log(str);
-
-                                // let o2Edit = o2.error.minEdit(str, o2.error.expectedStr());
-                                // let o1Edit = o.error.minEdit(str, o.error.expectedStr());
-                                // console.log(o1Edit + " o1 edit distance");
-                                // console.log(o2Edit + " o2 edit distance");
-                                //if (o2Edit == o1Edit) {
                                 return (o2.error_pos > o.error_pos) ? o2 : o
-                                // } else {
-                                //     return (o2Edit > o1Edit) ? o : o2;
-                                // }
                         }
                         return o2;
                 }

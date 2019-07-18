@@ -8,6 +8,7 @@
     "@types/js-levenshtein": "^1.1.0",
     "js-levenshtein": "^1.1.6",
     "metric-lcs": "^0.1.2",
+    "node-lcs": "^1.0.2",
     "space-lift": "^0.8.7"
   },
   "devDependencies": {

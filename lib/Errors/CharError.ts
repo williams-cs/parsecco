@@ -1,7 +1,7 @@
 import { Option, Some, None, tuple} from 'space-lift';
 import { ErrorType } from "./ErrorType";
-const jslevenshtein = require('js-levenshtein');
-const metriclcs = require('metric-lcs');
+import { metriclcs } from "../Edit/MetricLcs";
+
 
 export class CharError implements ErrorType {
     private _expectedChar : string;

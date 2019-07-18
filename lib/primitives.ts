@@ -295,13 +295,33 @@ export namespace Primitives {
                                 break;
                             case "failure":
                                 let str = istream.toString()
-                                if (str.length > 5) {
-                                    str = str.substring(0,6);
+                                if (o.error_pos == o2.error_pos) {
+                                    let o2Edit : number = o2.error.minEdit(str, o2.error.expectedStr());
+                                    let o1Edit : number = o.error.minEdit(str, o.error.expectedStr());
+                                    console.log("o1 error");
+                                    
+                                    console.log(o.error)
+                                    console.log("o2 error");
+                                    console.log(o2.error)
+                                    console.log(o1Edit + " o1 edit");
+                                    console.log(o2Edit + " o2 edit");
+                                    return (o2Edit > o1Edit) ? o : o2;
                                 }
-                                
-                                let o2Edit = o2.error.minEdit(str, o2.error.expectedStr());
-                                let o1Edit = o.error.minEdit(str, o.error.expectedStr());
-                                return (o2Edit > o1Edit) ? o : o2;
+
+                                // if (str.length > 5) {
+                                //     str = str.substring(0,6);
+                                // }
+                                //console.log(str);
+
+                                // let o2Edit = o2.error.minEdit(str, o2.error.expectedStr());
+                                // let o1Edit = o.error.minEdit(str, o.error.expectedStr());
+                                // console.log(o1Edit + " o1 edit distance");
+                                // console.log(o2Edit + " o2 edit distance");
+                                //if (o2Edit == o1Edit) {
+                                return (o2.error_pos > o.error_pos) ? o2 : o
+                                // } else {
+                                //     return (o2Edit > o1Edit) ? o : o2;
+                                // }
                         }
                         return o2;
                 }
@@ -471,13 +491,13 @@ export namespace Primitives {
     export function between<T, U, V>(popen: IParser<T>): (pclose: IParser<U>) => (p: IParser<V>) => IParser<V> {
         return (pclose: IParser<U>) => {
             return (p: IParser<V>) => {
-                let l: IParser<V> = expect(left<V, U>(p)(pclose))(
+                let l: IParser<V> = left<V, U>(p)(expect(pclose)(
                     (error : ErrorType) => new BetweenRightError(error)
-                );
+                ));
 
-                let r: IParser<V> = expect(right<T, V>(popen)(l))(
+                let r: IParser<V> = right<T, V>(expect(popen)(
                     (error : ErrorType) => new BetweenLeftError(error)
-                );
+                ))(l);
                 return r;
             }
         }
@@ -492,7 +512,7 @@ export namespace Primitives {
     export function debug<T>(p: IParser<T>) {
         return (label: string) => {
             return (istream: CharStream) => {
-                console.log("apply: " + label + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
+                ("apply: " + label + ", startpos: " + istream.startpos + ", endpos: " + istream.endpos);
                 let o = p(istream);
                 switch (o.tag) {
                     case "success":
@@ -592,7 +612,7 @@ export namespace Primitives {
                     }
                 }
             }
-            return new Failure(istream, istream.startpos, new StringError(<string>istream.substring(istream.startpos, istream.length() - 1).input));
+            return new Failure(istream, istream.startpos, new StringError(<string>istream.substring(istream.startpos, istream.endpos).input));
         }
     }
 }

@@ -64,21 +64,24 @@
 					<h2>documentation</h2>
 				</a>
 				<p><a href="https://williams-cs.github.io/pants/">Typedoc documentation can be found here</a></p>
-				<a href="#typescript-and-typedoc-versions" id="typescript-and-typedoc-versions" style="color: inherit; text-decoration: none;">
-					<h2>TypeScript and TypeDoc versions</h2>
-				</a>
-				<p>Pants is developed and tested with TypeScript 3.5.1 and TypeDoc 0.14.2.  To make sure that your system is up to date, run</p>
-				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> -</span><span style="color: #001080">g</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000">@</span><span style="color: #001080">latest</span>
-<span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> -</span><span style="color: #001080">g</span><span style="color: #000000"> </span><span style="color: #001080">typescript</span><span style="color: #000000">@</span><span style="color: #001080">latest</span>
-<span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> -</span><span style="color: #001080">g</span><span style="color: #000000"> </span><span style="color: #001080">typedoc</span><span style="color: #000000">@</span><span style="color: #001080">latest</span>
-</code></pre>
 				<a href="#installing-dependencies-and-building" id="installing-dependencies-and-building" style="color: inherit; text-decoration: none;">
 					<h2>installing dependencies and building</h2>
 				</a>
-				<p>We supply a <code>Makefile</code> with Pants to make working with this library easy.  To build, run:</p>
+				<p>We supply a <code>Makefile</code> with Pants to make working with this library easy. To install dependencies and build, run:</p>
 				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">make</span>
 </code></pre>
 				<p>in the Pants repository directory.</p>
+				<p>If you don&#39;t want to use the <code>Makefile</code>, you can also run <code>npm</code> commands directly.</p>
+				<p>To install dependencies:</p>
+				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span>
+</code></pre>
+				<p>To build:</p>
+				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">run</span><span style="color: #000000"> </span><span style="color: #001080">build</span>
+</code></pre>
+				<a href="#typescript-and-typedoc-versions" id="typescript-and-typedoc-versions" style="color: inherit; text-decoration: none;">
+					<h2>TypeScript and TypeDoc versions</h2>
+				</a>
+				<p>Pants is currently developed and tested with TypeScript 4.2.3 and TypeDoc 0.20.34.</p>
 				<a href="#running-tests" id="running-tests" style="color: inherit; text-decoration: none;">
 					<h2>running tests</h2>
 				</a>

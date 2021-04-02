@@ -1,7 +1,5 @@
 build: node_modules
-	tsc
-	typedoc --out docs --excludeExternals --readme README.md
-	touch docs/.nojekyll
+	npm run build
 
 clean:
 	rm -rf docs

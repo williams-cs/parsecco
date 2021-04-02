@@ -1,6 +1,6 @@
 {
   "name": "pants",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "pants is a PArser combinator library, iN TypeScript",
   "main": "./lib/index.js",
   "types": "./lib/index.d.ts",

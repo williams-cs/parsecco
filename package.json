@@ -29,7 +29,13 @@
     "combinator",
     "typescript"
   ],
-  "author": "Daniel W. Barowy",
+  "contributors": [
+    "Daniel W. Barowy",
+    "Kiersten Campbell",
+    "Dzung Pham",
+    "Lily Shao",
+    "Emmie Hine"
+  ],
   "license": "BSD-2-Clause",
   "bugs": {
     "url": "https://github.com/williams-cs/pants/issues"

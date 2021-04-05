@@ -1,7 +1,7 @@
 {
-  "name": "pants",
+  "name": "professor-parse",
   "version": "1.2.1",
-  "description": "pants is a PArser combinator library, iN TypeScript",
+  "description": "professor-parse is a parser combinator library",
   "main": "./dist/lib/index.js",
   "types": "./dist/lib/index.d.ts",
   "dependencies": {
@@ -38,7 +38,7 @@
   ],
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/williams-cs/pants/issues"
+    "url": "https://github.com/williams-cs/professor-parse/issues"
   },
-  "homepage": "https://github.com/williams-cs/pants#readme"
+  "homepage": "https://github.com/williams-cs/professor-parse#readme"
 }

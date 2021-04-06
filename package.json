@@ -17,8 +17,9 @@
   },
   "scripts": {
     "test": "mocha -r ts-node/register test/*.spec.ts",
-    "build": "tsc && npx typedoc --entryPoints lib/index.ts --out docs --excludeExternals --readme README.md && touch docs/.nojekyll",
-    "build:check": "tsc --noEmit"
+    "build": "tsc && npx typedoc --entryPoints src/index.ts --out docs --excludeExternals --readme README.md && touch docs/.nojekyll",
+    "build:check": "tsc --noEmit",
+    "clean": "npx rimraf dist docs node_modules"
   },
   "repository": {
     "type": "git",

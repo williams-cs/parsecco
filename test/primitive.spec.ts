@@ -1,6 +1,5 @@
-import { CharUtil as CU } from '../lib/charstream';
-// import {CharUtil} from '../lib/index';
-import { Primitives as P } from '../lib/index';
+import { CharUtil as CU } from '../src/charstream';
+import { Primitives as P } from '../src/primitives';
 import { assert, expect } from 'chai';
 import 'mocha';
 

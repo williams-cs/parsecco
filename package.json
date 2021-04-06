@@ -1,7 +1,7 @@
 {
-  "name": "professor-parse",
+  "name": "parsecco",
   "version": "1.2.1",
-  "description": "professor-parse is a parser combinator library",
+  "description": "parsecco is a parser combinator library",
   "main": "./dist/lib/index.js",
   "types": "./dist/lib/index.d.ts",
   "dependencies": {
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/williams-cs/pants.git"
+    "url": "git+https://github.com/williams-cs/parsecco.git"
   },
   "keywords": [
     "parser",
@@ -38,7 +38,7 @@
   ],
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/williams-cs/professor-parse/issues"
+    "url": "https://github.com/williams-cs/parsecco/issues"
   },
-  "homepage": "https://github.com/williams-cs/professor-parse#readme"
+  "homepage": "https://github.com/williams-cs/parsecco#readme"
 }

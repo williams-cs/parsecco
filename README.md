@@ -1,20 +1,20 @@
-# professor-parse
+# parsecco
 
-professor-parse is a parser combinator library for Typescript.
+parsecco is a parser combinator library for Typescript.
 
 ## documentation
 
-[Typedoc documentation can be found here](https://williams-cs.github.io/professor-parse/)
+[Typedoc documentation can be found here](https://williams-cs.github.io/parsecco/)
 
 ## installing dependencies and building
 
-We supply a `Makefile` with professor-parse to make working with this library easy. To install dependencies and build, run:
+We supply a `Makefile` with parsecco to make working with this library easy. To install dependencies and build, run:
 
 ```
 $ make
 ```
 
-in the professor-parse repository directory.
+in the `parsecco` repository directory.
 
 If you don't want to use the `Makefile`, you can also run `npm` commands directly.
 
@@ -32,7 +32,7 @@ $ npm run build
 
 ## TypeScript and TypeDoc versions
 
-professor-parse is currently developed and tested with TypeScript 4.2.3 and TypeDoc 0.20.34.
+parsecco is currently developed and tested with TypeScript 4.2.3 and TypeDoc 0.20.34.
 
 ## running tests
 

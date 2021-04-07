@@ -33,6 +33,21 @@ describe("Zero parser", () => {
   });
 });
 
+describe("OK parser", () => {
+  it("should succeed and consume no input", () => {
+    const result = { an: "arbitrary", obj: 1 };
+    const output = P.ok(result)(inputstream);
+    expect(output.inputstream).to.equal(inputstream);
+    switch (output.tag) {
+      case "failure":
+        assert(true);
+        assert.fail();
+      default:
+        expect(output.result).to.equal(result);
+    }
+  });
+});
+
 describe("Expect parser", () => {
   it("should create a critical failure with the correct error message and at the correct position", () => {
     let error_msg = "Expected )";

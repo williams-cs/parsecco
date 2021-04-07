@@ -95,6 +95,15 @@ export namespace Primitives {
   }
 
   /**
+   * `ok` succeeds without consuming any input, returning whatever
+   * is given here.
+   * @param res A result object.
+   */
+  export function ok<T>(res: T): IParser<T> {
+    return (istream) => new Success(istream, res);
+  }
+
+  /**
    * expect tries to apply the given parser and returns the result of that parser
    * if it succeeds, otherwise it returns a critical Failure
    * If the parser results in a critical Failure, expect simply returns it,

@@ -207,11 +207,28 @@ export namespace Primitives {
   }
 
   /**
-   * sat takes a predicate and yields a parser that consumes a
+   * `sat` takes a predicate and yields a parser that consumes a
    * single character if the character satisfies the predicate,
    * otherwise it fails.
    */
-  export function sat(char_class: string[]): IParser<CharStream> {
+  export function sat(p: (ch: string) => boolean): IParser<CharStream> {
+    let f = (x: CharStream) => {
+      const char = x.toString();
+      if (char.length !== 1)
+        throw new Error("Input to predicate must be a character.");
+      return p(char)
+        ? result(x)
+        : (istream: CharStream) => new Failure(istream, istream.startpos - 1);
+    };
+    return bind<CharStream, CharStream>(item)(f);
+  }
+
+  /**
+   * `satClass` takes an array of satisfactory characters and yields
+   * a parser that consumes a single character if the character
+   * is in the array, otherwise it fails.
+   */
+  export function satClass(char_class: string[]): IParser<CharStream> {
     let f = (x: CharStream) => {
       return char_class.indexOf(x.toString()) > -1
         ? result(x)
@@ -230,7 +247,7 @@ export namespace Primitives {
     if (c.length != 1) {
       throw new Error("char parser takes a string of length 1 (i.e., a char)");
     }
-    return sat([c]);
+    return satClass([c]);
   }
 
   export const lower_chars = "abcdefghijklmnopqrstuvwxyz".split("");
@@ -243,7 +260,7 @@ export namespace Primitives {
    * letter returns a parser that consumes a single alphabetic
    * character, from a-z, regardless of case.
    */
-  export const letter: IParser<CharStream> = sat(
+  export const letter: IParser<CharStream> = satClass(
     lower_chars.concat(upper_chars)
   );
 
@@ -252,7 +269,7 @@ export namespace Primitives {
    * character, from 0-9.  Note that the type of the result
    * is a string, not a number.
    */
-  export const digit: IParser<CharStream> = sat([
+  export const digit: IParser<CharStream> = satClass([
     "0",
     "1",
     "2",
@@ -279,13 +296,13 @@ export namespace Primitives {
    * upper returns a parser that consumes a single character
    * if that character is uppercase.
    */
-  export const upper: IParser<CharStream> = sat(upper_chars);
+  export const upper: IParser<CharStream> = satClass(upper_chars);
 
   /**
    * lower returns a parser that consumes a single character
    * if that character is lowercase.
    */
-  export const lower: IParser<CharStream> = sat(lower_chars);
+  export const lower: IParser<CharStream> = satClass(lower_chars);
 
   /**
    * choice specifies an ordered choice between two parsers,
@@ -594,7 +611,7 @@ export namespace Primitives {
    * wschars matches any whitespace char, namely
    * ' ', '\t', '\n', or '\r\n'.
    */
-  let wschars: IParser<CharStream> = choice(sat([" ", "\t"]))(nl);
+  let wschars: IParser<CharStream> = choice(satClass([" ", "\t"]))(nl);
 
   /**
    * ws matches zero or more of the following whitespace characters:

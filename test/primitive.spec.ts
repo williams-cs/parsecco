@@ -116,7 +116,22 @@ describe("Item parser", () => {
 
 describe("Sat parser", () => {
   it("should successfully consume input that matches a predicate", () => {
-    const output = P.sat(["h"])(inputstream);
+    const output = P.sat((ch) => ch === "h")(inputstream);
+    expect(output.inputstream.toString()).to.equal("elloworld");
+    switch (output.tag) {
+      case "success":
+        expect(output.result.toString()).to.equal("h");
+        break;
+      case "failure":
+        assert.fail();
+        break;
+    }
+  });
+});
+
+describe("SatClass parser", () => {
+  it("should successfully consume input that matches a char class", () => {
+    const output = P.satClass(["h"])(inputstream);
     expect(output.inputstream.toString()).to.equal("elloworld");
     switch (output.tag) {
       case "success":

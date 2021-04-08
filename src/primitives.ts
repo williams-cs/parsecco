@@ -293,6 +293,15 @@ export namespace Primitives {
   });
 
   /**
+   * A floating point parser, with optional fraction.
+   */
+  export const float: IParser<number> = choice(
+    seq<number, number, number>(integer)(
+      right<CharStream, number>(char("."))(integer)
+    )(([a, b]) => parseFloat(a.toString() + "." + b.toString()))
+  )(integer);
+
+  /**
    * upper returns a parser that consumes a single character
    * if that character is uppercase.
    */

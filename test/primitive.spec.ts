@@ -287,6 +287,43 @@ describe("Integer parser", () => {
   });
 });
 
+describe("Floating-point parser", () => {
+  it("should successfully consume a multi-digit float at the start of the input", () => {
+    const istr = new CU.CharStream("123.3helloworld");
+    const output = P.float(istr);
+    switch (output.tag) {
+      case "success":
+        expect(output.result).to.equal(123.3);
+        break;
+      default:
+        assert.fail();
+    }
+  });
+
+  it("should fail if the input does not begin with a number", () => {
+    const istr = new CU.CharStream("h123.0elloworld");
+    const output = P.float(istr);
+    switch (output.tag) {
+      case "success":
+        assert.fail();
+      default:
+        assert(true);
+    }
+  });
+
+  it("should successfully consume a float without a fraction", () => {
+    const istr = new CU.CharStream("123");
+    const output = P.float(istr);
+    switch (output.tag) {
+      case "success":
+        expect(output.result).to.equal(123);
+        break;
+      default:
+        assert.fail();
+    }
+  });
+});
+
 describe("Upper parser", () => {
   it("should successfully consume an uppercase character if the next char in the stream is uppercase", () => {
     const inputstream2 = new CU.CharStream("Helloworld");

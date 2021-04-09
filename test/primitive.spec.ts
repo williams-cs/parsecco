@@ -19,6 +19,29 @@ describe("Result parser", () => {
   });
 });
 
+describe("Recparser", () => {
+  it("should expand just like an ordinary parser, even for recursive definitions.", () => {
+    let res = P.recParser<CU.CharStream>();
+    const p: P.IParser<CU.CharStream> = res[0];
+    let pImpl = res[1];
+    pImpl.contents = P.pipe2<CU.CharStream, CU.CharStream, CU.CharStream>(
+      P.item
+    )(p)((a, b) => new CU.CharStream(a.toString() + b.toString()));
+    // this will eventually bottom out and fail because we've
+    // consumed all the tokens, but unlike an actual recursive
+    // defintion, it should not loop forever just generating the
+    // parsing function.
+    const output = p(inputstream);
+    switch (output.tag) {
+      case "success":
+        // only an infinite string can succeed!
+        assert.fail();
+      case "failure":
+        assert(true);
+    }
+  });
+});
+
 describe("Zero parser", () => {
   it("should fail and consume no input", () => {
     const output = P.zero("")(inputstream);

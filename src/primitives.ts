@@ -85,6 +85,30 @@ export namespace Primitives {
   }
 
   /**
+   * This data structure represents a mutable "cell" for
+   * separating declarations from implementations ala
+   * the recparser from FParsec.
+   */
+  export interface RefCell<T> {
+    contents: IParser<T>;
+  }
+
+  /**
+   * `recParser` is a forward declaration for a recursive parser.
+   * It is effectively a form of deferred evaluation to prevent
+   * Javascript from eagerly expanding recursive grammar productions.
+   * @returns A pair, `[decl,impl]` where `decl` is a parser declaration and `impl` is an implementation for p
+   */
+  export function recParser<T>(): [IParser<T>, RefCell<T>] {
+    const dumbParser: IParser<T> = (input: CharStream) => {
+      throw new Error("You forgot to initialize your recursive parser.");
+    };
+    const r = { contents: dumbParser };
+    const p: IParser<T> = (input: CharStream) => r.contents(input);
+    return [p, r];
+  }
+
+  /**
    * zero fails without consuming any input.
    * @param msg the error message.
    */

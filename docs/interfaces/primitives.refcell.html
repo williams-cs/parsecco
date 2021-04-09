@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>IParser | parsecco</title>
+	<title>RefCell | parsecco</title>
 	<meta name="description" content="Documentation for parsecco">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../modules/primitives.html">Primitives</a>
 				</li>
 				<li>
-					<a href="primitives.iparser.html">IParser</a>
+					<a href="primitives.refcell.html">RefCell</a>
 				</li>
 			</ul>
-			<h1>Interface IParser&lt;T&gt;</h1>
+			<h1>Interface RefCell&lt;T&gt;</h1>
 		</div>
 	</div>
 </header>
@@ -69,7 +69,9 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Generic type of a parser.</p>
+						<p>This data structure represents a mutable &quot;cell&quot; for
+							separating declarations from implementations ala
+						the recparser from FParsec.</p>
 					</div>
 				</div>
 			</section>
@@ -85,36 +87,35 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">IParser</span>
+						<span class="target">RefCell</span>
 					</li>
 				</ul>
 			</section>
-			<section class="tsd-panel">
-				<h3 class="tsd-before-signature">Callable</h3>
-				<ul class="tsd-signatures tsd-kind-interface tsd-parent-kind-namespace tsd-has-type-parameter">
-					<li class="tsd-signature tsd-kind-icon">IParser<span class="tsd-signature-symbol">(</span>inputstream<span class="tsd-signature-symbol">: </span><a href="../classes/charutil.charstream.html" class="tsd-signature-type" data-tsd-kind="Class">CharStream</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../modules/primitives.html#outcome" class="tsd-signature-type" data-tsd-kind="Type alias">Outcome</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
-				</ul>
-				<ul class="tsd-descriptions">
-					<li class="tsd-description">
-						<aside class="tsd-sources">
-							<ul>
-								<li>Defined in <a href="https://github.com/williams-cs/parsecco/blob/dae0eb8/src/primitives.ts#L73">primitives.ts:73</a></li>
+			<section class="tsd-panel-group tsd-index-group">
+				<h2>Index</h2>
+				<section class="tsd-panel tsd-index-panel">
+					<div class="tsd-index-content">
+						<section class="tsd-index-section ">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="primitives.refcell.html#contents" class="tsd-kind-icon">contents</a></li>
 							</ul>
-						</aside>
-						<div class="tsd-comment tsd-typography">
-							<div class="lead">
-								<p>Generic type of a parser.</p>
-							</div>
-						</div>
-						<h4 class="tsd-parameters-title">Parameters</h4>
-						<ul class="tsd-parameters">
-							<li>
-								<h5>inputstream: <a href="../classes/charutil.charstream.html" class="tsd-signature-type" data-tsd-kind="Class">CharStream</a></h5>
-							</li>
+						</section>
+					</div>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="contents" class="tsd-anchor"></a>
+					<h3>contents</h3>
+					<div class="tsd-signature tsd-kind-icon">contents<span class="tsd-signature-symbol">:</span> <a href="primitives.iparser.html" class="tsd-signature-type" data-tsd-kind="Interface">IParser</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/williams-cs/parsecco/blob/dae0eb8/src/primitives.ts#L93">primitives.ts:93</a></li>
 						</ul>
-						<h4 class="tsd-returns-title">Returns <a href="../modules/primitives.html#outcome" class="tsd-signature-type" data-tsd-kind="Type alias">Outcome</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
-					</li>
-				</ul>
+					</aside>
+				</section>
 			</section>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -136,7 +137,12 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-parent-kind-namespace tsd-has-type-parameter">
-						<a href="primitives.iparser.html" class="tsd-kind-icon">IParser</a>
+						<a href="primitives.refcell.html" class="tsd-kind-icon">Ref<wbr>Cell</a>
+						<ul>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="primitives.refcell.html#contents" class="tsd-kind-icon">contents</a>
+							</li>
+						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
@@ -149,6 +155,9 @@
 	<div class="container">
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+			</ul>
 		</div>
 	</div>
 </footer>

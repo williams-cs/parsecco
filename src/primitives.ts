@@ -86,11 +86,31 @@ export namespace Primitives {
 
   /**
    * zero fails without consuming any input.
-   * @param expecting the error message.
+   * @param msg the error message.
    */
-  export function zero<T>(expecting: string): IParser<T> {
+  export function zero<T>(msg: string): IParser<T> {
     return (istream) => {
-      return new Failure(istream, istream.startpos, expecting);
+      return new Failure(istream, istream.startpos, msg);
+    };
+  }
+
+  /**
+   * `fail` fails if the given parser `p` succeeds.  On failure,
+   * `fail` returns the given error message.  For either outcome,
+   * success or failure, `fail` never consumes input.
+   * @param p A parser
+   * @param msg An error message
+   * @returns
+   */
+  export function fail<T>(p: IParser<T>) {
+    return (msg: string) => (istream: CharStream) => {
+      const o = p(istream);
+      switch (o.tag) {
+        case "success":
+          return new Failure(istream, istream.startpos, msg, true);
+        case "failure":
+          return new Success(istream, undefined);
+      }
     };
   }
 

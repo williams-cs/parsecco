@@ -33,6 +33,39 @@ describe("Zero parser", () => {
   });
 });
 
+describe("Fail parser", () => {
+  it("should fail if the stream contains the given input, consuming no input", () => {
+    const p = P.str("hel");
+    const msg = "We never want to see 'hel'!";
+    const output = P.fail(p)(msg)(inputstream);
+    switch (output.tag) {
+      case "failure":
+        // stream should not be modified
+        expect(output.inputstream).to.eql(inputstream);
+        // we should see message
+        expect(output.error_msg).to.equal(msg);
+        break;
+      default:
+        assert.fail();
+    }
+  });
+
+  it("should succeed if the stream does not contain the given input, consuming no input", () => {
+    const p = P.str("leh");
+    const msg = "We never want to see 'hel'!";
+    const output = P.fail(p)(msg)(inputstream);
+    switch (output.tag) {
+      case "failure":
+        assert.fail();
+      default:
+        // stream should not be modified
+        expect(output.inputstream).to.eql(inputstream);
+        // output is undefined
+        expect(output.result).to.equal(undefined);
+    }
+  });
+});
+
 describe("OK parser", () => {
   it("should succeed and consume no input", () => {
     const result = { an: "arbitrary", obj: 1 };

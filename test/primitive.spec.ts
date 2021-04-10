@@ -40,6 +40,31 @@ describe("Recparser", () => {
         assert(true);
     }
   });
+
+  it("should succeed normally, just like any other parser", () => {
+    let [expr, impl] = P.recParser<CU.CharStream>();
+    impl.contents = P.str("helloworld");
+    const output = expr(inputstream);
+    switch(output.tag) {
+      case "success":
+        expect(output.result.toString()).to.equal(inputstream.toString());
+        break;
+      case "failure":
+        assert.fail();
+    }
+  });
+
+  it("should fail normally, just like any other parser", () => {
+    let [expr, impl] = P.recParser<CU.CharStream>();
+    impl.contents = P.str("yelloworld");
+    const output = expr(inputstream);
+    switch(output.tag) {
+      case "success":
+        assert.fail();
+      default:
+        expect(output.inputstream).to.equal(inputstream);
+    }
+  });
 });
 
 describe("Zero parser", () => {

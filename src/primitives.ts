@@ -94,6 +94,17 @@ export namespace Primitives {
   }
 
   /**
+   * This data structure represents a mutable "cell" for
+   * separating declarations from implementations ala
+   * the recparser from FParsec. The difference between
+   * Arg1RefCell and RefCell is that the former can
+   * store parser functions that take an argument.
+   */
+  export interface Arg1RefCell<A, T> {
+    contents: (arg: A) => IParser<T>;
+  }
+
+  /**
    * `recParser` is a forward declaration for a recursive parser.
    * It is effectively a form of deferred evaluation to prevent
    * Javascript from eagerly expanding recursive grammar productions.
@@ -105,6 +116,28 @@ export namespace Primitives {
     };
     const r = { contents: dumbParser };
     const p: IParser<T> = (input: CharStream) => r.contents(input);
+    return [p, r];
+  }
+
+
+  /**
+   * `rec1ArgParser` is a forward declaration for a recursive parser that
+   * takes one argument. It is effectively a form of deferred evaluation to
+   * prevent Javascript from eagerly expanding recursive grammar productions.
+   * @returns A pair, `[decl,impl]` where `decl` is a parser declaration and `impl` is an implementation for p
+   */
+  export function rec1ArgParser<A, T>(): [
+    (arg: A) => IParser<T>,
+    Arg1RefCell<A, T>
+  ] {
+    const dumbParser: (arg: A) => IParser<T> = (arg: A) => (
+      input: CharStream
+    ) => {
+      throw new Error("You forgot to initialize your recursive parser.");
+    };
+    const r = { contents: dumbParser };
+    const p: (arg: A) => IParser<T> = (arg: A) => (input: CharStream) =>
+      r.contents(arg)(input);
     return [p, r];
   }
 

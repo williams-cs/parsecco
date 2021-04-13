@@ -12,7 +12,7 @@ $ npm install --save parsecco
 
 ## Documentation
 
-This is auto-generated documentation from the [TSDoc](https://tsdoc.org) comments that preface every function. I was a little OCD about this-- every function should be well documented. If you find issues with the documentation, please open an issue.
+We provide auto-generated [TSDoc](https://tsdoc.org) documentation from the comments that preface every function. I was a little OCD about this-- every function should be well documented. If you find issues with the documentation, please open an issue.
 
 [TSDoc documentation can be found here](https://williams-cs.github.io/parsecco/)
 
@@ -21,6 +21,10 @@ This is auto-generated documentation from the [TSDoc](https://tsdoc.org) comment
 1. I don't use unpronounceable names for parsers (come on, people!). If you don't like my names, too bad.
 2. My `choice` combinator is an _ordered choice_ that returns the first match instead of all matches (in other words, it is `+++` and not `++` in Meijer and Hutton-speak).
 3. TypeScript has no language-level support for lazy evaluation, so recursive grammar definitions need to be forward-declared. See the `recParser` family of functions; these were inspired by [FParsec](https://www.quanttec.com/fparsec/)'s approach.
+
+## Usage Examples
+
+If you're looking for real-world usage examples, have a look at the [paraformula parser](https://github.com/dbarowy/paraformula) for parsing Microsoft Excel formulas.
 
 ## Developer Info
 

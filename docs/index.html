@@ -59,34 +59,50 @@
 				<a href="#parsecco" id="parsecco" style="color: inherit; text-decoration: none;">
 					<h1>parsecco</h1>
 				</a>
-				<p>parsecco is a parser combinator library for Typescript.</p>
+				<p>Parsecco is a parser combinator library for Typescript. It has no dependencies!</p>
+				<a href="#installing" id="installing" style="color: inherit; text-decoration: none;">
+					<h2>Installing</h2>
+				</a>
+				<p>You can download Parsecco from <a href="https://www.npmjs.com/package/parsecco">NPM</a>. To install it in your NPM project:</p>
+				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span><span style="color: #000000"> --</span><span style="color: #001080">save</span><span style="color: #000000"> </span><span style="color: #001080">parsecco</span>
+</code></pre>
 				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
-					<h2>documentation</h2>
+					<h2>Documentation</h2>
 				</a>
-				<p><a href="https://williams-cs.github.io/parsecco/">Typedoc documentation can be found here</a></p>
-				<a href="#installing-dependencies-and-building" id="installing-dependencies-and-building" style="color: inherit; text-decoration: none;">
-					<h2>installing dependencies and building</h2>
+				<p>This is auto-generated documentation from the <a href="https://tsdoc.org">TSDoc</a> comments that preface every function. I was a little OCD about this-- every function should be well documented. If you find issues with the documentation, please open an issue.</p>
+				<p><a href="https://williams-cs.github.io/parsecco/">TSDoc documentation can be found here</a></p>
+				<p>(todo) I plan to add tutorial documentation here in the near future. If you are familiar with the <a href="https://www.cs.nott.ac.uk/~pszgmh/monparsing.pdf">Monadic Parser Combinators</a> paper by Meijer and Hutton, Parsecco is very much in that vein with a few small caveats:</p>
+				<ol>
+					<li>I don&#39;t use unpronounceable names for parsers (come on, people!). If you don&#39;t like my names, too bad.</li>
+					<li>My <code>choice</code> combinator is an <em>ordered choice</em> that returns the first match instead of all matches (in other words, it is <code>+++</code> and not <code>++</code> in Meijer and Hutton-speak).</li>
+					<li>TypeScript has no language-level support for lazy evaluation, so recursive grammar definitions need to be forward-declared. See the <code>recParser</code> family of functions; these were inspired by <a href="https://www.quanttec.com/fparsec/">FParsec</a>&#39;s approach.</li>
+				</ol>
+				<a href="#developer-info" id="developer-info" style="color: inherit; text-decoration: none;">
+					<h2>Developer Info</h2>
 				</a>
-				<p>We supply a <code>Makefile</code> with parsecco to make working with this library easy. To install dependencies and build, run:</p>
-				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">make</span>
+				<p>Contributions to Parsecco are welcome. If you would like to set up a developer environment, do the following steps:</p>
+				<ol>
+					<li>Check out this repository.</li>
+					<li>Install development dependencies with<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span>
 </code></pre>
-				<p>in the <code>parsecco</code> repository directory.</p>
-				<p>If you don&#39;t want to use the <code>Makefile</code>, you can also run <code>npm</code> commands directly.</p>
-				<p>To install dependencies:</p>
-				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">install</span>
+					</li>
+					<li>Then build the library with<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">run</span><span style="color: #000000"> </span><span style="color: #001080">build</span>
 </code></pre>
-				<p>To build:</p>
-				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">run</span><span style="color: #000000"> </span><span style="color: #001080">build</span>
-</code></pre>
+					</li>
+				</ol>
+				<p>Please submit patches by pull request. Be sure that your patch passes all the tests (see below), and if your modification also needs testing, submit additional tests.</p>
 				<a href="#typescript-and-typedoc-versions" id="typescript-and-typedoc-versions" style="color: inherit; text-decoration: none;">
 					<h2>TypeScript and TypeDoc versions</h2>
 				</a>
-				<p>parsecco is currently developed and tested with TypeScript 4.2.3 and TypeDoc 0.20.34.</p>
-				<a href="#running-tests" id="running-tests" style="color: inherit; text-decoration: none;">
-					<h2>running tests</h2>
+				<p>The current version of Parsecco is was developed and tested with TypeScript 4.2.3 and TypeDoc 0.20.34.</p>
+				<a href="#test-suite" id="test-suite" style="color: inherit; text-decoration: none;">
+					<h2>Test Suite</h2>
 				</a>
-				<p>Run:</p>
-				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">make</span><span style="color: #000000"> </span><span style="color: #001080">test</span>
+				<p>An exhaustive test suite comes with Parsecco, and most of the dev dependencies are to the support the library&#39;s test suite. You can run the tests with:</p>
+				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">test</span>
+</code></pre>
+				<p>You can run a specific test with</p>
+				<pre><code><span style="color: #001080">$</span><span style="color: #000000"> </span><span style="color: #001080">npm</span><span style="color: #000000"> </span><span style="color: #001080">test</span><span style="color: #000000"> -- --</span><span style="color: #001080">grep</span><span style="color: #000000"> </span><span style="color: #A31515">&quot;a substring from the &#039;describe&#039; or &#039;it&#039; field you want to run&quot;</span>
 </code></pre>
 			</div>
 		</div>

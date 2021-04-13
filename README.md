@@ -16,7 +16,9 @@ We provide auto-generated [TSDoc](https://tsdoc.org) documentation from the comm
 
 [TSDoc documentation can be found here](https://williams-cs.github.io/parsecco/)
 
-(todo) I plan to add tutorial documentation here in the near future. If you are familiar with the [Monadic Parser Combinators](https://www.cs.nott.ac.uk/~pszgmh/monparsing.pdf) paper by Meijer and Hutton, Parsecco is very much in that vein with a few small caveats:
+(todo) I plan to add tutorial documentation here in the near future.
+
+In the meantime, if you are familiar with the [Monadic Parser Combinators](https://www.cs.nott.ac.uk/~pszgmh/monparsing.pdf) paper by Meijer and Hutton, Parsecco is very much in that vein with a few small caveats:
 
 1. I don't use unpronounceable names for parsers (come on, people!). If you don't like my names, too bad.
 2. My `choice` combinator is an _ordered choice_ that returns the first match instead of all matches (in other words, it is `+++` and not `++` in Meijer and Hutton-speak).

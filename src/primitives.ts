@@ -263,23 +263,18 @@ export namespace Primitives {
   }
 
   /**
-   * seq is a curried function that takes a parser p, a parser q,
-   * and a function f. It applies p to the input, passing the
-   * remaining input stream to q; q is then applied.  The function
-   * f takes the result of p and q, as a tuple, and returns
-   * a single result.
+   * `seq` takes a parser `p` and a parser `q`. It applies `p` to the input,
+   * passing the remaining input stream to `q`; `q` is then applied. It
+   * returns the result of `p` and `q` as a tuple.
    * @param p A parser
    */
-  export function seq<T, U, V>(p: IParser<T>) {
+  export function seq<T, U>(p: IParser<T>) {
     return (q: IParser<U>) => {
-      return (f: (e: [T, U]) => V) => {
-        return bind<T, V>(p)((x) => {
-          return bind<U, V>(q)((y) => {
-            let tup: [T, U] = [x, y];
-            return result<V>(f(tup));
-          });
+      return bind<T, [T,U]>(p)((t) => {
+        return bind<U, [T,U]>(q)((u) => {
+          return result([t,u]);
         });
-      };
+      });
     };
   }
 
@@ -373,9 +368,9 @@ export namespace Primitives {
    * A floating point parser, with optional fraction.
    */
   export const float: IParser<number> = choice(
-    seq<number, number, number>(integer)(
+    pipe2<number, number, number>(integer)(
       right<CharStream, number>(char("."))(integer)
-    )(([a, b]) => parseFloat(a.toString() + "." + b.toString()))
+    )((a, b) => parseFloat(a.toString() + "." + b.toString()))
   )(integer);
 
   /**
@@ -474,35 +469,20 @@ export namespace Primitives {
 
   /**
    * `pipe2(p1)(p2)(f)` applies the parsers `p1` and `p2` in sequence.
-   * It returns the result of the function application `f(a,b)`, where
-   * `a` and `b` are the results returned by `p1` and `p2`.
+   * It returns the result of the function application `f(t,u)`, where
+   * `t` and `u` are the results returned by `p1` and `p2`.
    * @param p1 A parser.
    * @param p2 Another parser.
    * @param f A function that takes the result of `p1` and `p2`.
    */
-  export function pipe2<A, B, C>(p1: IParser<A>) {
-    return (p2: IParser<B>) => {
-      return (f: (a: A, b: B) => C) => {
-        return (istream: CharStream) => {
-          let o = p1(istream);
-          switch (o.tag) {
-            case "success":
-              let istream2 = o.inputstream;
-              let a = o.result;
-              let o2 = p2(istream2);
-              switch (o2.tag) {
-                case "success":
-                  let istream3 = o2.inputstream;
-                  let b = o2.result;
-                  let c = f(a, b);
-                  return new Success<C>(istream3, c);
-                case "failure":
-                  return o2;
-              }
-            case "failure":
-              return o;
-          }
-        };
+  export function pipe2<T, U, V>(p: IParser<T>) {
+    return (q: IParser<U>) => {
+      return (f: (t: T, u: U) => V) => {
+        return bind<T, V>(p)((t) => {
+          return bind<U, V>(q)((u) => {
+            return result<V>(f(t,u));
+          });
+        });
       };
     };
   }
@@ -584,9 +564,7 @@ export namespace Primitives {
    */
   export function many1<T>(p: IParser<T>) {
     return (istream: CharStream) => {
-      return seq<T, T[], T[]>(p)(many<T>(p))((tup) => {
-        let hd: T = tup["0"];
-        let tl: T[] = tup["1"];
+      return pipe2<T, T[], T[]>(p)(many<T>(p))((hd,tl) => {
         tl.unshift(hd);
         return tl;
       })(istream);
@@ -601,9 +579,9 @@ export namespace Primitives {
     return (istream: CharStream) => {
       let chars: string[] = s.split("");
       let p = result(new CharStream(""));
-      let f = (tup: [CharStream, CharStream]) => tup[0].concat(tup[1]);
+      let f = (a: CharStream, b: CharStream) => a.concat(b);
       for (var c of chars) {
-        p = seq<CharStream, CharStream, CharStream>(p)(char(c))(f);
+        p = pipe2<CharStream, CharStream, CharStream>(p)(char(c))(f);
       }
       return p(istream);
     };

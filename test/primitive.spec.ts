@@ -227,26 +227,19 @@ describe("SatClass parser", () => {
 
 describe("Seq parser", () => {
   it("should successfully apply two parsers in a row", () => {
-    const output = P.seq<CU.CharStream, CU.CharStream, CU.CharStream>(P.item)(
+    const output = P.seq<CU.CharStream, CU.CharStream>(P.item)(
       P.item
-    )((tup) => tup[1].concat(tup[0]))(inputstream);
+    )(inputstream);
+    const expected = ["h", "e"];
     switch (output.tag) {
       case "success":
-        expect(output.result.toString()).to.equal("eh");
+        expect(output.result[0].toString()).to.equal(expected[0]);
+        expect(output.result[1].toString()).to.equal(expected[1]);
         break;
       case "failure":
         assert.fail();
         break;
     }
-  });
-
-  it("should not eagerly compose two parsers", () => {
-    let p2: P.IParser<CU.CharStream> = (i) =>
-      P.seq<CU.CharStream, CU.CharStream, CU.CharStream>(P.char("."))(p2)(
-        (x) => x[0]
-      )(i);
-    let p = p2;
-    assert(true);
   });
 });
 
@@ -604,6 +597,14 @@ describe("Appfun parser", () => {
 });
 
 describe("pipe2 parser", () => {
+  it("should not eagerly compose two parsers", () => {
+    let p2: P.IParser<CU.CharStream> = (i) =>
+      P.pipe2<CU.CharStream, CU.CharStream, CU.CharStream>(P.char("."))(p2)(
+        (x,) => x
+      )(i);
+    assert(true);
+  });
+
   it("should apply a function to the result of two successful parses in sequence", () => {
     const i = new CU.CharStream("ok");
     const f = (a: CU.CharStream, b: CU.CharStream) =>
@@ -742,9 +743,9 @@ describe("Str parser", () => {
 
 describe("EOF parser", () => {
   it("should succeed at the end of the input", () => {
-    const p = P.seq<CU.CharStream, P.EOFMark, CU.CharStream>(
+    const p = P.pipe2<CU.CharStream, P.EOFMark, CU.CharStream>(
       P.str("helloworld")
-    )(P.eof)((tup) => tup[0]);
+    )(P.eof)((a,b) => a);
     const output = p(inputstream);
     switch (output.tag) {
       case "success":
@@ -758,14 +759,11 @@ describe("EOF parser", () => {
   });
 
   it("should fail when not at the end of the input", () => {
-    const p = P.seq<CU.CharStream, P.EOFMark, CU.CharStream>(P.str("hello"))(
-      P.eof
-    )((tup) => tup[0]);
+    const p = P.seq(P.str("hello"))(P.eof);
     const output = p(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
-        break;
       case "failure":
         expect(output.inputstream).to.equal(inputstream);
         break;

@@ -69,7 +69,7 @@
 				<a href="#documentation" id="documentation" style="color: inherit; text-decoration: none;">
 					<h2>Documentation</h2>
 				</a>
-				<p>This is auto-generated documentation from the <a href="https://tsdoc.org">TSDoc</a> comments that preface every function. I was a little OCD about this-- every function should be well documented. If you find issues with the documentation, please open an issue.</p>
+				<p>We provide auto-generated <a href="https://tsdoc.org">TSDoc</a> documentation from the comments that preface every function. I was a little OCD about this-- every function should be well documented. If you find issues with the documentation, please open an issue.</p>
 				<p><a href="https://williams-cs.github.io/parsecco/">TSDoc documentation can be found here</a></p>
 				<p>(todo) I plan to add tutorial documentation here in the near future. If you are familiar with the <a href="https://www.cs.nott.ac.uk/~pszgmh/monparsing.pdf">Monadic Parser Combinators</a> paper by Meijer and Hutton, Parsecco is very much in that vein with a few small caveats:</p>
 				<ol>
@@ -77,6 +77,10 @@
 					<li>My <code>choice</code> combinator is an <em>ordered choice</em> that returns the first match instead of all matches (in other words, it is <code>+++</code> and not <code>++</code> in Meijer and Hutton-speak).</li>
 					<li>TypeScript has no language-level support for lazy evaluation, so recursive grammar definitions need to be forward-declared. See the <code>recParser</code> family of functions; these were inspired by <a href="https://www.quanttec.com/fparsec/">FParsec</a>&#39;s approach.</li>
 				</ol>
+				<a href="#usage-examples" id="usage-examples" style="color: inherit; text-decoration: none;">
+					<h2>Usage Examples</h2>
+				</a>
+				<p>If you&#39;re looking for real-world usage examples, have a look at the <a href="https://github.com/dbarowy/paraformula">paraformula parser</a> for parsing Microsoft Excel formulas.</p>
 				<a href="#developer-info" id="developer-info" style="color: inherit; text-decoration: none;">
 					<h2>Developer Info</h2>
 				</a>

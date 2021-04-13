@@ -636,6 +636,37 @@ describe("pipe2 parser", () => {
   });
 });
 
+describe("pipe3 parser", () => {
+  it("should apply a function to the result of three successful parses in sequence", () => {
+    const i = new CU.CharStream("foo");
+    const f = (a: CU.CharStream, b: CU.CharStream, c: CU.CharStream) =>
+      a.toString() + b.toString() + c.toString();
+    const output = P.pipe3<CU.CharStream, CU.CharStream, CU.CharStream, string>(P.item)(P.item)(P.item)(f)(i);
+    switch (output.tag) {
+      case "success":
+        expect(output.result).to.equal("foo");
+        break;
+      default:
+        assert.fail();
+    }
+  });
+
+  it("should fail if any of the parses fail", () => {
+    const i = new CU.CharStream("oo");
+    const f = (a: CU.CharStream, b: CU.CharStream, c: CU.CharStream) =>
+      a.toString() + b.toString() + c.toString();
+    const output = P.pipe3<CU.CharStream, CU.CharStream, CU.CharStream, string>(P.item)(
+      P.item
+    )(P.item)(f)(i);
+    switch (output.tag) {
+      case "success":
+        assert.fail();
+      default:
+        assert(true);
+    }
+  });
+});
+
 describe("Many parser", () => {
   it("should apply the given parser until the end of the input", () => {
     const output = P.many(P.item)(inputstream);

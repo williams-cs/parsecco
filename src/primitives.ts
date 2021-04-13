@@ -508,6 +508,43 @@ export namespace Primitives {
   }
 
   /**
+   * `pipe3(p1)(p2)(p3)(f)` applies the parsers `p1`, `p2`, and `p3` in
+   * sequence. It returns the result of the function application `f(a,b,c)`,
+   * where `a`, `b`, and `c` are the results returned by `p1`, `p2`, and
+   * `p3`, respectively.
+   * @param p1 A parser.
+   * @param p2 A parser.
+   * @param p3 A parser.
+   * @param f A function that takes the results of `p1`, `p2`, and `p3`.
+   */
+  export function pipe3<A,B,C,D>(p1: IParser<A>) {
+    return (p2: IParser<B>) => {
+      return (p3: IParser<C>) => {
+        return (f: (a: A, b: B, c: C) => D) => {
+          return pipe2<A,[B,C],D>(
+            // parse p1
+            p1
+          )(
+            pipe2<B,C,[B,C]>(
+              // then parse p2
+              p2
+            )(
+              // then parse p3
+              p3
+            )(
+              // then return a tuple (b,c)
+              (b,c) => [b,c]
+            )
+          )(
+            // then apply f to all of a, b, c
+            (a, [b,c]) => f(a,b,c)
+          )
+        }
+      }
+    }
+  }
+
+  /**
    * many repeatedly applies the parser p until p fails. many always
    * succeeds, even if it matches nothing or if an outcome is critical.
    * many tries to guard against an infinite loop by raising an exception

@@ -193,7 +193,7 @@ export namespace Primitives {
   export function expect<T>(parser: IParser<T>) {
     return (error_msg: string) => {
       return (istream: CharStream) => {
-        let outcome: Outcome<T> = parser(istream);
+        const outcome: Outcome<T> = parser(istream);
         switch (outcome.tag) {
           case "success":
             return outcome;
@@ -214,8 +214,8 @@ export namespace Primitives {
     if (istream.isEmpty()) {
       return new Failure(istream, istream.startpos);
     } else {
-      let remaining = istream.tail(); // remaining string;
-      let res = istream.head(); // result of parse;
+      const remaining = istream.tail(); // remaining string;
+      const res = istream.head(); // result of parse;
       return new Success(remaining, res);
     }
   };
@@ -230,10 +230,10 @@ export namespace Primitives {
   export function bind<T, U>(p: IParser<T>) {
     return (f: (t: T) => IParser<U>) => {
       return (istream: CharStream) => {
-        let r = p(istream);
+        const r = p(istream);
         switch (r.tag) {
           case "success":
-            let o = f(r.result)(r.inputstream);
+            const o = f(r.result)(r.inputstream);
             switch (o.tag) {
               case "success":
                 break;
@@ -284,7 +284,7 @@ export namespace Primitives {
    * otherwise it fails.
    */
   export function sat(p: (ch: string) => boolean): IParser<CharStream> {
-    let f = (x: CharStream) => {
+    const f = (x: CharStream) => {
       const char = x.toString();
       if (char.length !== 1)
         throw new Error("Input to predicate must be a character.");
@@ -301,7 +301,7 @@ export namespace Primitives {
    * is in the array, otherwise it fails.
    */
   export function satClass(char_class: string[]): IParser<CharStream> {
-    let f = (x: CharStream) => {
+    const f = (x: CharStream) => {
       return char_class.indexOf(x.toString()) > -1
         ? result(x)
         : (istream: CharStream) => new Failure(istream, istream.startpos - 1);
@@ -399,7 +399,7 @@ export namespace Primitives {
   export function choice<T>(p1: IParser<T>): (p2: IParser<T>) => IParser<T> {
     return (p2: IParser<T>) => {
       return (istream: CharStream) => {
-        let o = p1(istream);
+        const o = p1(istream);
         switch (o.tag) {
           case "success":
             return o;
@@ -407,7 +407,7 @@ export namespace Primitives {
             if (o.is_critical) {
               return o;
             }
-            let o2 = p2(istream);
+            const o2 = p2(istream);
             switch (o2.tag) {
               case "success":
                 break;
@@ -492,7 +492,7 @@ export namespace Primitives {
   export function appfun<T, U>(p: IParser<T>) {
     return (f: (t: T) => U) => {
       return (istream: CharStream) => {
-        let o = p(istream);
+        const o = p(istream);
         switch (o.tag) {
           case "success":
             return new Success<U>(o.inputstream, f(o.result));
@@ -579,10 +579,10 @@ export namespace Primitives {
   export function many<T>(p: IParser<T>): IParser<T[]> {
     return (istream: CharStream) => {
       let istream2 = istream;
-      let outputs: T[] = [];
+      const outputs: T[] = [];
       let succeeds = true;
       while (!istream2.isEmpty() && succeeds) {
-        let o = p(istream2);
+        const o = p(istream2);
         switch (o.tag) {
           case "success":
             if (istream2 == o.inputstream) {
@@ -692,8 +692,8 @@ export namespace Primitives {
   ): (pclose: IParser<U>) => (p: IParser<V>) => IParser<V> {
     return (pclose: IParser<U>) => {
       return (p: IParser<V>) => {
-        let l: IParser<V> = left<V, U>(p)(pclose);
-        let r: IParser<V> = right<T, V>(popen)(l);
+        const l: IParser<V> = left<V, U>(p)(pclose);
+        const r: IParser<V> = right<T, V>(popen)(l);
         return r;
       };
     };
@@ -716,7 +716,7 @@ export namespace Primitives {
             ", endpos: " +
             istream.endpos
         );
-        let o = p(istream);
+        const o = p(istream);
         switch (o.tag) {
           case "success":
             console.log(
@@ -755,7 +755,7 @@ export namespace Primitives {
    * wschars matches any whitespace char, namely
    * ' ', '\t', '\n', or '\r\n'.
    */
-  let wschars: IParser<CharStream> = choice(satClass([" ", "\t"]))(nl);
+  const wschars: IParser<CharStream> = choice(satClass([" ", "\t"]))(nl);
 
   /**
    * ws matches zero or more of the following whitespace characters:
@@ -764,7 +764,7 @@ export namespace Primitives {
    * Note: ws NEVER fails
    */
   export const ws: IParser<CharStream> = (istream: CharStream) => {
-    let o = many(wschars)(istream);
+    const o = many(wschars)(istream);
     switch (o.tag) {
       case "success":
         return new Success(o.inputstream, CharStream.concat(o.result));
@@ -779,7 +779,7 @@ export namespace Primitives {
    * ws1 returns matched whitespace in a single CharStream result.
    */
   export const ws1: IParser<CharStream> = (istream: CharStream) => {
-    let o = many1(wschars)(istream);
+    const o = many1(wschars)(istream);
     switch (o.tag) {
       case "success":
         return new Success(o.inputstream, CharStream.concat(o.result));
@@ -789,13 +789,13 @@ export namespace Primitives {
   };
 
   function groupBy<T, U>(list: T[], keyGetter: (e: T) => U): Map<U, T[]> {
-    let m: Map<U, T[]> = new Map<U, T[]>();
+    const m: Map<U, T[]> = new Map<U, T[]>();
     list.forEach((elem) => {
       const key = keyGetter(elem);
       if (!m.has(key)) {
         m.set(key, []);
       }
-      let collection = m.get(key)!;
+      const collection = m.get(key)!;
       collection.push(elem);
     });
     return m;
@@ -804,8 +804,8 @@ export namespace Primitives {
   export function strSat(strs: string[]): IParser<CharStream> {
     // sort strings first by length, and then lexicograpically;
     // slice() called here so as not to modify original array
-    let smap = groupBy(strs, (s) => s.length);
-    let sizes: number[] = [];
+    const smap = groupBy(strs, (s) => s.length);
+    const sizes: number[] = [];
     // find size classes;
     // also sort each set of equivalent-length values
     smap.forEach((vals: string[], key: number, m: Map<number, string[]>) => {
@@ -820,9 +820,9 @@ export namespace Primitives {
         // for each size class, try matching all of
         // the strings; if one is found, return the
         // appropriate CharStream; if not, fail.
-        let peek = istream.peek(sizes[peekIndex]);
-        let tail = istream.seek(sizes[peekIndex]);
-        let candidates = smap.get(sizes[peekIndex])!;
+        const peek = istream.peek(sizes[peekIndex]);
+        const tail = istream.seek(sizes[peekIndex]);
+        const candidates = smap.get(sizes[peekIndex])!;
         for (let cIndex = 0; cIndex < candidates.length; cIndex++) {
           if (candidates[cIndex] === peek.toString()) {
             return new Success(tail, peek);

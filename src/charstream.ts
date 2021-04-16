@@ -61,7 +61,7 @@ export namespace CharUtil {
             if (this.startpos + num > this.endpos) {
                 return this;
             } else {
-                let newHasEOF = this.startpos + num == this.endpos && this.hasEOF;
+                const newHasEOF = this.startpos + num == this.endpos && this.hasEOF;
                 return new CharStream(this.input, this.startpos, this.startpos + num, newHasEOF);
             }
         }

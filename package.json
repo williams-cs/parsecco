@@ -1,6 +1,6 @@
 {
   "name": "parsecco",
-  "version": "1.4.0",
+  "version": "1.4.2",
   "description": "parsecco is a parser combinator library",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

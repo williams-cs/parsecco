@@ -438,6 +438,41 @@ export namespace Primitives {
   }
 
   /**
+   * `prefix` is a prefix-optimized `choice` combinator.  If `pre`
+   * succeeds, `p` is called, and `prefix`'s and `p`'s results
+   * are returned by calling the reducer `f`.  If `p` fails,
+   * just `p`'s result is returned. Use this whereever you would
+   * write choice(p)(pipe2(p)(q)(f)).
+   * @param pre A prefix parser that should always succeed.
+   * @param p A suffix parser that may succeed.
+   * @param f A function that is called only if `p` succeeds.
+   */
+  export function prefix<T, U>(pre: IParser<T>) {
+    return (p: IParser<U>) => {
+      return (f: (t: T, u: U) => T) => {
+        return (istream: CharStream) => {
+          const output1 = pre(istream);
+          switch (output1.tag) {
+            case "success":
+              const output2 = p(output1.inputstream);
+              switch (output2.tag) {
+                case "success":
+                  return new Success(
+                    output2.inputstream,
+                    f(output1.result, output2.result)
+                  );
+                case "failure":
+                  return output1;
+              }
+            case "failure":
+              return output1;
+          }
+        };
+      };
+    };
+  }
+
+  /**
    * appfun allows the user to apply a function f to
    * the result of a parser p, assuming that p is successful.
    * This is the same as the `|>>`
@@ -572,18 +607,16 @@ export namespace Primitives {
   }
 
   /**
-   * str yields a parser for the given string.
+   * `str` yields a parser for the given string.
    * @param s A string
    */
   export function str(s: string): IParser<CharStream> {
     return (istream: CharStream) => {
-      let chars: string[] = s.split("");
-      let p = result(new CharStream(""));
-      let f = (a: CharStream, b: CharStream) => a.concat(b);
-      for (var c of chars) {
-        p = pipe2<CharStream, CharStream, CharStream>(p)(char(c))(f);
+      if (istream.peekMatches(s)) {
+        return new Success(istream.seek(s.length), new CharStream(s));
+      } else {
+        return new Failure(istream, istream.startpos);
       }
-      return p(istream);
     };
   }
 

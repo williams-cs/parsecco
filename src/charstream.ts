@@ -1,3 +1,5 @@
+import { runInThisContext } from "vm";
+
 export namespace CharUtil {
     export class CharStream {
         public readonly input : String;
@@ -61,6 +63,18 @@ export namespace CharUtil {
             } else {
                 let newHasEOF = this.startpos + num == this.endpos && this.hasEOF;
                 return new CharStream(this.input, this.startpos, this.startpos + num, newHasEOF);
+            }
+        }
+
+        /**
+         * Returns true if the next s.length characters match s.
+         * @param s A string.
+         */
+        public peekMatches(s: string) : boolean {
+            if (this.startpos + s.length > this.endpos) {
+                return false;
+            } else {
+                return this.input.substring(this.startpos, this.startpos + s.length) === s;
             }
         }
 

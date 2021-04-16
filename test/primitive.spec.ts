@@ -570,6 +570,60 @@ describe("Choices parser", () => {
   });
 });
 
+describe("Prefix parser", () => {
+  it("should allow parsing alternatives that share a prefix (case 1)", () => {
+    const outcome = P.prefix(P.str("hello"))(P.str("bacon"))((p,s) => assert.fail())(inputstream);
+    switch (outcome.tag) {
+      case "success":
+        expect(outcome.result.toString()).to.equal("hello");
+        break;
+      case "failure":
+        assert.fail();
+    }
+  });
+
+  it("should allow parsing alternatives that share a prefix (case 2)", () => {
+    const input = new CU.CharStream("hellobacon");
+    const outcome = P.prefix<CU.CharStream, CU.CharStream>(P.str("hello"))(P.str("bacon"))((p,s) => new CU.CharStream(p.toString() + s.toString()))(input);
+    switch (outcome.tag) {
+      case "success":
+        expect(outcome.result.toString()).to.equal("hellobacon");
+        break;
+      case "failure":
+        assert.fail();
+    }
+  });
+
+  it("should only ever run the first parser once (case 1)", () => {
+    let i = 0;
+    const first = P.pipe<CU.CharStream, CU.CharStream>(P.str("hello"))(r => {i++; return r;});
+    const outcome = P.prefix(first)(P.str("bacon"))((p,s) => assert.fail())(inputstream);
+    switch (outcome.tag) {
+      case "success":
+        expect(outcome.result.toString()).to.equal("hello");
+        assert(i === 1, "i not equal to 1");
+        break;
+      case "failure":
+        assert.fail();
+    }
+  });
+
+  it("should only ever run the first parser once (case 2)", () => {
+    let i = 0;
+    const first = P.pipe<CU.CharStream, CU.CharStream>(P.str("hello"))(r => {i++; return r;});
+    const input = new CU.CharStream("hellobacon");
+    const outcome = P.prefix<CU.CharStream, CU.CharStream>(first)(P.str("bacon"))((p,s) => new CU.CharStream(p.toString() + s.toString()))(input);
+    switch (outcome.tag) {
+      case "success":
+        expect(outcome.result.toString()).to.equal("hellobacon");
+        assert(i === 1, "i not equal to 1");
+        break;
+      case "failure":
+        assert.fail();
+    }
+  });
+});
+
 describe("Appfun parser", () => {
   it("should apply a function to the result of a successful parse", () => {
     const output = P.appfun(P.item)((s) => "whatever!")(inputstream);

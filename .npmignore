@@ -1,1 +1,6 @@
 .github
+src
+docs
+tsconfig.json
+.vscode
+test

@@ -432,9 +432,19 @@ export namespace Primitives {
     if (parsers.length == 0) {
       throw new Error("Error: choices must have a non-empty array.");
     }
-    return parsers.length > 1
-      ? choice<T>(parsers[0])(choices<T>(...parsers.slice(1)))
-      : parsers[0];
+    return (istream: CharStream) => {
+      let i = 0;
+      while (true && i < parsers.length) {
+        const o = parsers[i](istream);
+        if (o.tag === "success") {
+          return o;
+        } else if (o.is_critical) {
+          return o;
+        }
+        i++;
+      }
+      return new Failure(istream, istream.startpos);
+    }
   }
 
   /**

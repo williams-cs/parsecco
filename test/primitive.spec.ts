@@ -562,7 +562,6 @@ describe("Choices parser", () => {
     switch (outcome.tag) {
       case "success":
         assert.fail();
-        break;
       case "failure":
         expect(outcome.is_critical).to.equal(true);
         break;

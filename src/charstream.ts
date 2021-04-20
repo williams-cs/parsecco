@@ -3,8 +3,8 @@ import { runInThisContext } from "vm";
 export namespace CharUtil {
     export class CharStream {
         public readonly input : String;
-        public readonly startpos : number;
-        public readonly endpos : number;
+        public readonly startpos : number; // start index into input (inclusive)
+        public readonly endpos : number; // end index into input (exclusive)
         public readonly hasEOF : boolean = true;
 
         constructor(s: String, startpos?: number, endpos?: number, hasEOF?: boolean) {
@@ -58,7 +58,7 @@ export namespace CharUtil {
          * @param num
          */
         public peek(num: number) : CharStream {
-            if (this.startpos + num > this.endpos) {
+            if (this.startpos + num >= this.endpos) {
                 return this;
             } else {
                 const newHasEOF = this.startpos + num == this.endpos && this.hasEOF;
@@ -76,6 +76,35 @@ export namespace CharUtil {
             } else {
                 return this.input.substring(this.startpos, this.startpos + s.length) === s;
             }
+        }
+
+        /**
+         * Returns a new CharStream created by repeatedly applying the given
+         * predicate until it no longer matches.
+         * @param pred A predicate over valid characters.
+         */
+        public seekWhile(pred: (char: string) => boolean) : CharStream {
+            let pos = this.startpos;
+            let end = this.endpos;
+            while (pos < end && pred(this.input.charAt(pos))) {
+                pos++;
+            }
+            return new CharStream(this.input, pos, end, pos == end);
+        }
+
+        /**
+         * A highly optimized seek that advances the stream while the given
+         * predicate returns true.  Returns a pair of CharStreams [a,b] where
+         * a is the matching string and b is the remainder of the stream.
+         * @param okCodes A predicate over valid ASCII character codes.
+         */
+        public seekWhileCharCode(okCodes: (n: number) => boolean) : [CharStream,CharStream] {
+            let pos = this.startpos;
+            let end = this.endpos;
+            while (pos < end && okCodes(this.input.charCodeAt(pos))) {
+                pos++;
+            }
+            return [new CharStream(this.input, this.startpos, pos, pos == end), new CharStream(this.input, pos, end, this.hasEOF)];
         }
 
         /**

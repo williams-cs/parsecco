@@ -801,6 +801,11 @@ export namespace Primitives {
     return m;
   }
 
+  /**
+   * Match any of given alternatives in the given array of strings. Matches
+   * longest-first and, where length is the same, lexicographically first.
+   * @param strs An array of acceptable strings.
+   */
   export function strSat(strs: string[]): IParser<CharStream> {
     // sort strings first by length, and then lexicograpically;
     // slice() called here so as not to modify original array
@@ -832,4 +837,39 @@ export namespace Primitives {
       return new Failure(istream, istream.startpos);
     };
   }
+
+  /**
+   * An optimized parser that seeks the input until the given predicate does not
+   * return true.  On success, it returns the matching CharStream.
+   * @param pred A function that returns true if the given character should be accepted.
+   */
+  export function matchWhile(pred: (char: string) => boolean) : IParser<CharStream> {
+    return (istream: CharStream) => {
+      const rem = istream.seekWhile(pred);
+      const diff = rem.startpos - istream.startpos;
+      if (diff == 0) {
+        // no input consumed
+        return new Failure(istream, istream.startpos);
+      } else {
+        const match = istream.peek(diff);
+        return result(match)(rem);
+      }
+    }
+  } 
+
+  /**
+   * An optimized parser that seeks the input until the given predicate does not
+   * return true.  On success, it returns the matching CharStream.
+   * @param pred A function that returns true if the given character code should be accepted.
+   */
+  export function matchWhileCharCode(pred: (char: number) => boolean) : IParser<CharStream> {
+    return (istream: CharStream) => {
+      const [match, rem] = istream.seekWhileCharCode(pred);
+      if (match.startpos == match.endpos) {
+        // no input consumed
+        return new Failure(istream, istream.startpos);
+      }
+      return result(match)(rem);
+    }
+  } 
 }

@@ -1183,3 +1183,56 @@ describe("strSat parser", () => {
     }
   });
 });
+
+describe("matchWhile", () => {
+  it("should match until a predicate returns false", () => {
+    const input = new CU.CharStream("helloFunction3(");
+    const output = P.matchWhile(ch => (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) || (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) || (ch.charCodeAt(0) > 97 && ch.charCodeAt(0) < 123))(input);
+    switch(output.tag) {
+      case "success":
+        expect(output.result.toString()).to.equal("helloFunction3");
+        break;
+      case "failure":
+        assert.fail();
+    }
+  });
+
+  it ("shouldn't consume any input from a string that doesn't match", () => {
+    const input = new CU.CharStream("!@&^%#*(");
+    const output = P.matchWhile(ch => (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) || (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) || (ch.charCodeAt(0) > 97 && ch.charCodeAt(0) < 123))(input);
+    switch(output.tag) {
+      case "success":
+        assert.fail();
+      case "failure":
+        assert(true);
+    }
+  });
+});
+
+describe("matchWhileCharCode", () => {
+  it("should match until a predicate returns false", () => {
+    const input = new CU.CharStream("helloFunction3(");
+    const output = P.matchWhileCharCode(n => (n > 48 && n < 58) || (n > 65 && n < 91) || (n > 97 && n < 123))(input);
+    const expectedMatch = new CU.CharStream("helloFunction3(", 0, 14, false);
+    const expectedRem = new CU.CharStream("helloFunction3(", 14, 15, true);
+    switch(output.tag) {
+      case "success":
+        expect(output.result).to.eql(expectedMatch);
+        expect(output.inputstream).to.eql(expectedRem);
+        break;
+      case "failure":
+        assert.fail();
+    }
+  });
+
+  it ("shouldn't consume any input from a string that doesn't match", () => {
+    const input = new CU.CharStream("!@&^%#*(");
+    const output = P.matchWhileCharCode(n => (n > 48 && n < 58) || (n > 65 && n < 91) || (n > 97 && n < 123))(input);
+    switch(output.tag) {
+      case "success":
+        assert.fail();
+      case "failure":
+        assert(true);
+    }
+  });
+});

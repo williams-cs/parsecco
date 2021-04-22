@@ -729,13 +729,18 @@ export namespace Primitives {
             );
             break;
           case "failure":
+            const PAD = 10;
+            const leftpad = Math.max(istream.startpos - PAD, 0);
+            const rightpad = Math.min(istream.startpos + PAD, istream.endpos);
             console.log(
               "failure: " +
                 label +
                 ", startpos: " +
                 istream.startpos +
                 ", endpos: " +
-                istream.endpos
+                istream.endpos + "\n" +
+                "  \"" + istream.input.substring(istream.startpos - leftpad, istream.startpos + rightpad) + "\"\n" +
+                "^".padStart(leftpad + 4)
             );
             break;
         }

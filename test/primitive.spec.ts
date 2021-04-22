@@ -769,12 +769,10 @@ describe("Str parser", () => {
     const output = p(inputstream);
     switch (output.tag) {
       case "success":
-        // console.log("DEBUGGING!" + inputstream);
         expect(output.result.toString()).to.equal("hello");
         expect(output.inputstream.toString()).to.equal("world");
         break;
       case "failure":
-        // console.log("DEBUGGIN! fail")
         assert.fail();
         break;
     }

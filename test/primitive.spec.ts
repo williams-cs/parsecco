@@ -45,7 +45,7 @@ describe("Recparser", () => {
     let [expr, impl] = P.recParser<CU.CharStream>();
     impl.contents = P.str("helloworld");
     const output = expr(inputstream);
-    switch(output.tag) {
+    switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal(inputstream.toString());
         break;
@@ -58,7 +58,7 @@ describe("Recparser", () => {
     let [expr, impl] = P.recParser<CU.CharStream>();
     impl.contents = P.str("yelloworld");
     const output = expr(inputstream);
-    switch(output.tag) {
+    switch (output.tag) {
       case "success":
         assert.fail();
       default:
@@ -227,9 +227,9 @@ describe("SatClass parser", () => {
 
 describe("Seq parser", () => {
   it("should successfully apply two parsers in a row", () => {
-    const output = P.seq<CU.CharStream, CU.CharStream>(P.item)(
-      P.item
-    )(inputstream);
+    const output = P.seq<CU.CharStream, CU.CharStream>(P.item)(P.item)(
+      inputstream
+    );
     const expected = ["h", "e"];
     switch (output.tag) {
       case "success":
@@ -571,7 +571,9 @@ describe("Choices parser", () => {
 
 describe("Prefix parser", () => {
   it("should allow parsing alternatives that share a prefix (case 1)", () => {
-    const outcome = P.prefix(P.str("hello"))(P.str("bacon"))((p,s) => assert.fail())(inputstream);
+    const outcome = P.prefix(P.str("hello"))(P.str("bacon"))((p, s) =>
+      assert.fail()
+    )(inputstream);
     switch (outcome.tag) {
       case "success":
         expect(outcome.result.toString()).to.equal("hello");
@@ -583,7 +585,9 @@ describe("Prefix parser", () => {
 
   it("should allow parsing alternatives that share a prefix (case 2)", () => {
     const input = new CU.CharStream("hellobacon");
-    const outcome = P.prefix<CU.CharStream, CU.CharStream>(P.str("hello"))(P.str("bacon"))((p,s) => new CU.CharStream(p.toString() + s.toString()))(input);
+    const outcome = P.prefix<CU.CharStream, CU.CharStream>(P.str("hello"))(
+      P.str("bacon")
+    )((p, s) => new CU.CharStream(p.toString() + s.toString()))(input);
     switch (outcome.tag) {
       case "success":
         expect(outcome.result.toString()).to.equal("hellobacon");
@@ -595,8 +599,13 @@ describe("Prefix parser", () => {
 
   it("should only ever run the first parser once (case 1)", () => {
     let i = 0;
-    const first = P.pipe<CU.CharStream, CU.CharStream>(P.str("hello"))(r => {i++; return r;});
-    const outcome = P.prefix(first)(P.str("bacon"))((p,s) => assert.fail())(inputstream);
+    const first = P.pipe<CU.CharStream, CU.CharStream>(P.str("hello"))((r) => {
+      i++;
+      return r;
+    });
+    const outcome = P.prefix(first)(P.str("bacon"))((p, s) => assert.fail())(
+      inputstream
+    );
     switch (outcome.tag) {
       case "success":
         expect(outcome.result.toString()).to.equal("hello");
@@ -609,9 +618,14 @@ describe("Prefix parser", () => {
 
   it("should only ever run the first parser once (case 2)", () => {
     let i = 0;
-    const first = P.pipe<CU.CharStream, CU.CharStream>(P.str("hello"))(r => {i++; return r;});
+    const first = P.pipe<CU.CharStream, CU.CharStream>(P.str("hello"))((r) => {
+      i++;
+      return r;
+    });
     const input = new CU.CharStream("hellobacon");
-    const outcome = P.prefix<CU.CharStream, CU.CharStream>(first)(P.str("bacon"))((p,s) => new CU.CharStream(p.toString() + s.toString()))(input);
+    const outcome = P.prefix<CU.CharStream, CU.CharStream>(first)(
+      P.str("bacon")
+    )((p, s) => new CU.CharStream(p.toString() + s.toString()))(input);
     switch (outcome.tag) {
       case "success":
         expect(outcome.result.toString()).to.equal("hellobacon");
@@ -653,7 +667,7 @@ describe("pipe2 parser", () => {
   it("should not eagerly compose two parsers", () => {
     let p2: P.IParser<CU.CharStream> = (i) =>
       P.pipe2<CU.CharStream, CU.CharStream, CU.CharStream>(P.char("."))(p2)(
-        (x,) => x
+        (x) => x
       )(i);
     assert(true);
   });
@@ -695,7 +709,9 @@ describe("pipe3 parser", () => {
     const i = new CU.CharStream("foo");
     const f = (a: CU.CharStream, b: CU.CharStream, c: CU.CharStream) =>
       a.toString() + b.toString() + c.toString();
-    const output = P.pipe3<CU.CharStream, CU.CharStream, CU.CharStream, string>(P.item)(P.item)(P.item)(f)(i);
+    const output = P.pipe3<CU.CharStream, CU.CharStream, CU.CharStream, string>(
+      P.item
+    )(P.item)(P.item)(f)(i);
     switch (output.tag) {
       case "success":
         expect(output.result).to.equal("foo");
@@ -709,9 +725,9 @@ describe("pipe3 parser", () => {
     const i = new CU.CharStream("oo");
     const f = (a: CU.CharStream, b: CU.CharStream, c: CU.CharStream) =>
       a.toString() + b.toString() + c.toString();
-    const output = P.pipe3<CU.CharStream, CU.CharStream, CU.CharStream, string>(P.item)(
+    const output = P.pipe3<CU.CharStream, CU.CharStream, CU.CharStream, string>(
       P.item
-    )(P.item)(f)(i);
+    )(P.item)(P.item)(f)(i);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -796,7 +812,7 @@ describe("EOF parser", () => {
   it("should succeed at the end of the input", () => {
     const p = P.pipe2<CU.CharStream, P.EOFMark, CU.CharStream>(
       P.str("helloworld")
-    )(P.eof)((a,b) => a);
+    )(P.eof)((a, b) => a);
     const output = p(inputstream);
     switch (output.tag) {
       case "success":
@@ -1185,8 +1201,13 @@ describe("strSat parser", () => {
 describe("matchWhile", () => {
   it("should match until a predicate returns false", () => {
     const input = new CU.CharStream("helloFunction3(");
-    const output = P.matchWhile(ch => (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) || (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) || (ch.charCodeAt(0) > 97 && ch.charCodeAt(0) < 123))(input);
-    switch(output.tag) {
+    const output = P.matchWhile(
+      (ch) =>
+        (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) ||
+        (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) ||
+        (ch.charCodeAt(0) > 97 && ch.charCodeAt(0) < 123)
+    )(input);
+    switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("helloFunction3");
         break;
@@ -1195,10 +1216,15 @@ describe("matchWhile", () => {
     }
   });
 
-  it ("shouldn't consume any input from a string that doesn't match", () => {
+  it("shouldn't consume any input from a string that doesn't match", () => {
     const input = new CU.CharStream("!@&^%#*(");
-    const output = P.matchWhile(ch => (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) || (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) || (ch.charCodeAt(0) > 97 && ch.charCodeAt(0) < 123))(input);
-    switch(output.tag) {
+    const output = P.matchWhile(
+      (ch) =>
+        (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) ||
+        (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) ||
+        (ch.charCodeAt(0) > 97 && ch.charCodeAt(0) < 123)
+    )(input);
+    switch (output.tag) {
       case "success":
         assert.fail();
       case "failure":
@@ -1210,10 +1236,12 @@ describe("matchWhile", () => {
 describe("matchWhileCharCode", () => {
   it("should match until a predicate returns false", () => {
     const input = new CU.CharStream("helloFunction3(");
-    const output = P.matchWhileCharCode(n => (n > 48 && n < 58) || (n > 65 && n < 91) || (n > 97 && n < 123))(input);
+    const output = P.matchWhileCharCode(
+      (n) => (n > 48 && n < 58) || (n > 65 && n < 91) || (n > 97 && n < 123)
+    )(input);
     const expectedMatch = new CU.CharStream("helloFunction3(", 0, 14, false);
     const expectedRem = new CU.CharStream("helloFunction3(", 14, 15, true);
-    switch(output.tag) {
+    switch (output.tag) {
       case "success":
         expect(output.result).to.eql(expectedMatch);
         expect(output.inputstream).to.eql(expectedRem);
@@ -1223,12 +1251,41 @@ describe("matchWhileCharCode", () => {
     }
   });
 
-  it ("shouldn't consume any input from a string that doesn't match", () => {
+  it("shouldn't consume any input from a string that doesn't match", () => {
     const input = new CU.CharStream("!@&^%#*(");
-    const output = P.matchWhileCharCode(n => (n > 48 && n < 58) || (n > 65 && n < 91) || (n > 97 && n < 123))(input);
-    switch(output.tag) {
+    const output = P.matchWhileCharCode(
+      (n) => (n > 48 && n < 58) || (n > 65 && n < 91) || (n > 97 && n < 123)
+    )(input);
+    switch (output.tag) {
       case "success":
         assert.fail();
+      case "failure":
+        assert(true);
+    }
+  });
+});
+
+describe("debug", () => {
+  it("should work", () => {
+    const input = new CU.CharStream(
+      "hel\nloFu\nnction3(hjdsfsdoiu34n43kb\nsdfjhueise"
+    );
+    const p = P.debug(
+      P.left(
+        P.matchWhile(
+          (ch) =>
+            (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) ||
+            (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) ||
+            (ch.charCodeAt(0) > 97 && ch.charCodeAt(0) < 123) ||
+            ch.charCodeAt(0) === 10
+        )
+      )(P.eof)
+    )("function thingy");
+    const output = p(input);
+    switch (output.tag) {
+      case "success":
+        assert.fail();
+        break;
       case "failure":
         assert(true);
     }

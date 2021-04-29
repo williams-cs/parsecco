@@ -119,7 +119,6 @@ export namespace Primitives {
     return [p, r];
   }
 
-
   /**
    * `rec1ArgParser` is a forward declaration for a recursive parser that
    * takes one argument. It is effectively a form of deferred evaluation to
@@ -270,9 +269,9 @@ export namespace Primitives {
    */
   export function seq<T, U>(p: IParser<T>) {
     return (q: IParser<U>) => {
-      return bind<T, [T,U]>(p)((t) => {
-        return bind<U, [T,U]>(q)((u) => {
-          return result([t,u]);
+      return bind<T, [T, U]>(p)((t) => {
+        return bind<U, [T, U]>(q)((u) => {
+          return result([t, u]);
         });
       });
     };
@@ -444,7 +443,7 @@ export namespace Primitives {
         i++;
       }
       return new Failure(istream, istream.startpos);
-    }
+    };
   }
 
   /**
@@ -525,7 +524,7 @@ export namespace Primitives {
       return (f: (t: T, u: U) => V) => {
         return bind<T, V>(p)((t) => {
           return bind<U, V>(q)((u) => {
-            return result<V>(f(t,u));
+            return result<V>(f(t, u));
           });
         });
       };
@@ -542,15 +541,15 @@ export namespace Primitives {
    * @param p3 A parser.
    * @param f A function that takes the results of `p1`, `p2`, and `p3`.
    */
-  export function pipe3<A,B,C,D>(p1: IParser<A>) {
+  export function pipe3<A, B, C, D>(p1: IParser<A>) {
     return (p2: IParser<B>) => {
       return (p3: IParser<C>) => {
         return (f: (a: A, b: B, c: C) => D) => {
-          return pipe2<A,[B,C],D>(
+          return pipe2<A, [B, C], D>(
             // parse p1
             p1
           )(
-            pipe2<B,C,[B,C]>(
+            pipe2<B, C, [B, C]>(
               // then parse p2
               p2
             )(
@@ -558,15 +557,15 @@ export namespace Primitives {
               p3
             )(
               // then return a tuple (b,c)
-              (b,c) => [b,c]
+              (b, c) => [b, c]
             )
           )(
             // then apply f to all of a, b, c
-            (a, [b,c]) => f(a,b,c)
-          )
-        }
-      }
-    }
+            (a, [b, c]) => f(a, b, c)
+          );
+        };
+      };
+    };
   }
 
   /**
@@ -609,7 +608,7 @@ export namespace Primitives {
    */
   export function many1<T>(p: IParser<T>) {
     return (istream: CharStream) => {
-      return pipe2<T, T[], T[]>(p)(many<T>(p))((hd,tl) => {
+      return pipe2<T, T[], T[]>(p)(many<T>(p))((hd, tl) => {
         tl.unshift(hd);
         return tl;
       })(istream);
@@ -738,15 +737,162 @@ export namespace Primitives {
                 ", startpos: " +
                 istream.startpos +
                 ", endpos: " +
-                istream.endpos + "\n" +
-                "  \"" + istream.input.substring(istream.startpos - leftpad, istream.startpos + rightpad) + "\"\n" +
-                "^".padStart(leftpad + 4)
+                istream.endpos +
+                "\n" +
+                diagnosticMessage(
+                  PAD,
+                  o.error_pos,
+                  o.inputstream.toString(),
+                  o.error_msg
+                )
             );
             break;
         }
         return o;
       };
     };
+  }
+
+  /**
+   * Get the index of the left side of the input stream error window.
+   * @param windowSz The size of the error window.
+   * @param failurePos The position of the error in the input stream.
+   * @returns An index.
+   */
+  function windowLeftIndex(windowSz: number, failurePos: number): number {
+    return failurePos - windowSz < 0 ? 0 : failurePos - windowSz;
+  }
+
+  /**
+   * Get the index of the right side of the input stream error window.
+   * @param windowSz The size of the error window.
+   * @param failurePos The position of the error in the input stream.
+   * @param bufferLen The total length of the input stream.
+   * @returns An index.
+   */
+  function windowRightIndex(
+    windowSz: number,
+    failurePos: number,
+    bufferLen: number
+  ): number {
+    return failurePos + windowSz >= bufferLen
+      ? bufferLen - 1
+      : failurePos + windowSz;
+  }
+
+  /**
+   * Finds the index of the newline closest to the failure position in the left side of the input window.
+   * @param leftIndex The left bound of the input window.
+   * @param failurePos The position of the error in the input stream.
+   * @param buffer The input.
+   * @returns An index.
+   */
+  function indexOfLastNewlineLeftWindow(
+    leftIndex: number,
+    failurePos: number,
+    buffer: string
+  ): number {
+    function searchBackward(pos: number): number {
+      if (pos <= leftIndex) {
+        return -1;
+      } else if (buffer[pos] === "\n") {
+        return pos;
+      } else {
+        return searchBackward(pos - 1);
+      }
+    }
+
+    const idx = searchBackward(failurePos - 1);
+    return idx === -1 ? leftIndex : idx;
+  }
+
+  /**
+   * Finds the index of the newline closest to the failure position in the right side of the input window.
+   * @param rightIndex The right bound of the input window.
+   * @param failurePos The position of the error in the input stream.
+   * @param buffer The input.
+   * @returns An index.
+   */
+  function indexOfFirstNewlineRightWindow(
+    rightIndex: number,
+    failurePos: number,
+    buffer: string
+  ): number {
+    function searchForward(pos: number): number {
+      if (pos >= rightIndex) {
+        return -1;
+      } else if (buffer[pos] === "\n") {
+        return pos;
+      } else {
+        return searchForward(pos + 1);
+      }
+    }
+
+    const idx = searchForward(failurePos - 1);
+    return idx === -1 ? rightIndex : idx;
+  }
+
+  /**
+   * Pads a string `s` with `padStr` `num` times.
+   * @param s
+   * @param padStr
+   * @param num
+   * @returns
+   */
+  function leftPad(s: string, padStr: string, num: number): string {
+    return num > 0 ? leftPad(padStr + s, padStr, num - 1) : s;
+  }
+
+  /**
+   * Produce a diagnostic message for a parser failure.
+   * @param windowSz The amount of context (in chars) to show to the left and right of the failure position.
+   * @param failurePos Where the parse failed.
+   * @param buffer The input stream.
+   * @param err The error message.
+   */
+  export function diagnosticMessage(
+    windowSz: number,
+    failurePos: number,
+    buffer: string,
+    err: string
+  ): string {
+    // compute window
+    const leftIdx = windowLeftIndex(windowSz, failurePos);
+    const rightIdx = windowRightIndex(windowSz, failurePos, buffer.length);
+    const lastNLLeft = indexOfLastNewlineLeftWindow(
+      leftIdx,
+      failurePos,
+      buffer
+    );
+    const firstNLRight = indexOfFirstNewlineRightWindow(
+      rightIdx,
+      failurePos,
+      buffer
+    );
+
+    // find caret position in last line
+    const caretPos = failurePos - lastNLLeft;
+
+    // create window string
+    const window = buffer.substr(
+      leftIdx,
+      failurePos - leftIdx + 1 + rightIdx - failurePos
+    );
+
+    // augment with diagnostic information
+    const diag =
+      leftPad("", "=", rightIdx - leftIdx) +
+      "\n" +
+      err +
+      "\n" +
+      window +
+      "\n" +
+      leftPad("^", " ", caretPos - 1) +
+      "\n" +
+      leftPad("", "=", rightIdx - leftIdx) +
+      "\n";
+
+    return diag;
   }
 
   /**
@@ -848,7 +994,9 @@ export namespace Primitives {
    * return true.  On success, it returns the matching CharStream.
    * @param pred A function that returns true if the given character should be accepted.
    */
-  export function matchWhile(pred: (char: string) => boolean) : IParser<CharStream> {
+  export function matchWhile(
+    pred: (char: string) => boolean
+  ): IParser<CharStream> {
     return (istream: CharStream) => {
       const rem = istream.seekWhile(pred);
       const diff = rem.startpos - istream.startpos;
@@ -859,15 +1007,17 @@ export namespace Primitives {
         const match = istream.peek(diff);
         return result(match)(rem);
       }
-    }
-  } 
+    };
+  }
 
   /**
    * An optimized parser that seeks the input until the given predicate does not
    * return true.  On success, it returns the matching CharStream.
    * @param pred A function that returns true if the given character code should be accepted.
    */
-  export function matchWhileCharCode(pred: (char: number) => boolean) : IParser<CharStream> {
+  export function matchWhileCharCode(
+    pred: (char: number) => boolean
+  ): IParser<CharStream> {
     return (istream: CharStream) => {
       const [match, rem] = istream.seekWhileCharCode(pred);
       if (match.startpos == match.endpos) {
@@ -875,6 +1025,6 @@ export namespace Primitives {
         return new Failure(istream, istream.startpos);
       }
       return result(match)(rem);
-    }
-  } 
+    };
+  }
 }

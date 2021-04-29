@@ -1264,30 +1264,3 @@ describe("matchWhileCharCode", () => {
     }
   });
 });
-
-describe("debug", () => {
-  it("should work", () => {
-    const input = new CU.CharStream(
-      "hel\nloFu\nnction3(hjdsfsdoiu34n43kb\nsdfjhueise"
-    );
-    const p = P.debug(
-      P.left(
-        P.matchWhile(
-          (ch) =>
-            (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) ||
-            (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) ||
-            (ch.charCodeAt(0) > 97 && ch.charCodeAt(0) < 123) ||
-            ch.charCodeAt(0) === 10
-        )
-      )(P.eof)
-    )("function thingy");
-    const output = p(input);
-    switch (output.tag) {
-      case "success":
-        assert.fail();
-        break;
-      case "failure":
-        assert(true);
-    }
-  });
-});

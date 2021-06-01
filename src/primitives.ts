@@ -158,7 +158,7 @@ export namespace Primitives {
    * @returns
    */
   export function fail<T>(p: IParser<T>) {
-    return function (msg: string) {
+    return function (msg: string): IParser<undefined> {
       return function* (istream: CharStream) {
         const o = yield* p(istream);
         switch (o.tag) {

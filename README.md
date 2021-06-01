@@ -2,6 +2,12 @@
 
 Parsecco is a parser combinator library for Typescript. It has no dependencies!
 
+## Features
+
+- Includes many of the parsers you know and love, like `item`, `bind`, and `sat`, but also includes a number of much faster hand-optimized parsers.
+- All parsers are written in _generator-style_, which makes them compatible with cooperative multitasking.
+- Actively maintained. I am happy to accept issues and pull requests!
+
 ## Installing
 
 You can download Parsecco from [NPM](https://www.npmjs.com/package/parsecco). To install it in your NPM project:

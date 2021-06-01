@@ -13,14 +13,14 @@ describe("Failure object", () => {
 });
 
 describe("Result parser", () => {
-  it("should succeed without consuming any input", () => {
-    const output = P.result(true)(inputstream);
+  it("should succeed without consuming any input", function* () {
+    const output = yield* P.result(true)(inputstream);
     expect(output.inputstream).to.equal(inputstream);
   });
 });
 
 describe("Recparser", () => {
-  it("should expand just like an ordinary parser, even for recursive definitions.", () => {
+  it("should expand just like an ordinary parser, even for recursive definitions.", function* () {
     let res = P.recParser<CU.CharStream>();
     const p: P.IParser<CU.CharStream> = res[0];
     let pImpl = res[1];
@@ -31,7 +31,7 @@ describe("Recparser", () => {
     // consumed all the tokens, but unlike an actual recursive
     // defintion, it should not loop forever just generating the
     // parsing function.
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         // only an infinite string can succeed!
@@ -41,10 +41,10 @@ describe("Recparser", () => {
     }
   });
 
-  it("should succeed normally, just like any other parser", () => {
+  it("should succeed normally, just like any other parser", function* () {
     let [expr, impl] = P.recParser<CU.CharStream>();
     impl.contents = P.str("helloworld");
-    const output = expr(inputstream);
+    const output = yield* expr(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal(inputstream.toString());
@@ -54,10 +54,10 @@ describe("Recparser", () => {
     }
   });
 
-  it("should fail normally, just like any other parser", () => {
+  it("should fail normally, just like any other parser", function* () {
     let [expr, impl] = P.recParser<CU.CharStream>();
     impl.contents = P.str("yelloworld");
-    const output = expr(inputstream);
+    const output = yield* expr(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -68,8 +68,8 @@ describe("Recparser", () => {
 });
 
 describe("Zero parser", () => {
-  it("should fail and consume no input", () => {
-    const output = P.zero("")(inputstream);
+  it("should fail and consume no input", function* () {
+    const output = yield* P.zero("")(inputstream);
     expect(output.inputstream).to.equal(inputstream);
     switch (output.tag) {
       case "failure":
@@ -82,10 +82,10 @@ describe("Zero parser", () => {
 });
 
 describe("Fail parser", () => {
-  it("should fail if the stream contains the given input, consuming no input", () => {
+  it("should fail if the stream contains the given input, consuming no input", function* () {
     const p = P.str("hel");
     const msg = "We never want to see 'hel'!";
-    const output = P.fail(p)(msg)(inputstream);
+    const output = yield* P.fail(p)(msg)(inputstream);
     switch (output.tag) {
       case "failure":
         // stream should not be modified
@@ -98,10 +98,10 @@ describe("Fail parser", () => {
     }
   });
 
-  it("should succeed if the stream does not contain the given input, consuming no input", () => {
+  it("should succeed if the stream does not contain the given input, consuming no input", function* () {
     const p = P.str("leh");
     const msg = "We never want to see 'hel'!";
-    const output = P.fail(p)(msg)(inputstream);
+    const output = yield* P.fail(p)(msg)(inputstream);
     switch (output.tag) {
       case "failure":
         assert.fail();
@@ -115,9 +115,9 @@ describe("Fail parser", () => {
 });
 
 describe("OK parser", () => {
-  it("should succeed and consume no input", () => {
+  it("should succeed and consume no input", function* () {
     const result = { an: "arbitrary", obj: 1 };
-    const output = P.ok(result)(inputstream);
+    const output = yield* P.ok(result)(inputstream);
     expect(output.inputstream).to.equal(inputstream);
     switch (output.tag) {
       case "failure":
@@ -130,14 +130,14 @@ describe("OK parser", () => {
 });
 
 describe("Expect parser", () => {
-  it("should create a critical failure with the correct error message and at the correct position", () => {
+  it("should create a critical failure with the correct error message and at the correct position", function* () {
     let error_msg = "Expected )";
     let inputstream = new CU.CharStream("   (   ");
     let openParen = P.right(P.ws)(P.char("("));
     let closeParen = P.right(P.ws)(P.char(")"));
     let expectCloseParen = P.expect(closeParen)(error_msg);
     let parenParser = P.right(openParen)(expectCloseParen);
-    let outcome = parenParser(inputstream);
+    let outcome = yield* parenParser(inputstream);
 
     switch (outcome.tag) {
       case "failure":
@@ -156,13 +156,13 @@ describe("Expect parser", () => {
     }
   });
 
-  it("should not create a failure if the parser succeeds", () => {
+  it("should not create a failure if the parser succeeds", function* () {
     let inputstream = new CU.CharStream("   (  ) ");
     let openParen = P.right(P.ws)(P.char("("));
     let closeParen = P.right(P.ws)(P.char(")"));
     let expectCloseParen = P.expect(closeParen)("Expected )");
     let parenParser = P.right(openParen)(expectCloseParen);
-    let outcome = parenParser(inputstream);
+    let outcome = yield* parenParser(inputstream);
 
     switch (outcome.tag) {
       case "success":
@@ -175,14 +175,14 @@ describe("Expect parser", () => {
 });
 
 describe("Item parser", () => {
-  it("should successfully consume input when there is input to consume", () => {
-    const output = P.item(inputstream);
+  it("should successfully consume input when there is input to consume", function* () {
+    const output = yield* P.item(inputstream);
     expect(output.inputstream.toString()).to.equal("elloworld");
   });
 
-  it("should fail to consume input when there is no input to consume", () => {
+  it("should fail to consume input when there is no input to consume", function* () {
     const empty = new CU.CharStream("");
-    const output = P.item(empty);
+    const output = yield P.item(empty);
     expect(output.inputstream.toString()).to.equal("");
     switch (output.tag) {
       case "success":
@@ -196,8 +196,8 @@ describe("Item parser", () => {
 });
 
 describe("Sat parser", () => {
-  it("should successfully consume input that matches a predicate", () => {
-    const output = P.sat((ch) => ch === "h")(inputstream);
+  it("should successfully consume input that matches a predicate", function* () {
+    const output = yield* P.sat((ch) => ch === "h")(inputstream);
     expect(output.inputstream.toString()).to.equal("elloworld");
     switch (output.tag) {
       case "success":
@@ -211,8 +211,8 @@ describe("Sat parser", () => {
 });
 
 describe("SatClass parser", () => {
-  it("should successfully consume input that matches a char class", () => {
-    const output = P.satClass(["h"])(inputstream);
+  it("should successfully consume input that matches a char class", function* () {
+    const output = yield* P.satClass(["h"])(inputstream);
     expect(output.inputstream.toString()).to.equal("elloworld");
     switch (output.tag) {
       case "success":
@@ -226,8 +226,8 @@ describe("SatClass parser", () => {
 });
 
 describe("Seq parser", () => {
-  it("should successfully apply two parsers in a row", () => {
-    const output = P.seq<CU.CharStream, CU.CharStream>(P.item)(P.item)(
+  it("should successfully apply two parsers in a row", function* () {
+    const output = yield* P.seq<CU.CharStream, CU.CharStream>(P.item)(P.item)(
       inputstream
     );
     const expected = ["h", "e"];
@@ -244,8 +244,8 @@ describe("Seq parser", () => {
 });
 
 describe("Char parser", () => {
-  it("should successfully consume the given character if it is next in the stream", () => {
-    const output = P.char("h")(inputstream);
+  it("should successfully consume the given character if it is next in the stream", function* () {
+    const output = yield* P.char("h")(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("h");
@@ -256,8 +256,8 @@ describe("Char parser", () => {
     }
   });
 
-  it("should fail if the given character is not the next in the stream", () => {
-    const output = P.char("e")(inputstream);
+  it("should fail if the given character is not the next in the stream", function* () {
+    const output = yield* P.char("e")(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -270,8 +270,8 @@ describe("Char parser", () => {
 });
 
 describe("Letter parser", () => {
-  it("should successfully consume an alphabetic letter", () => {
-    const output = P.letter(inputstream);
+  it("should successfully consume an alphabetic letter", function* () {
+    const output = yield* P.letter(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("h");
@@ -282,9 +282,9 @@ describe("Letter parser", () => {
     }
   });
 
-  it("should fail to consume a non-alphabetic letter", () => {
+  it("should fail to consume a non-alphabetic letter", function* () {
     const inputstream2 = new CU.CharStream("!helloworld");
-    const output = P.letter(inputstream2);
+    const output = yield* P.letter(inputstream2);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -295,9 +295,9 @@ describe("Letter parser", () => {
     }
   });
 
-  it("should only consume a single alphabetic letter", () => {
+  it("should only consume a single alphabetic letter", function* () {
     const inputstream2 = new CU.CharStream("hey");
-    const output = P.letter(inputstream2);
+    const output = yield* P.letter(inputstream2);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("h");
@@ -310,9 +310,9 @@ describe("Letter parser", () => {
 });
 
 describe("Digit parser", () => {
-  it("should successfully consume a numeric digit if the next character in the stream is a numeric character", () => {
+  it("should successfully consume a numeric digit if the next character in the stream is a numeric character", function* () {
     const inputstream2 = new CU.CharStream("0helloworld");
-    const output = P.digit(inputstream2);
+    const output = yield* P.digit(inputstream2);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("0");
@@ -323,8 +323,8 @@ describe("Digit parser", () => {
     }
   });
 
-  it("should fail if the next character in the stream is not a numeric character", () => {
-    const output = P.digit(inputstream);
+  it("should fail if the next character in the stream is not a numeric character", function* () {
+    const output = yield* P.digit(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -337,9 +337,9 @@ describe("Digit parser", () => {
 });
 
 describe("Integer parser", () => {
-  it("should successfully consume a multi-digit number at the start of the input", () => {
+  it("should successfully consume a multi-digit number at the start of the input", function* () {
     const istr = new CU.CharStream("123helloworld");
-    const output = P.integer(istr);
+    const output = yield* P.integer(istr);
     switch (output.tag) {
       case "success":
         expect(output.result).to.equal(123);
@@ -349,9 +349,9 @@ describe("Integer parser", () => {
     }
   });
 
-  it("should fail if the input does not begin with a number", () => {
+  it("should fail if the input does not begin with a number", function* () {
     const istr = new CU.CharStream("h123elloworld");
-    const output = P.integer(istr);
+    const output = yield* P.integer(istr);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -362,9 +362,9 @@ describe("Integer parser", () => {
 });
 
 describe("Floating-point parser", () => {
-  it("should successfully consume a multi-digit float at the start of the input", () => {
+  it("should successfully consume a multi-digit float at the start of the input", function* () {
     const istr = new CU.CharStream("123.3helloworld");
-    const output = P.float(istr);
+    const output = yield* P.float(istr);
     switch (output.tag) {
       case "success":
         expect(output.result).to.equal(123.3);
@@ -374,9 +374,9 @@ describe("Floating-point parser", () => {
     }
   });
 
-  it("should fail if the input does not begin with a number", () => {
+  it("should fail if the input does not begin with a number", function* () {
     const istr = new CU.CharStream("h123.0elloworld");
-    const output = P.float(istr);
+    const output = yield* P.float(istr);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -385,9 +385,9 @@ describe("Floating-point parser", () => {
     }
   });
 
-  it("should successfully consume a float without a fraction", () => {
+  it("should successfully consume a float without a fraction", function* () {
     const istr = new CU.CharStream("123");
-    const output = P.float(istr);
+    const output = yield* P.float(istr);
     switch (output.tag) {
       case "success":
         expect(output.result).to.equal(123);
@@ -399,9 +399,9 @@ describe("Floating-point parser", () => {
 });
 
 describe("Upper parser", () => {
-  it("should successfully consume an uppercase character if the next char in the stream is uppercase", () => {
+  it("should successfully consume an uppercase character if the next char in the stream is uppercase", function* () {
     const inputstream2 = new CU.CharStream("Helloworld");
-    const output = P.upper(inputstream2);
+    const output = yield* P.upper(inputstream2);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("H");
@@ -412,9 +412,9 @@ describe("Upper parser", () => {
     }
   });
 
-  it("should fail if the next character in the stream is not uppercase", () => {
+  it("should fail if the next character in the stream is not uppercase", function* () {
     const inputstream2 = new CU.CharStream("hElloworld");
-    const output = P.upper(inputstream2);
+    const output = yield* P.upper(inputstream2);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -425,9 +425,9 @@ describe("Upper parser", () => {
     }
   });
 
-  it("should fail if the next character in the stream is not a letter", () => {
+  it("should fail if the next character in the stream is not a letter", function* () {
     const inputstream2 = new CU.CharStream("#helloworld");
-    const output = P.upper(inputstream2);
+    const output = yield* P.upper(inputstream2);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -440,8 +440,8 @@ describe("Upper parser", () => {
 });
 
 describe("Lower parser", () => {
-  it("should successfully consume a lower character if the next char in the stream is lowercase", () => {
-    const output = P.lower(inputstream);
+  it("should successfully consume a lower character if the next char in the stream is lowercase", function* () {
+    const output = yield* P.lower(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("h");
@@ -452,9 +452,9 @@ describe("Lower parser", () => {
     }
   });
 
-  it("should fail if the next character in the stream is not lowercase", () => {
+  it("should fail if the next character in the stream is not lowercase", function* () {
     const inputstream2 = new CU.CharStream("#helloworld");
-    const output = P.lower(inputstream2);
+    const output = yield* P.lower(inputstream2);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -465,9 +465,9 @@ describe("Lower parser", () => {
     }
   });
 
-  it("should fail if the next character in the stream is not a letter", () => {
+  it("should fail if the next character in the stream is not a letter", function* () {
     const inputstream2 = new CU.CharStream("#helloworld");
-    const output = P.lower(inputstream2);
+    const output = yield* P.lower(inputstream2);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -480,8 +480,8 @@ describe("Lower parser", () => {
 });
 
 describe("Choice parser", () => {
-  it("should allow parsing alternatives", () => {
-    const outcome = P.choice(P.upper)(P.lower)(inputstream);
+  it("should allow parsing alternatives", function* () {
+    const outcome = yield* P.choice(P.upper)(P.lower)(inputstream);
     switch (outcome.tag) {
       case "success":
         expect(outcome.result.toString()).to.equal("h");
@@ -492,9 +492,9 @@ describe("Choice parser", () => {
     }
   });
 
-  it("should fail if no alternatives can be applied", () => {
+  it("should fail if no alternatives can be applied", function* () {
     const inputstream2 = new CU.CharStream("4helloworld");
-    const outcome = P.choice(P.upper)(P.lower)(inputstream2);
+    const outcome = yield* P.choice(P.upper)(P.lower)(inputstream2);
     switch (outcome.tag) {
       case "success":
         assert.fail();
@@ -505,10 +505,10 @@ describe("Choice parser", () => {
     }
   });
 
-  it("should fail on the first choice if there is a critical failure", () => {
+  it("should fail on the first choice if there is a critical failure", function* () {
     const p1 = P.expect(P.strSat(["Hello"]))("Expected Hello");
     const p2 = P.strSat(["hello"]);
-    const outcome = P.choice(p1)(p2)(inputstream);
+    const outcome = yield* P.choice(p1)(p2)(inputstream);
     switch (outcome.tag) {
       case "success":
         assert.fail();
@@ -521,12 +521,12 @@ describe("Choice parser", () => {
 });
 
 describe("Choices parser", () => {
-  it("should allow parsing multiple options", () => {
+  it("should allow parsing multiple options", function* () {
     const p1 = P.char("a");
     const p2 = P.char("b");
     const p3 = P.char("h");
     const p4 = P.char("w");
-    const outcome = P.choices(p1, p2, p3, p4)(inputstream);
+    const outcome = yield* P.choices(p1, p2, p3, p4)(inputstream);
     switch (outcome.tag) {
       case "success":
         expect(outcome.result.toString()).to.equal("h");
@@ -537,12 +537,12 @@ describe("Choices parser", () => {
     }
   });
 
-  it("should fail if no alternatives can be applied", () => {
+  it("should fail if no alternatives can be applied", function* () {
     const p1 = P.char("a");
     const p2 = P.char("b");
     const p3 = P.char("c");
     const p4 = P.char("d");
-    const outcome = P.choices(p1, p2, p3, p4)(inputstream);
+    const outcome = yield* P.choices(p1, p2, p3, p4)(inputstream);
     switch (outcome.tag) {
       case "success":
         assert.fail();
@@ -553,12 +553,12 @@ describe("Choices parser", () => {
     }
   });
 
-  it("should fail on the first critical failure", () => {
+  it("should fail on the first critical failure", function* () {
     const p1 = P.char("a");
     const p2 = P.char("b");
     const p3 = P.expect(P.char("c"))("Expected c");
     const p4 = P.char("d");
-    const outcome = P.choices(p1, p2, p3, p4)(inputstream);
+    const outcome = yield* P.choices(p1, p2, p3, p4)(inputstream);
     switch (outcome.tag) {
       case "success":
         assert.fail();
@@ -570,8 +570,8 @@ describe("Choices parser", () => {
 });
 
 describe("Prefix parser", () => {
-  it("should allow parsing alternatives that share a prefix (case 1)", () => {
-    const outcome = P.prefix(P.str("hello"))(P.str("bacon"))((p, s) =>
+  it("should allow parsing alternatives that share a prefix (case 1)", function* () {
+    const outcome = yield* P.prefix(P.str("hello"))(P.str("bacon"))((p, s) =>
       assert.fail()
     )(inputstream);
     switch (outcome.tag) {
@@ -583,11 +583,13 @@ describe("Prefix parser", () => {
     }
   });
 
-  it("should allow parsing alternatives that share a prefix (case 2)", () => {
+  it("should allow parsing alternatives that share a prefix (case 2)", function* () {
     const input = new CU.CharStream("hellobacon");
-    const outcome = P.prefix<CU.CharStream, CU.CharStream>(P.str("hello"))(
-      P.str("bacon")
-    )((p, s) => new CU.CharStream(p.toString() + s.toString()))(input);
+    const outcome = yield* P.prefix<CU.CharStream, CU.CharStream>(
+      P.str("hello")
+    )(P.str("bacon"))((p, s) => new CU.CharStream(p.toString() + s.toString()))(
+      input
+    );
     switch (outcome.tag) {
       case "success":
         expect(outcome.result.toString()).to.equal("hellobacon");
@@ -597,15 +599,15 @@ describe("Prefix parser", () => {
     }
   });
 
-  it("should only ever run the first parser once (case 1)", () => {
+  it("should only ever run the first parser once (case 1)", function* () {
     let i = 0;
     const first = P.pipe<CU.CharStream, CU.CharStream>(P.str("hello"))((r) => {
       i++;
       return r;
     });
-    const outcome = P.prefix(first)(P.str("bacon"))((p, s) => assert.fail())(
-      inputstream
-    );
+    const outcome = yield* P.prefix(first)(P.str("bacon"))((p, s) =>
+      assert.fail()
+    )(inputstream);
     switch (outcome.tag) {
       case "success":
         expect(outcome.result.toString()).to.equal("hello");
@@ -616,14 +618,14 @@ describe("Prefix parser", () => {
     }
   });
 
-  it("should only ever run the first parser once (case 2)", () => {
+  it("should only ever run the first parser once (case 2)", function* () {
     let i = 0;
     const first = P.pipe<CU.CharStream, CU.CharStream>(P.str("hello"))((r) => {
       i++;
       return r;
     });
     const input = new CU.CharStream("hellobacon");
-    const outcome = P.prefix<CU.CharStream, CU.CharStream>(first)(
+    const outcome = yield* P.prefix<CU.CharStream, CU.CharStream>(first)(
       P.str("bacon")
     )((p, s) => new CU.CharStream(p.toString() + s.toString()))(input);
     switch (outcome.tag) {
@@ -638,8 +640,8 @@ describe("Prefix parser", () => {
 });
 
 describe("Appfun parser", () => {
-  it("should apply a function to the result of a successful parse", () => {
-    const output = P.appfun(P.item)((s) => "whatever!")(inputstream);
+  it("should apply a function to the result of a successful parse", function* () {
+    const output = yield* P.appfun(P.item)((s) => "whatever!")(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result).to.equal("whatever!");
@@ -649,9 +651,9 @@ describe("Appfun parser", () => {
     }
   });
 
-  it("should fail if p fails", () => {
+  it("should fail if p fails", function* () {
     const empty = new CU.CharStream("");
-    const output = P.appfun(P.item)((s) => "whatever!")(empty);
+    const output = yield* P.appfun(P.item)((s) => "whatever!")(empty);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -672,11 +674,11 @@ describe("pipe2 parser", () => {
     assert(true);
   });
 
-  it("should apply a function to the result of two successful parses in sequence", () => {
+  it("should apply a function to the result of two successful parses in sequence", function* () {
     const i = new CU.CharStream("ok");
     const f = (a: CU.CharStream, b: CU.CharStream) =>
       a.toString() + b.toString();
-    const output = P.pipe2<CU.CharStream, CU.CharStream, string>(P.item)(
+    const output = yield* P.pipe2<CU.CharStream, CU.CharStream, string>(P.item)(
       P.item
     )(f)(i);
     switch (output.tag) {
@@ -688,11 +690,11 @@ describe("pipe2 parser", () => {
     }
   });
 
-  it("should fail if any of the parses fail", () => {
+  it("should fail if any of the parses fail", function* () {
     const i = new CU.CharStream("o");
     const f = (a: CU.CharStream, b: CU.CharStream) =>
       a.toString() + b.toString();
-    const output = P.pipe2<CU.CharStream, CU.CharStream, string>(P.item)(
+    const output = yield* P.pipe2<CU.CharStream, CU.CharStream, string>(P.item)(
       P.item
     )(f)(i);
     switch (output.tag) {
@@ -705,13 +707,16 @@ describe("pipe2 parser", () => {
 });
 
 describe("pipe3 parser", () => {
-  it("should apply a function to the result of three successful parses in sequence", () => {
+  it("should apply a function to the result of three successful parses in sequence", function* () {
     const i = new CU.CharStream("foo");
     const f = (a: CU.CharStream, b: CU.CharStream, c: CU.CharStream) =>
       a.toString() + b.toString() + c.toString();
-    const output = P.pipe3<CU.CharStream, CU.CharStream, CU.CharStream, string>(
-      P.item
-    )(P.item)(P.item)(f)(i);
+    const output = yield* P.pipe3<
+      CU.CharStream,
+      CU.CharStream,
+      CU.CharStream,
+      string
+    >(P.item)(P.item)(P.item)(f)(i);
     switch (output.tag) {
       case "success":
         expect(output.result).to.equal("foo");
@@ -721,13 +726,16 @@ describe("pipe3 parser", () => {
     }
   });
 
-  it("should fail if any of the parses fail", () => {
+  it("should fail if any of the parses fail", function* () {
     const i = new CU.CharStream("oo");
     const f = (a: CU.CharStream, b: CU.CharStream, c: CU.CharStream) =>
       a.toString() + b.toString() + c.toString();
-    const output = P.pipe3<CU.CharStream, CU.CharStream, CU.CharStream, string>(
-      P.item
-    )(P.item)(P.item)(f)(i);
+    const output = yield* P.pipe3<
+      CU.CharStream,
+      CU.CharStream,
+      CU.CharStream,
+      string
+    >(P.item)(P.item)(P.item)(f)(i);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -738,8 +746,8 @@ describe("pipe3 parser", () => {
 });
 
 describe("Many parser", () => {
-  it("should apply the given parser until the end of the input", () => {
-    const output = P.many(P.item)(inputstream);
+  it("should apply the given parser until the end of the input", function* () {
+    const output = yield* P.many(P.item)(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("h,e,l,l,o,w,o,r,l,d");
@@ -750,9 +758,9 @@ describe("Many parser", () => {
     }
   });
 
-  it("including zero times", () => {
+  it("including zero times", function* () {
     const empty = new CU.CharStream("");
-    const output = P.many(P.item)(empty);
+    const output = yield* P.many(P.item)(empty);
     switch (output.tag) {
       case "success":
         expect(output.result).to.eql([]);
@@ -763,10 +771,10 @@ describe("Many parser", () => {
     }
   });
 
-  it("should apply the given parser until it fails", () => {
+  it("should apply the given parser until it fails", function* () {
     const tstring = "54hello";
     const inputstream2 = new CU.CharStream(tstring);
-    const output = P.many(P.digit)(inputstream2);
+    const output = yield* P.many(P.digit)(inputstream2);
     switch (output.tag) {
       case "success":
         let s = "";
@@ -780,9 +788,9 @@ describe("Many parser", () => {
 });
 
 describe("Str parser", () => {
-  it("should match a string and leave remainder in inputstream", () => {
+  it("should match a string and leave remainder in inputstream", function* () {
     const p = P.str("hello");
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("hello");
@@ -794,9 +802,9 @@ describe("Str parser", () => {
     }
   });
 
-  it("should fail if string is not in input stream", () => {
+  it("should fail if string is not in input stream", function* () {
     const inputstream2 = new CU.CharStream("worldhello");
-    const output = P.str("hello")(inputstream2);
+    const output = yield* P.str("hello")(inputstream2);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -809,11 +817,11 @@ describe("Str parser", () => {
 });
 
 describe("EOF parser", () => {
-  it("should succeed at the end of the input", () => {
+  it("should succeed at the end of the input", function* () {
     const p = P.pipe2<CU.CharStream, P.EOFMark, CU.CharStream>(
       P.str("helloworld")
     )(P.eof)((a, b) => a);
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("helloworld");
@@ -825,9 +833,9 @@ describe("EOF parser", () => {
     }
   });
 
-  it("should fail when not at the end of the input", () => {
+  it("should fail when not at the end of the input", function* () {
     const p = P.seq(P.str("hello"))(P.eof);
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -839,9 +847,9 @@ describe("EOF parser", () => {
 });
 
 describe("FResult parser", () => {
-  it("should return the given value if the given parser succeeds", () => {
+  it("should return the given value if the given parser succeeds", function* () {
     const p = P.fresult(P.str("hello"))(1);
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result).to.equal(1);
@@ -852,9 +860,9 @@ describe("FResult parser", () => {
     }
   });
 
-  it("should fail if the parser fails", () => {
+  it("should fail if the parser fails", function* () {
     const p = P.fresult(P.str("ello"))(1);
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -867,9 +875,9 @@ describe("FResult parser", () => {
 });
 
 describe("Left parser", () => {
-  it("should apply p and q in sequence and return the result of q on success", () => {
+  it("should apply p and q in sequence and return the result of q on success", function* () {
     const p = P.left(P.str("hello"))(P.str("world"));
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("hello");
@@ -880,9 +888,9 @@ describe("Left parser", () => {
     }
   });
 
-  it("should fail if p fails", () => {
+  it("should fail if p fails", function* () {
     const p = P.left(P.str("z"))(P.str("world"));
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -893,9 +901,9 @@ describe("Left parser", () => {
     }
   });
 
-  it("should fail if q fails", () => {
+  it("should fail if q fails", function* () {
     const p = P.left(P.str("hello"))(P.str("z"));
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -908,11 +916,11 @@ describe("Left parser", () => {
 });
 
 describe("Right parser", () => {
-  it("should apply p and q in sequence and return the result of q on success", () => {
+  it("should apply p and q in sequence and return the result of q on success", function* () {
     const p = P.right<CU.CharStream, CU.CharStream>(P.str("hello"))(
       P.str("world")
     );
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("world");
@@ -923,9 +931,9 @@ describe("Right parser", () => {
     }
   });
 
-  it("should fail if p fails", () => {
+  it("should fail if p fails", function* () {
     const p = P.right<CU.CharStream, CU.CharStream>(P.str("z"))(P.str("world"));
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -936,9 +944,9 @@ describe("Right parser", () => {
     }
   });
 
-  it("should fail if q fails", () => {
+  it("should fail if q fails", function* () {
     const p = P.right(P.str("hello"))(P.str("z"));
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -953,11 +961,11 @@ describe("Right parser", () => {
 describe("Between parser", () => {
   const input = new CU.CharStream("foo(bar)");
 
-  it("should apply popen, p, and pclose in sequence and return the result of p on success", () => {
+  it("should apply popen, p, and pclose in sequence and return the result of p on success", function* () {
     const p = P.between<CU.CharStream, CU.CharStream, CU.CharStream>(
       P.str("foo(")
     )(P.char(")"))(P.str("bar"));
-    const output = p(input);
+    const output = yield* p(input);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("bar");
@@ -968,9 +976,9 @@ describe("Between parser", () => {
     }
   });
 
-  it("should fail if popen fails", () => {
+  it("should fail if popen fails", function* () {
     const p = P.between(P.str("zoo("))(P.str("bar"))(P.char(")"));
-    const output = p(input);
+    const output = yield* p(input);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -981,9 +989,9 @@ describe("Between parser", () => {
     }
   });
 
-  it("should fail if pclose fails", () => {
+  it("should fail if pclose fails", function* () {
     const p = P.between(P.str("foo("))(P.str("bar"))(P.char("-"));
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -994,9 +1002,9 @@ describe("Between parser", () => {
     }
   });
 
-  it("should fail if p fails", () => {
+  it("should fail if p fails", function* () {
     const p = P.between(P.str("foo("))(P.str("huh"))(P.char(")"));
-    const output = p(inputstream);
+    const output = yield* p(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -1009,10 +1017,10 @@ describe("Between parser", () => {
 });
 
 describe("many1 parser", () => {
-  it("should succeed if p succeeds at least once", () => {
+  it("should succeed if p succeeds at least once", function* () {
     const i = new CU.CharStream("hhhelloworld");
     const p = P.many1(P.char("h"));
-    const output = p(i);
+    const output = yield* p(i);
     switch (output.tag) {
       case "success":
         expect(CU.CharStream.concat(output.result).toString()).to.equal("hhh");
@@ -1023,10 +1031,10 @@ describe("many1 parser", () => {
     }
   });
 
-  it("should fail if p does not succeed at least once", () => {
+  it("should fail if p does not succeed at least once", function* () {
     const i = new CU.CharStream("elloworld");
     const p = P.many1(P.char("h"));
-    const output = p(i);
+    const output = yield* p(i);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -1039,9 +1047,9 @@ describe("many1 parser", () => {
 });
 
 describe("ws parser", () => {
-  it("should successfully consume whitespace", () => {
+  it("should successfully consume whitespace", function* () {
     const i = new CU.CharStream(" \t  \n\t \r\nhelloworld");
-    const output = P.ws(i);
+    const output = yield* P.ws(i);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal(" \t  \n\t \r\n");
@@ -1053,8 +1061,8 @@ describe("ws parser", () => {
     }
   });
 
-  it("should succeed even if the string has no whitespace", () => {
-    const output = P.ws(inputstream);
+  it("should succeed even if the string has no whitespace", function* () {
+    const output = yield* P.ws(inputstream);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("");
@@ -1068,9 +1076,9 @@ describe("ws parser", () => {
 });
 
 describe("ws1 parser", () => {
-  it("should successfully consume whitespace", () => {
+  it("should successfully consume whitespace", function* () {
     const i = new CU.CharStream(" \t  \n\t \r\nhelloworld");
-    const output = P.ws1(i);
+    const output = yield* P.ws1(i);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal(" \t  \n\t \r\n");
@@ -1082,8 +1090,8 @@ describe("ws1 parser", () => {
     }
   });
 
-  it("should fail if the string has no whitespace", () => {
-    const output = P.ws1(inputstream);
+  it("should fail if the string has no whitespace", function* () {
+    const output = yield* P.ws1(inputstream);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -1096,9 +1104,9 @@ describe("ws1 parser", () => {
 });
 
 describe("nl parser", () => {
-  it("should successfully match a UNIX newline", () => {
+  it("should successfully match a UNIX newline", function* () {
     const i = new CU.CharStream("\n");
-    const output = P.nl(i);
+    const output = yield* P.nl(i);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("\n");
@@ -1109,9 +1117,9 @@ describe("nl parser", () => {
     }
   });
 
-  it("should successfully match a Windows newline", () => {
+  it("should successfully match a Windows newline", function* () {
     const i = new CU.CharStream("\r\n");
-    const output = P.nl(i);
+    const output = yield* P.nl(i);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("\r\n");
@@ -1122,9 +1130,9 @@ describe("nl parser", () => {
     }
   });
 
-  it("should not match other whitespace", () => {
+  it("should not match other whitespace", function* () {
     const i = new CU.CharStream(" ");
-    const output = P.nl(i);
+    const output = yield* P.nl(i);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -1134,9 +1142,9 @@ describe("nl parser", () => {
     }
   });
 
-  it("should not match the empty string", () => {
+  it("should not match the empty string", function* () {
     const i = new CU.CharStream("");
-    const output = P.nl(i);
+    const output = yield* P.nl(i);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -1148,7 +1156,7 @@ describe("nl parser", () => {
 });
 
 describe("strSat parser", () => {
-  it("should match the shortest, lexicographically first string in the given set that occurs in the input", () => {
+  it("should match the shortest, lexicographically first string in the given set that occurs in the input", function* () {
     const i = new CU.CharStream("the quick brown fox jumps over the lazy dog");
     const strs = [
       "the",
@@ -1160,7 +1168,7 @@ describe("strSat parser", () => {
       "lazy",
       "dog",
     ];
-    const output = P.strSat(strs)(i);
+    const output = yield* P.strSat(strs)(i);
     switch (output.tag) {
       case "success":
         expect(output.result.toString()).to.equal("the");
@@ -1174,7 +1182,7 @@ describe("strSat parser", () => {
     }
   });
 
-  it("should fail if there are no matches", () => {
+  it("should fail if there are no matches", function* () {
     const i = new CU.CharStream("hello world");
     const strs = [
       "the",
@@ -1186,7 +1194,7 @@ describe("strSat parser", () => {
       "lazy",
       "dog",
     ];
-    const output = P.strSat(strs)(i);
+    const output = yield* P.strSat(strs)(i);
     switch (output.tag) {
       case "success":
         assert.fail();
@@ -1199,9 +1207,9 @@ describe("strSat parser", () => {
 });
 
 describe("matchWhile", () => {
-  it("should match until a predicate returns false", () => {
+  it("should match until a predicate returns false", function* () {
     const input = new CU.CharStream("helloFunction3(");
-    const output = P.matchWhile(
+    const output = yield* P.matchWhile(
       (ch) =>
         (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) ||
         (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) ||
@@ -1216,9 +1224,9 @@ describe("matchWhile", () => {
     }
   });
 
-  it("shouldn't consume any input from a string that doesn't match", () => {
+  it("shouldn't consume any input from a string that doesn't match", function* () {
     const input = new CU.CharStream("!@&^%#*(");
-    const output = P.matchWhile(
+    const output = yield* P.matchWhile(
       (ch) =>
         (ch.charCodeAt(0) > 48 && ch.charCodeAt(0) < 58) ||
         (ch.charCodeAt(0) > 65 && ch.charCodeAt(0) < 91) ||
@@ -1234,9 +1242,9 @@ describe("matchWhile", () => {
 });
 
 describe("matchWhileCharCode", () => {
-  it("should match until a predicate returns false", () => {
+  it("should match until a predicate returns false", function* () {
     const input = new CU.CharStream("helloFunction3(");
-    const output = P.matchWhileCharCode(
+    const output = yield* P.matchWhileCharCode(
       (n) => (n > 48 && n < 58) || (n > 65 && n < 91) || (n > 97 && n < 123)
     )(input);
     const expectedMatch = new CU.CharStream("helloFunction3(", 0, 14, false);
@@ -1251,9 +1259,9 @@ describe("matchWhileCharCode", () => {
     }
   });
 
-  it("shouldn't consume any input from a string that doesn't match", () => {
+  it("shouldn't consume any input from a string that doesn't match", function* () {
     const input = new CU.CharStream("!@&^%#*(");
-    const output = P.matchWhileCharCode(
+    const output = yield* P.matchWhileCharCode(
       (n) => (n > 48 && n < 58) || (n > 65 && n < 91) || (n > 97 && n < 123)
     )(input);
     switch (output.tag) {

@@ -3,6 +3,8 @@ import { Primitives as P } from "../src/primitives";
 import { assert, expect } from "chai";
 import "mocha";
 
+require("mocha-generators").install(); // needed to ensure generator tests are actually run
+
 const inputstream = new CU.CharStream("helloworld");
 
 describe("Failure object", () => {

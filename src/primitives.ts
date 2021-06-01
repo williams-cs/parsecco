@@ -71,7 +71,7 @@ export namespace Primitives {
    * Generic type of a parser.
    */
   export interface IParser<T> {
-    (inputstream: CharStream): Outcome<T>;
+    (inputstream: CharStream): Generator<any, Outcome<T>, undefined>;
   }
 
   /**
@@ -79,7 +79,7 @@ export namespace Primitives {
    * @param v The result of the parse.
    */
   export function result<T>(v: T): IParser<T> {
-    return (istream) => {
+    return function* (istream: CharStream) {
       return new Success<T>(istream, v);
     };
   }
@@ -129,11 +129,10 @@ export namespace Primitives {
     (arg: A) => IParser<T>,
     Arg1RefCell<A, T>
   ] {
-    const dumbParser: (arg: A) => IParser<T> = (arg: A) => (
-      input: CharStream
-    ) => {
-      throw new Error("You forgot to initialize your recursive parser.");
-    };
+    const dumbParser: (arg: A) => IParser<T> =
+      (arg: A) => (input: CharStream) => {
+        throw new Error("You forgot to initialize your recursive parser.");
+      };
     const r = { contents: dumbParser };
     const p: (arg: A) => IParser<T> = (arg: A) => (input: CharStream) =>
       r.contents(arg)(input);
@@ -145,7 +144,7 @@ export namespace Primitives {
    * @param msg the error message.
    */
   export function zero<T>(msg: string): IParser<T> {
-    return (istream) => {
+    return function* (istream: CharStream) {
       return new Failure(istream, istream.startpos, msg);
     };
   }
@@ -159,14 +158,16 @@ export namespace Primitives {
    * @returns
    */
   export function fail<T>(p: IParser<T>) {
-    return (msg: string) => (istream: CharStream) => {
-      const o = p(istream);
-      switch (o.tag) {
-        case "success":
-          return new Failure(istream, istream.startpos, msg, true);
-        case "failure":
-          return new Success(istream, undefined);
-      }
+    return function (msg: string) {
+      return function* (istream: CharStream) {
+        const o = yield* p(istream);
+        switch (o.tag) {
+          case "success":
+            return new Failure(istream, istream.startpos, msg, true);
+          case "failure":
+            return new Success(istream, undefined);
+        }
+      };
     };
   }
 
@@ -176,7 +177,9 @@ export namespace Primitives {
    * @param res A result object.
    */
   export function ok<T>(res: T): IParser<T> {
-    return (istream) => new Success(istream, res);
+    return function* (istream) {
+      return new Success(istream, res);
+    };
   }
 
   /**
@@ -190,9 +193,9 @@ export namespace Primitives {
    * @param error_msg The error message if the parser fails
    */
   export function expect<T>(parser: IParser<T>) {
-    return (error_msg: string) => {
-      return (istream: CharStream) => {
-        const outcome: Outcome<T> = parser(istream);
+    return function (error_msg: string) {
+      return function* (istream: CharStream) {
+        const outcome: Outcome<T> = yield* parser(istream);
         switch (outcome.tag) {
           case "success":
             return outcome;
@@ -209,7 +212,7 @@ export namespace Primitives {
    * item successfully consumes the first character if the input
    * string is non-empty, otherwise it fails.
    */
-  export const item: IParser<CharStream> = (istream: CharStream) => {
+  export const item: IParser<CharStream> = function* (istream: CharStream) {
     if (istream.isEmpty()) {
       return new Failure(istream, istream.startpos);
     } else {
@@ -227,12 +230,12 @@ export namespace Primitives {
    * @param p A parser
    */
   export function bind<T, U>(p: IParser<T>) {
-    return (f: (t: T) => IParser<U>) => {
-      return (istream: CharStream) => {
-        const r = p(istream);
+    return function (f: (t: T) => IParser<U>) {
+      return function* (istream: CharStream) {
+        const r = yield* p(istream);
         switch (r.tag) {
           case "success":
-            const o = f(r.result)(r.inputstream);
+            const o = yield* f(r.result)(r.inputstream);
             switch (o.tag) {
               case "success":
                 break;
@@ -283,13 +286,15 @@ export namespace Primitives {
    * otherwise it fails.
    */
   export function sat(p: (ch: string) => boolean): IParser<CharStream> {
-    const f = (x: CharStream) => {
+    const f = function (x: CharStream) {
       const char = x.toString();
       if (char.length !== 1)
         throw new Error("Input to predicate must be a character.");
       return p(char)
         ? result(x)
-        : (istream: CharStream) => new Failure(istream, istream.startpos - 1);
+        : function* (istream: CharStream) {
+            return new Failure(istream, istream.startpos - 1);
+          };
     };
     return bind<CharStream, CharStream>(item)(f);
   }
@@ -303,7 +308,9 @@ export namespace Primitives {
     const f = (x: CharStream) => {
       return char_class.indexOf(x.toString()) > -1
         ? result(x)
-        : (istream: CharStream) => new Failure(istream, istream.startpos - 1);
+        : function* (istream: CharStream) {
+            return new Failure(istream, istream.startpos - 1);
+          };
     };
     return bind<CharStream, CharStream>(item)(f);
   }
@@ -397,8 +404,8 @@ export namespace Primitives {
    */
   export function choice<T>(p1: IParser<T>): (p2: IParser<T>) => IParser<T> {
     return (p2: IParser<T>) => {
-      return (istream: CharStream) => {
-        const o = p1(istream);
+      return function* (istream: CharStream) {
+        const o = yield* p1(istream);
         switch (o.tag) {
           case "success":
             return o;
@@ -406,7 +413,7 @@ export namespace Primitives {
             if (o.is_critical) {
               return o;
             }
-            const o2 = p2(istream);
+            const o2 = yield* p2(istream);
             switch (o2.tag) {
               case "success":
                 break;
@@ -431,10 +438,10 @@ export namespace Primitives {
     if (parsers.length == 0) {
       throw new Error("Error: choices must have a non-empty array.");
     }
-    return (istream: CharStream) => {
+    return function* (istream: CharStream) {
       let i = 0;
       while (true && i < parsers.length) {
-        const o = parsers[i](istream);
+        const o = yield* parsers[i](istream);
         if (o.tag === "success") {
           return o;
         } else if (o.is_critical) {
@@ -459,11 +466,11 @@ export namespace Primitives {
   export function prefix<T, U>(pre: IParser<T>) {
     return (p: IParser<U>) => {
       return (f: (t: T, u: U) => T) => {
-        return (istream: CharStream) => {
-          const output1 = pre(istream);
+        return function* (istream: CharStream) {
+          const output1 = yield* pre(istream);
           switch (output1.tag) {
             case "success":
-              const output2 = p(output1.inputstream);
+              const output2 = yield* p(output1.inputstream);
               switch (output2.tag) {
                 case "success":
                   return new Success(
@@ -490,8 +497,8 @@ export namespace Primitives {
    */
   export function appfun<T, U>(p: IParser<T>) {
     return (f: (t: T) => U) => {
-      return (istream: CharStream) => {
-        const o = p(istream);
+      return function* (istream: CharStream) {
+        const o = yield* p(istream);
         switch (o.tag) {
           case "success":
             return new Success<U>(o.inputstream, f(o.result));
@@ -576,12 +583,12 @@ export namespace Primitives {
    * @param p The parser to try
    */
   export function many<T>(p: IParser<T>): IParser<T[]> {
-    return (istream: CharStream) => {
+    return function* (istream: CharStream) {
       let istream2 = istream;
       const outputs: T[] = [];
       let succeeds = true;
       while (!istream2.isEmpty() && succeeds) {
-        const o = p(istream2);
+        const o = yield* p(istream2);
         switch (o.tag) {
           case "success":
             if (istream2 == o.inputstream) {
@@ -620,7 +627,7 @@ export namespace Primitives {
    * @param s A string
    */
   export function str(s: string): IParser<CharStream> {
-    return (istream: CharStream) => {
+    return function* (istream: CharStream) {
       if (istream.peekMatches(s)) {
         return new Success(istream.seek(s.length), new CharStream(s));
       } else {
@@ -633,7 +640,7 @@ export namespace Primitives {
    * Returns a parser that succeeds only if the end of the
    * input has been reached.
    */
-  export const eof: IParser<EOFMark> = (istream: CharStream) => {
+  export const eof: IParser<EOFMark> = function* (istream: CharStream) {
     return istream.isEOF()
       ? new Success(istream, EOF)
       : new Failure(istream, istream.startpos);
@@ -706,7 +713,7 @@ export namespace Primitives {
    */
   export function debug<T>(p: IParser<T>) {
     return (label: string) => {
-      return (istream: CharStream) => {
+      return function* (istream: CharStream) {
         console.log(
           "apply: " +
             label +
@@ -715,7 +722,7 @@ export namespace Primitives {
             ", endpos: " +
             istream.endpos
         );
-        const o = p(istream);
+        const o = yield* p(istream);
         switch (o.tag) {
           case "success":
             console.log(
@@ -729,8 +736,6 @@ export namespace Primitives {
             break;
           case "failure":
             const PAD = 10;
-            const leftpad = Math.max(istream.startpos - PAD, 0);
-            const rightpad = Math.min(istream.startpos + PAD, istream.endpos);
             console.log(
               "failure: " +
                 label +
@@ -914,8 +919,8 @@ export namespace Primitives {
    * ws returns matched whitespace in a single CharStream result.
    * Note: ws NEVER fails
    */
-  export const ws: IParser<CharStream> = (istream: CharStream) => {
-    const o = many(wschars)(istream);
+  export const ws: IParser<CharStream> = function* (istream: CharStream) {
+    const o = yield* many(wschars)(istream);
     switch (o.tag) {
       case "success":
         return new Success(o.inputstream, CharStream.concat(o.result));
@@ -929,8 +934,8 @@ export namespace Primitives {
    * ' ', '\t', '\n', or '\r\n'
    * ws1 returns matched whitespace in a single CharStream result.
    */
-  export const ws1: IParser<CharStream> = (istream: CharStream) => {
-    const o = many1(wschars)(istream);
+  export const ws1: IParser<CharStream> = function* (istream: CharStream) {
+    const o = yield* many1(wschars)(istream);
     switch (o.tag) {
       case "success":
         return new Success(o.inputstream, CharStream.concat(o.result));
@@ -970,7 +975,7 @@ export namespace Primitives {
     });
     sizes.sort().reverse();
 
-    return (istream: CharStream) => {
+    return function* (istream: CharStream) {
       // start with the smallest size class
       for (let peekIndex = 0; peekIndex < sizes.length; peekIndex++) {
         // for each size class, try matching all of
@@ -997,7 +1002,7 @@ export namespace Primitives {
   export function matchWhile(
     pred: (char: string) => boolean
   ): IParser<CharStream> {
-    return (istream: CharStream) => {
+    return function* (istream: CharStream) {
       const rem = istream.seekWhile(pred);
       const diff = rem.startpos - istream.startpos;
       if (diff == 0) {
@@ -1005,7 +1010,7 @@ export namespace Primitives {
         return new Failure(istream, istream.startpos);
       } else {
         const match = istream.peek(diff);
-        return result(match)(rem);
+        return yield* result(match)(rem);
       }
     };
   }
@@ -1018,13 +1023,13 @@ export namespace Primitives {
   export function matchWhileCharCode(
     pred: (char: number) => boolean
   ): IParser<CharStream> {
-    return (istream: CharStream) => {
+    return function* (istream: CharStream) {
       const [match, rem] = istream.seekWhileCharCode(pred);
       if (match.startpos == match.endpos) {
         // no input consumed
         return new Failure(istream, istream.startpos);
       }
-      return result(match)(rem);
+      return yield* result(match)(rem);
     };
   }
 }

@@ -1,2 +1,2 @@
-export {Primitives} from './primitives'
-export {CharUtil} from './charstream'
+export { Primitives } from './primitives';
+export { CharUtil } from './charstream';

@@ -1,4 +1,4 @@
-import { CharUtil } from "./charstream";
+import { CharUtil } from './charstream';
 import CharStream = CharUtil.CharStream;
 
 export namespace Primitives {
@@ -15,7 +15,7 @@ export namespace Primitives {
    * Represents a successful parse.
    */
   export class Success<T> {
-    tag: "success" = "success";
+    tag: 'success' = 'success';
     inputstream: CharStream;
     result: T;
 
@@ -34,7 +34,7 @@ export namespace Primitives {
    * Represents a failed parse.
    */
   export class Failure {
-    tag: "failure" = "failure";
+    tag: 'failure' = 'failure';
     inputstream: CharStream;
     error_pos: number;
     error_msg: string;
@@ -49,12 +49,7 @@ export namespace Primitives {
      * @param error_msg The error message for the failure
      * @param is_critical Whether or not the failure is critical
      */
-    constructor(
-      istream: CharStream,
-      error_pos: number,
-      error_msg: string = "",
-      is_critical = false
-    ) {
+    constructor(istream: CharStream, error_pos: number, error_msg: string = '', is_critical = false) {
       this.inputstream = istream;
       this.error_pos = error_pos;
       this.error_msg = error_msg;
@@ -111,8 +106,8 @@ export namespace Primitives {
    * @returns A pair, `[decl,impl]` where `decl` is a parser declaration and `impl` is an implementation for p
    */
   export function recParser<T>(): [IParser<T>, RefCell<T>] {
-    const dumbParser: IParser<T> = (input: CharStream) => {
-      throw new Error("You forgot to initialize your recursive parser.");
+    const dumbParser: IParser<T> = (_input: CharStream) => {
+      throw new Error('You forgot to initialize your recursive parser.');
     };
     const r = { contents: dumbParser };
     const p: IParser<T> = (input: CharStream) => r.contents(input);
@@ -125,17 +120,12 @@ export namespace Primitives {
    * prevent Javascript from eagerly expanding recursive grammar productions.
    * @returns A pair, `[decl,impl]` where `decl` is a parser declaration and `impl` is an implementation for p
    */
-  export function rec1ArgParser<A, T>(): [
-    (arg: A) => IParser<T>,
-    Arg1RefCell<A, T>
-  ] {
-    const dumbParser: (arg: A) => IParser<T> =
-      (arg: A) => (input: CharStream) => {
-        throw new Error("You forgot to initialize your recursive parser.");
-      };
+  export function rec1ArgParser<A, T>(): [(arg: A) => IParser<T>, Arg1RefCell<A, T>] {
+    const dumbParser: (arg: A) => IParser<T> = (_arg: A) => (_input: CharStream) => {
+      throw new Error('You forgot to initialize your recursive parser.');
+    };
     const r = { contents: dumbParser };
-    const p: (arg: A) => IParser<T> = (arg: A) => (input: CharStream) =>
-      r.contents(arg)(input);
+    const p: (arg: A) => IParser<T> = (arg: A) => (input: CharStream) => r.contents(arg)(input);
     return [p, r];
   }
 
@@ -162,9 +152,9 @@ export namespace Primitives {
       return function* (istream: CharStream) {
         const o = yield* p(istream);
         switch (o.tag) {
-          case "success":
+          case 'success':
             return new Failure(istream, istream.startpos, msg, true);
-          case "failure":
+          case 'failure':
             return new Success(istream, undefined);
         }
       };
@@ -197,12 +187,10 @@ export namespace Primitives {
       return function* (istream: CharStream) {
         const outcome: Outcome<T> = yield* parser(istream);
         switch (outcome.tag) {
-          case "success":
+          case 'success':
             return outcome;
-          case "failure":
-            return outcome.is_critical
-              ? outcome
-              : new Failure(istream, istream.startpos, error_msg, true);
+          case 'failure':
+            return outcome.is_critical ? outcome : new Failure(istream, istream.startpos, error_msg, true);
         }
       };
     };
@@ -234,27 +222,17 @@ export namespace Primitives {
       return function* (istream: CharStream) {
         const r = yield* p(istream);
         switch (r.tag) {
-          case "success":
+          case 'success':
             const o = yield* f(r.result)(r.inputstream);
             switch (o.tag) {
-              case "success":
+              case 'success':
                 break;
-              case "failure": // note: backtracks, returning original istream
-                return new Failure(
-                  istream,
-                  o.error_pos,
-                  o.error_msg,
-                  o.is_critical
-                );
+              case 'failure': // note: backtracks, returning original istream
+                return new Failure(istream, o.error_pos, o.error_msg, o.is_critical);
             }
             return o;
-          case "failure":
-            return new Failure(
-              istream,
-              r.error_pos,
-              r.error_msg,
-              r.is_critical
-            );
+          case 'failure':
+            return new Failure(istream, r.error_pos, r.error_msg, r.is_critical);
         }
       };
     };
@@ -272,8 +250,8 @@ export namespace Primitives {
    */
   export function seq<T, U>(p: IParser<T>) {
     return (q: IParser<U>) => {
-      return bind<T, [T, U]>(p)((t) => {
-        return bind<U, [T, U]>(q)((u) => {
+      return bind<T, [T, U]>(p)(t => {
+        return bind<U, [T, U]>(q)(u => {
           return result([t, u]);
         });
       });
@@ -288,8 +266,7 @@ export namespace Primitives {
   export function sat(p: (ch: string) => boolean): IParser<CharStream> {
     const f = function (x: CharStream) {
       const char = x.toString();
-      if (char.length !== 1)
-        throw new Error("Input to predicate must be a character.");
+      if (char.length !== 1) throw new Error('Input to predicate must be a character.');
       return p(char)
         ? result(x)
         : function* (istream: CharStream) {
@@ -323,49 +300,32 @@ export namespace Primitives {
    */
   export function char(c: string): IParser<CharStream> {
     if (c.length != 1) {
-      throw new Error("char parser takes a string of length 1 (i.e., a char)");
+      throw new Error('char parser takes a string of length 1 (i.e., a char)');
     }
     return satClass([c]);
   }
 
-  export const lower_chars = "abcdefghijklmnopqrstuvwxyz".split("");
+  export const lower_chars = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
-  export const upper_chars = "abcdefghijklmnopqrstuvwxyz"
-    .toUpperCase()
-    .split("");
+  export const upper_chars = 'abcdefghijklmnopqrstuvwxyz'.toUpperCase().split('');
 
   /**
    * letter returns a parser that consumes a single alphabetic
    * character, from a-z, regardless of case.
    */
-  export const letter: IParser<CharStream> = satClass(
-    lower_chars.concat(upper_chars)
-  );
+  export const letter: IParser<CharStream> = satClass(lower_chars.concat(upper_chars));
 
   /**
    * digit returns a parser that consumes a single numeric
    * character, from 0-9.  Note that the type of the result
    * is a string, not a number.
    */
-  export const digit: IParser<CharStream> = satClass([
-    "0",
-    "1",
-    "2",
-    "3",
-    "4",
-    "5",
-    "6",
-    "7",
-    "8",
-    "9",
-  ]);
+  export const digit: IParser<CharStream> = satClass(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']);
 
   /**
    * An integer parser.
    */
-  export const integer: IParser<number> = appfun<CharStream[], number>(
-    many1(digit)
-  )((arr) => {
+  export const integer: IParser<number> = appfun<CharStream[], number>(many1(digit))(arr => {
     const s = CharStream.concat(arr).toString();
     return parseFloat(s);
   });
@@ -374,9 +334,9 @@ export namespace Primitives {
    * A floating point parser, with optional fraction.
    */
   export const float: IParser<number> = choice(
-    pipe2<number, number, number>(integer)(
-      right<CharStream, number>(char("."))(integer)
-    )((a, b) => parseFloat(a.toString() + "." + b.toString()))
+    pipe2<number, number, number>(integer)(right<CharStream, number>(char('.'))(integer))((a, b) =>
+      parseFloat(a.toString() + '.' + b.toString())
+    )
   )(integer);
 
   /**
@@ -407,17 +367,17 @@ export namespace Primitives {
       return function* (istream: CharStream) {
         const o = yield* p1(istream);
         switch (o.tag) {
-          case "success":
+          case 'success':
             return o;
-          case "failure":
+          case 'failure':
             if (o.is_critical) {
               return o;
             }
             const o2 = yield* p2(istream);
             switch (o2.tag) {
-              case "success":
+              case 'success':
                 break;
-              case "failure":
+              case 'failure':
                 return o2.is_critical || o2.error_pos >= o.error_pos ? o2 : o;
             }
             return o2;
@@ -436,13 +396,13 @@ export namespace Primitives {
    */
   export function choices<T>(...parsers: IParser<T>[]): IParser<T> {
     if (parsers.length == 0) {
-      throw new Error("Error: choices must have a non-empty array.");
+      throw new Error('Error: choices must have a non-empty array.');
     }
     return function* (istream: CharStream) {
       let i = 0;
       while (true && i < parsers.length) {
         const o = yield* parsers[i](istream);
-        if (o.tag === "success") {
+        if (o.tag === 'success') {
           return o;
         } else if (o.is_critical) {
           return o;
@@ -469,18 +429,15 @@ export namespace Primitives {
         return function* (istream: CharStream) {
           const output1 = yield* pre(istream);
           switch (output1.tag) {
-            case "success":
+            case 'success':
               const output2 = yield* p(output1.inputstream);
               switch (output2.tag) {
-                case "success":
-                  return new Success(
-                    output2.inputstream,
-                    f(output1.result, output2.result)
-                  );
-                case "failure":
+                case 'success':
+                  return new Success(output2.inputstream, f(output1.result, output2.result));
+                case 'failure':
                   return output1;
               }
-            case "failure":
+            case 'failure':
               return output1;
           }
         };
@@ -500,9 +457,9 @@ export namespace Primitives {
       return function* (istream: CharStream) {
         const o = yield* p(istream);
         switch (o.tag) {
-          case "success":
+          case 'success':
             return new Success<U>(o.inputstream, f(o.result));
-          case "failure":
+          case 'failure':
             return o;
         }
       };
@@ -529,8 +486,8 @@ export namespace Primitives {
   export function pipe2<T, U, V>(p: IParser<T>) {
     return (q: IParser<U>) => {
       return (f: (t: T, u: U) => V) => {
-        return bind<T, V>(p)((t) => {
-          return bind<U, V>(q)((u) => {
+        return bind<T, V>(p)(t => {
+          return bind<U, V>(q)(u => {
             return result<V>(f(t, u));
           });
         });
@@ -590,14 +547,14 @@ export namespace Primitives {
       while (!istream2.isEmpty() && succeeds) {
         const o = yield* p(istream2);
         switch (o.tag) {
-          case "success":
+          case 'success':
             if (istream2 == o.inputstream) {
-              throw new Error("Parser loops infinitely.");
+              throw new Error('Parser loops infinitely.');
             }
             istream2 = o.inputstream;
             outputs.push(o.result);
             break;
-          case "failure":
+          case 'failure':
             succeeds = false;
             break;
         }
@@ -641,9 +598,7 @@ export namespace Primitives {
    * input has been reached.
    */
   export const eof: IParser<EOFMark> = function* (istream: CharStream) {
-    return istream.isEOF()
-      ? new Success(istream, EOF)
-      : new Failure(istream, istream.startpos);
+    return istream.isEOF() ? new Success(istream, EOF) : new Failure(istream, istream.startpos);
   };
 
   /**
@@ -654,7 +609,7 @@ export namespace Primitives {
   export function fresult<T, U>(p: IParser<T>) {
     return (x: U) => {
       return (istream: CharStream) => {
-        return bind<T, U>(p)((t: T) => result(x))(istream);
+        return bind<T, U>(p)((_t: T) => result(x))(istream);
       };
     };
   }
@@ -682,7 +637,7 @@ export namespace Primitives {
   export function right<T, U>(p: IParser<T>) {
     return (q: IParser<U>) => {
       return (istream: CharStream) => {
-        return bind<T, U>(p)((_) => q)(istream);
+        return bind<T, U>(p)(_ => q)(istream);
       };
     };
   }
@@ -693,9 +648,7 @@ export namespace Primitives {
    * successful, returns the result of p.
    * @param popen the first parser
    */
-  export function between<T, U, V>(
-    popen: IParser<T>
-  ): (pclose: IParser<U>) => (p: IParser<V>) => IParser<V> {
+  export function between<T, U, V>(popen: IParser<T>): (pclose: IParser<U>) => (p: IParser<V>) => IParser<V> {
     return (pclose: IParser<U>) => {
       return (p: IParser<V>) => {
         const l: IParser<V> = left<V, U>(p)(pclose);
@@ -714,42 +667,23 @@ export namespace Primitives {
   export function debug<T>(p: IParser<T>) {
     return (label: string) => {
       return function* (istream: CharStream) {
-        console.log(
-          "apply: " +
-            label +
-            ", startpos: " +
-            istream.startpos +
-            ", endpos: " +
-            istream.endpos
-        );
+        console.log('apply: ' + label + ', startpos: ' + istream.startpos + ', endpos: ' + istream.endpos);
         const o = yield* p(istream);
         switch (o.tag) {
-          case "success":
-            console.log(
-              "success: " +
-                label +
-                ", startpos: " +
-                istream.startpos +
-                ", endpos: " +
-                istream.endpos
-            );
+          case 'success':
+            console.log('success: ' + label + ', startpos: ' + istream.startpos + ', endpos: ' + istream.endpos);
             break;
-          case "failure":
+          case 'failure':
             const PAD = 10;
             console.log(
-              "failure: " +
+              'failure: ' +
                 label +
-                ", startpos: " +
+                ', startpos: ' +
                 istream.startpos +
-                ", endpos: " +
+                ', endpos: ' +
                 istream.endpos +
-                "\n" +
-                diagnosticMessage(
-                  PAD,
-                  o.error_pos,
-                  o.inputstream.toString(),
-                  o.error_msg
-                )
+                '\n' +
+                diagnosticMessage(PAD, o.error_pos, o.inputstream.toString(), o.error_msg)
             );
             break;
         }
@@ -775,14 +709,8 @@ export namespace Primitives {
    * @param bufferLen The total length of the input stream.
    * @returns An index.
    */
-  function windowRightIndex(
-    windowSz: number,
-    failurePos: number,
-    bufferLen: number
-  ): number {
-    return failurePos + windowSz >= bufferLen
-      ? bufferLen - 1
-      : failurePos + windowSz;
+  function windowRightIndex(windowSz: number, failurePos: number, bufferLen: number): number {
+    return failurePos + windowSz >= bufferLen ? bufferLen - 1 : failurePos + windowSz;
   }
 
   /**
@@ -792,15 +720,11 @@ export namespace Primitives {
    * @param buffer The input.
    * @returns An index.
    */
-  function indexOfLastNewlineLeftWindow(
-    leftIndex: number,
-    failurePos: number,
-    buffer: string
-  ): number {
+  function indexOfLastNewlineLeftWindow(leftIndex: number, failurePos: number, buffer: string): number {
     function searchBackward(pos: number): number {
       if (pos <= leftIndex) {
         return -1;
-      } else if (buffer[pos] === "\n") {
+      } else if (buffer[pos] === '\n') {
         return pos;
       } else {
         return searchBackward(pos - 1);
@@ -809,32 +733,6 @@ export namespace Primitives {
 
     const idx = searchBackward(failurePos - 1);
     return idx === -1 ? leftIndex : idx;
-  }
-
-  /**
-   * Finds the index of the newline closest to the failure position in the right side of the input window.
-   * @param rightIndex The right bound of the input window.
-   * @param failurePos The position of the error in the input stream.
-   * @param buffer The input.
-   * @returns An index.
-   */
-  function indexOfFirstNewlineRightWindow(
-    rightIndex: number,
-    failurePos: number,
-    buffer: string
-  ): number {
-    function searchForward(pos: number): number {
-      if (pos >= rightIndex) {
-        return -1;
-      } else if (buffer[pos] === "\n") {
-        return pos;
-      } else {
-        return searchForward(pos + 1);
-      }
-    }
-
-    const idx = searchForward(failurePos - 1);
-    return idx === -1 ? rightIndex : idx;
   }
 
   /**
@@ -855,47 +753,30 @@ export namespace Primitives {
    * @param buffer The input stream.
    * @param err The error message.
    */
-  export function diagnosticMessage(
-    windowSz: number,
-    failurePos: number,
-    buffer: string,
-    err: string
-  ): string {
+  export function diagnosticMessage(windowSz: number, failurePos: number, buffer: string, err: string): string {
     // compute window
     const leftIdx = windowLeftIndex(windowSz, failurePos);
     const rightIdx = windowRightIndex(windowSz, failurePos, buffer.length);
-    const lastNLLeft = indexOfLastNewlineLeftWindow(
-      leftIdx,
-      failurePos,
-      buffer
-    );
-    const firstNLRight = indexOfFirstNewlineRightWindow(
-      rightIdx,
-      failurePos,
-      buffer
-    );
+    const lastNLLeft = indexOfLastNewlineLeftWindow(leftIdx, failurePos, buffer);
 
     // find caret position in last line
     const caretPos = failurePos - lastNLLeft;
 
     // create window string
-    const window = buffer.substr(
-      leftIdx,
-      failurePos - leftIdx + 1 + rightIdx - failurePos
-    );
+    const window = buffer.substr(leftIdx, failurePos - leftIdx + 1 + rightIdx - failurePos);
 
     // augment with diagnostic information
     const diag =
-      leftPad("", "=", rightIdx - leftIdx) +
-      "\n" +
+      leftPad('', '=', rightIdx - leftIdx) +
+      '\n' +
       err +
-      "\n" +
+      '\n' +
       window +
-      "\n" +
-      leftPad("^", " ", caretPos - 1) +
-      "\n" +
-      leftPad("", "=", rightIdx - leftIdx) +
-      "\n";
+      '\n' +
+      leftPad('^', ' ', caretPos - 1) +
+      '\n' +
+      leftPad('', '=', rightIdx - leftIdx) +
+      '\n';
 
     return diag;
   }
@@ -903,15 +784,13 @@ export namespace Primitives {
   /**
    * nl matches and returns a newline.
    */
-  export const nl: IParser<CharStream> = Primitives.choice(
-    Primitives.str("\n")
-  )(Primitives.str("\r\n"));
+  export const nl: IParser<CharStream> = Primitives.choice(Primitives.str('\n'))(Primitives.str('\r\n'));
 
   /**
    * wschars matches any whitespace char, namely
    * ' ', '\t', '\n', or '\r\n'.
    */
-  const wschars: IParser<CharStream> = choice(satClass([" ", "\t"]))(nl);
+  const wschars: IParser<CharStream> = choice(satClass([' ', '\t']))(nl);
 
   /**
    * ws matches zero or more of the following whitespace characters:
@@ -922,9 +801,9 @@ export namespace Primitives {
   export const ws: IParser<CharStream> = function* (istream: CharStream) {
     const o = yield* many(wschars)(istream);
     switch (o.tag) {
-      case "success":
+      case 'success':
         return new Success(o.inputstream, CharStream.concat(o.result));
-      case "failure":
+      case 'failure':
         return o;
     }
   };
@@ -937,16 +816,16 @@ export namespace Primitives {
   export const ws1: IParser<CharStream> = function* (istream: CharStream) {
     const o = yield* many1(wschars)(istream);
     switch (o.tag) {
-      case "success":
+      case 'success':
         return new Success(o.inputstream, CharStream.concat(o.result));
-      case "failure":
+      case 'failure':
         return o;
     }
   };
 
   function groupBy<T, U>(list: T[], keyGetter: (e: T) => U): Map<U, T[]> {
     const m: Map<U, T[]> = new Map<U, T[]>();
-    list.forEach((elem) => {
+    list.forEach(elem => {
       const key = keyGetter(elem);
       if (!m.has(key)) {
         m.set(key, []);
@@ -965,11 +844,11 @@ export namespace Primitives {
   export function strSat(strs: string[]): IParser<CharStream> {
     // sort strings first by length, and then lexicograpically;
     // slice() called here so as not to modify original array
-    const smap = groupBy(strs, (s) => s.length);
+    const smap = groupBy(strs, s => s.length);
     const sizes: number[] = [];
     // find size classes;
     // also sort each set of equivalent-length values
-    smap.forEach((vals: string[], key: number, m: Map<number, string[]>) => {
+    smap.forEach((vals: string[], key: number, _m: Map<number, string[]>) => {
       sizes.push(key);
       vals.sort();
     });
@@ -999,9 +878,7 @@ export namespace Primitives {
    * return true.  On success, it returns the matching CharStream.
    * @param pred A function that returns true if the given character should be accepted.
    */
-  export function matchWhile(
-    pred: (char: string) => boolean
-  ): IParser<CharStream> {
+  export function matchWhile(pred: (char: string) => boolean): IParser<CharStream> {
     return function* (istream: CharStream) {
       const rem = istream.seekWhile(pred);
       const diff = rem.startpos - istream.startpos;
@@ -1020,9 +897,7 @@ export namespace Primitives {
    * return true.  On success, it returns the matching CharStream.
    * @param pred A function that returns true if the given character code should be accepted.
    */
-  export function matchWhileCharCode(
-    pred: (char: number) => boolean
-  ): IParser<CharStream> {
+  export function matchWhileCharCode(pred: (char: number) => boolean): IParser<CharStream> {
     return function* (istream: CharStream) {
       const [match, rem] = istream.seekWhileCharCode(pred);
       if (match.startpos == match.endpos) {

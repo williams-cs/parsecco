@@ -45,9 +45,9 @@ export namespace Primitives {
      * If the failure is critical, then parsing will stop immediately.
      *
      * @param istream The string, unmodified, that was given to the parser.
-     * @param error_pos The position of the parsing failure in istream
-     * @param error_msg The error message for the failure
-     * @param is_critical Whether or not the failure is critical
+     * @param error_pos The position of the parsing failure in istream.
+     * @param error_msg The error message for the failure.
+     * @param is_critical Whether or not the failure should cause an enclosing choice to fail (i.e., short-circuit).
      */
     constructor(istream: CharStream, error_pos: number, error_msg: string = '', is_critical = false) {
       this.inputstream = istream;
@@ -153,7 +153,7 @@ export namespace Primitives {
         const o = yield* p(istream);
         switch (o.tag) {
           case 'success':
-            return new Failure(istream, istream.startpos, msg, true);
+            return new Failure(istream, istream.startpos, msg, false);
           case 'failure':
             return new Success(istream, undefined);
         }

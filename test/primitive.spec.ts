@@ -1216,3 +1216,15 @@ describe('matchWhileCharCode', () => {
     }
   });
 });
+
+describe('diagnosticMessage', () => {
+  it('should correctly place an error position caret in the presence of newlines', function () {
+    const input = new CU.CharStream('(this\nthis\nthis is ablah\nblah\nblah test)');
+    // const g = P.between(P.char('('))(P.char(')'))(P.many1(P.debug(P.choice(P.letter)(P.nl))('letter')));
+    // in BNF, g ::= '(' (ltr|nl)+ ')'
+    const expected = '=============\n\nthis is ablah\n    ^\n=============\n';
+    const fail = new P.Failure(input, 15, '', false);
+    const output = P.diagnosticMessage(fail, P.PAD);
+    expect(output).to.eql(expected);
+  });
+});
